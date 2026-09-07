@@ -28,9 +28,15 @@ hand-counted NOP delays → the Xtensa cycle counter (`xthal_get_ccount`) scaled
 ![Four-controller passthrough wiring](docs/n64-esp32-wiring.png)
 
 [Download the wiring graphic (SVG)](docs/n64-esp32-wiring.svg). The diagram uses
-logical terminal positions, not physical board pad positions. Power the ESP by
+the board’s component-side view with USB at the top, matching the supplied
+Super Mini pinout. The right-edge pins run **5V, GND, 3V3, GPIO 13, 12, 11, 10,
+9, 8** from top to bottom; 3V3 is labelled `3V3OUT` in the reference image.
+Board spacing is simplified, and controller terminals are schematic. Power the ESP by
 tapping one console controller port’s 3.3V rail into the ESP **3V3** pin (port 1
-is shown). Console power still passes through to each controller. Connect a
+is shown). Tap **GND from that same port** to ESP GND. One ground tap is enough:
+all four port grounds are already common inside the same N64 console. Preserve
+each controller’s power and ground passthrough; no extra ground bridges between
+ports are needed. Connect a
 **470 µF electrolytic capacitor** across ESP 3V3 and GND, close to the board with
 short leads: **positive (+) to 3V3**, **negative (striped side) to GND**. Use a
 voltage rating of at least 6.3V. The 470 µF value is the reported value from the
@@ -44,7 +50,7 @@ The generic `esp32dev` environments leave the LED disabled unless that flag is s
 
 | N64 connector | ESP32 |
 |---------------|-------|
-| GND           | GND   |
+| GND (same port as power tap) | GND |
 | DATA (middle) | GPIO 13/12/11/10 (`N64_PIN_1..N64_PIN_4` in [src/main.cpp](src/main.cpp)) |
 | 3.3V (tap one console port) | 3V3, with 470 µF capacitor to GND |
 
