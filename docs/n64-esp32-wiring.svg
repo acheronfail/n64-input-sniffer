@@ -1,0 +1,153 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1220" viewBox="0 0 1600 1220"><title>Four N64 controllers to ESP32-S3 Super Mini — passive sniffer wiring</title><desc>Each console port passes 3.3V, data and ground to its controller. Data taps connect ports 1, 2, 3, 4 to GPIO 13, 12, 11, 10 respectively. All grounds connect to ESP ground. Console port 1 3.3V powers the ESP through its 3V3 pin. A 470 µF polarized capacitor connects positive to 3V3 and negative to common ground, close to the ESP. USB is disconnected and the 5V pin is left open. Schematic terminal positions are not the physical board layout.</desc><rect width="1600" height="1220" fill="#f5f7fb"/><style>text{font-family:DejaVu Sans,sans-serif} .small{font-size:18px}.label{font-size:22px;font-weight:600}.muted{fill:#526078}</style>
+<text x="60" y="65" font-size="38" fill="#15243b" font-weight="bold" text-anchor="start">N64 → ESP32-S3 Super Mini</text>
+<text x="60" y="104" font-size="23" fill="#526078" font-weight="normal" text-anchor="start">4-controller wiring • console-powered ESP • 470 µF supply capacitor</text>
+<text x="60" y="155" font-size="18" fill="#526078" font-weight="bold" text-anchor="start">CONSOLE PORTS</text>
+<text x="555" y="155" font-size="18" fill="#526078" font-weight="bold" text-anchor="start">CONTROLLERS</text>
+<text x="1105" y="155" font-size="23" fill="#15243b" font-weight="bold" text-anchor="start">ESP32-S3 SUPER MINI</text>
+<polyline points="875,340 875,895" fill="none" stroke="#526078" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="875,885 1100,885" fill="none" stroke="#526078" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="875" cy="885" r="6" fill="#526078"/>
+<rect x="50" y="190" width="700" height="165" rx="12" fill="#ffffff" stroke="#dce2eb"/>
+<text x="75" y="222" font-size="22" fill="#15243b" font-weight="bold" text-anchor="start">PORT 1</text>
+<text x="570" y="222" font-size="22" fill="#15243b" font-weight="bold" text-anchor="start">PAD 1</text>
+<text x="75" y="256" font-size="18" fill="#cf394f" font-weight="bold" text-anchor="start">3.3V</text>
+<text x="590" y="256" font-size="18" fill="#cf394f" font-weight="bold" text-anchor="start">3.3V</text>
+<polyline points="170,250 565,250" fill="none" stroke="#cf394f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="170" cy="250" r="4" fill="#cf394f"/>
+<circle cx="565" cy="250" r="4" fill="#cf394f"/>
+<text x="75" y="286" font-size="18" fill="#1376bd" font-weight="bold" text-anchor="start">DATA</text>
+<text x="590" y="286" font-size="18" fill="#1376bd" font-weight="bold" text-anchor="start">DATA</text>
+<polyline points="170,280 565,280" fill="none" stroke="#1376bd" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="170" cy="280" r="4" fill="#1376bd"/>
+<circle cx="565" cy="280" r="4" fill="#1376bd"/>
+<text x="75" y="316" font-size="18" fill="#526078" font-weight="bold" text-anchor="start">GND</text>
+<text x="590" y="316" font-size="18" fill="#526078" font-weight="bold" text-anchor="start">GND</text>
+<polyline points="170,310 565,310" fill="none" stroke="#526078" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="170" cy="310" r="4" fill="#526078"/>
+<circle cx="565" cy="310" r="4" fill="#526078"/>
+<polyline points="375,310 375,340 875,340" fill="none" stroke="#526078" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="375" cy="310" r="6" fill="#526078"/>
+<circle cx="875" cy="340" r="6" fill="#526078"/>
+<polyline points="455,280 455,365 1100,365" fill="none" stroke="#f5f7fb" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="455,280 455,365 1100,365" fill="none" stroke="#1376bd" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="455" cy="280" r="6" fill="#1376bd"/>
+<text x="910" y="353" font-size="18" fill="#1376bd" font-weight="bold" text-anchor="start">P1 DATA → GPIO 13</text>
+<rect x="50" y="375" width="700" height="165" rx="12" fill="#ffffff" stroke="#dce2eb"/>
+<text x="75" y="407" font-size="22" fill="#15243b" font-weight="bold" text-anchor="start">PORT 2</text>
+<text x="570" y="407" font-size="22" fill="#15243b" font-weight="bold" text-anchor="start">PAD 2</text>
+<text x="75" y="441" font-size="18" fill="#cf394f" font-weight="bold" text-anchor="start">3.3V</text>
+<text x="590" y="441" font-size="18" fill="#cf394f" font-weight="bold" text-anchor="start">3.3V</text>
+<polyline points="170,435 565,435" fill="none" stroke="#cf394f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="170" cy="435" r="4" fill="#cf394f"/>
+<circle cx="565" cy="435" r="4" fill="#cf394f"/>
+<text x="75" y="471" font-size="18" fill="#7b4bcc" font-weight="bold" text-anchor="start">DATA</text>
+<text x="590" y="471" font-size="18" fill="#7b4bcc" font-weight="bold" text-anchor="start">DATA</text>
+<polyline points="170,465 565,465" fill="none" stroke="#7b4bcc" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="170" cy="465" r="4" fill="#7b4bcc"/>
+<circle cx="565" cy="465" r="4" fill="#7b4bcc"/>
+<text x="75" y="501" font-size="18" fill="#526078" font-weight="bold" text-anchor="start">GND</text>
+<text x="590" y="501" font-size="18" fill="#526078" font-weight="bold" text-anchor="start">GND</text>
+<polyline points="170,495 565,495" fill="none" stroke="#526078" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="170" cy="495" r="4" fill="#526078"/>
+<circle cx="565" cy="495" r="4" fill="#526078"/>
+<polyline points="375,495 375,525 875,525" fill="none" stroke="#526078" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="375" cy="495" r="6" fill="#526078"/>
+<circle cx="875" cy="525" r="6" fill="#526078"/>
+<polyline points="455,465 455,550 1100,550" fill="none" stroke="#f5f7fb" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="455,465 455,550 1100,550" fill="none" stroke="#7b4bcc" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="455" cy="465" r="6" fill="#7b4bcc"/>
+<text x="910" y="538" font-size="18" fill="#7b4bcc" font-weight="bold" text-anchor="start">P2 DATA → GPIO 12</text>
+<rect x="50" y="560" width="700" height="165" rx="12" fill="#ffffff" stroke="#dce2eb"/>
+<text x="75" y="592" font-size="22" fill="#15243b" font-weight="bold" text-anchor="start">PORT 3</text>
+<text x="570" y="592" font-size="22" fill="#15243b" font-weight="bold" text-anchor="start">PAD 3</text>
+<text x="75" y="626" font-size="18" fill="#cf394f" font-weight="bold" text-anchor="start">3.3V</text>
+<text x="590" y="626" font-size="18" fill="#cf394f" font-weight="bold" text-anchor="start">3.3V</text>
+<polyline points="170,620 565,620" fill="none" stroke="#cf394f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="170" cy="620" r="4" fill="#cf394f"/>
+<circle cx="565" cy="620" r="4" fill="#cf394f"/>
+<text x="75" y="656" font-size="18" fill="#008878" font-weight="bold" text-anchor="start">DATA</text>
+<text x="590" y="656" font-size="18" fill="#008878" font-weight="bold" text-anchor="start">DATA</text>
+<polyline points="170,650 565,650" fill="none" stroke="#008878" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="170" cy="650" r="4" fill="#008878"/>
+<circle cx="565" cy="650" r="4" fill="#008878"/>
+<text x="75" y="686" font-size="18" fill="#526078" font-weight="bold" text-anchor="start">GND</text>
+<text x="590" y="686" font-size="18" fill="#526078" font-weight="bold" text-anchor="start">GND</text>
+<polyline points="170,680 565,680" fill="none" stroke="#526078" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="170" cy="680" r="4" fill="#526078"/>
+<circle cx="565" cy="680" r="4" fill="#526078"/>
+<polyline points="375,680 375,710 875,710" fill="none" stroke="#526078" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="375" cy="680" r="6" fill="#526078"/>
+<circle cx="875" cy="710" r="6" fill="#526078"/>
+<polyline points="455,650 455,735 1100,735" fill="none" stroke="#f5f7fb" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="455,650 455,735 1100,735" fill="none" stroke="#008878" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="455" cy="650" r="6" fill="#008878"/>
+<text x="910" y="723" font-size="18" fill="#008878" font-weight="bold" text-anchor="start">P3 DATA → GPIO 11</text>
+<rect x="50" y="745" width="700" height="165" rx="12" fill="#ffffff" stroke="#dce2eb"/>
+<text x="75" y="777" font-size="22" fill="#15243b" font-weight="bold" text-anchor="start">PORT 4</text>
+<text x="570" y="777" font-size="22" fill="#15243b" font-weight="bold" text-anchor="start">PAD 4</text>
+<text x="75" y="811" font-size="18" fill="#cf394f" font-weight="bold" text-anchor="start">3.3V</text>
+<text x="590" y="811" font-size="18" fill="#cf394f" font-weight="bold" text-anchor="start">3.3V</text>
+<polyline points="170,805 565,805" fill="none" stroke="#cf394f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="170" cy="805" r="4" fill="#cf394f"/>
+<circle cx="565" cy="805" r="4" fill="#cf394f"/>
+<text x="75" y="841" font-size="18" fill="#b57000" font-weight="bold" text-anchor="start">DATA</text>
+<text x="590" y="841" font-size="18" fill="#b57000" font-weight="bold" text-anchor="start">DATA</text>
+<polyline points="170,835 565,835" fill="none" stroke="#b57000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="170" cy="835" r="4" fill="#b57000"/>
+<circle cx="565" cy="835" r="4" fill="#b57000"/>
+<text x="75" y="871" font-size="18" fill="#526078" font-weight="bold" text-anchor="start">GND</text>
+<text x="590" y="871" font-size="18" fill="#526078" font-weight="bold" text-anchor="start">GND</text>
+<polyline points="170,865 565,865" fill="none" stroke="#526078" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="170" cy="865" r="4" fill="#526078"/>
+<circle cx="565" cy="865" r="4" fill="#526078"/>
+<polyline points="375,865 375,895 875,895" fill="none" stroke="#526078" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="375" cy="865" r="6" fill="#526078"/>
+<circle cx="875" cy="895" r="6" fill="#526078"/>
+<polyline points="455,835 455,920 1100,920" fill="none" stroke="#f5f7fb" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="455,835 455,920 1100,920" fill="none" stroke="#b57000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="455" cy="835" r="6" fill="#b57000"/>
+<text x="910" y="908" font-size="18" fill="#b57000" font-weight="bold" text-anchor="start">P4 DATA → GPIO 10</text>
+<rect x="1100" y="215" width="440" height="715" rx="20" fill="#e5edf5" stroke="#9babbd"/>
+<rect x="1245" y="184" width="150" height="65" rx="10" fill="#b9c6d5" stroke="#7e8da1"/>
+<rect x="1264" y="192" width="112" height="30" rx="8" fill="#34435a" stroke="none"/>
+<text x="1320" y="280" font-size="22" fill="#15243b" font-weight="bold" text-anchor="middle">USB-C</text>
+<text x="1320" y="307" font-size="17" fill="#15243b" font-weight="normal" text-anchor="middle">Leave unplugged in this setup</text>
+<circle cx="1100" cy="365" r="9" fill="#1376bd"/>
+<text x="1125" y="372" font-size="24" fill="#1376bd" font-weight="bold" text-anchor="start">GPIO 13</text>
+<rect x="1300" y="385" width="195" height="175" rx="9" fill="#25374e" stroke="none"/>
+<text x="1397" y="458" font-size="24" fill="white" font-weight="bold" text-anchor="middle">ESP32-S3</text>
+<text x="1397" y="493" font-size="19" fill="white" font-weight="normal" text-anchor="middle">Super Mini</text>
+<circle cx="1100" cy="550" r="9" fill="#7b4bcc"/>
+<text x="1125" y="557" font-size="24" fill="#7b4bcc" font-weight="bold" text-anchor="start">GPIO 12</text>
+<circle cx="1100" cy="735" r="9" fill="#008878"/>
+<text x="1125" y="742" font-size="24" fill="#008878" font-weight="bold" text-anchor="start">GPIO 11</text>
+<circle cx="1100" cy="920" r="9" fill="#b57000"/>
+<text x="1125" y="927" font-size="24" fill="#b57000" font-weight="bold" text-anchor="start">GPIO 10</text>
+<polyline points="300,250 300,175 1040,175 1040,335 1240,335 1240,630" fill="none" stroke="#cf394f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="300" cy="250" r="6" fill="#cf394f"/>
+<circle cx="1100" cy="335" r="9" fill="#cf394f"/>
+<text x="1125" y="326" font-size="23" fill="#cf394f" font-weight="bold" text-anchor="start">3V3</text>
+<text x="775" y="205" font-size="19" fill="#cf394f" font-weight="bold" text-anchor="start">Console 3.3V supply</text>
+<polyline points="1215,630 1265,630" fill="none" stroke="#cf394f" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="1215,650 1265,650" fill="none" stroke="#526078" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="1240,650 1240,885 1100,885" fill="none" stroke="#526078" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="1204" y="616" font-size="25" fill="#cf394f" font-weight="bold" text-anchor="start">+</text>
+<text x="1204" y="678" font-size="25" fill="#526078" font-weight="bold" text-anchor="start">−</text>
+<text x="1285" y="624" font-size="27" fill="#15243b" font-weight="bold" text-anchor="start">470 µF</text>
+<text x="1285" y="653" font-size="18" fill="#15243b" font-weight="normal" text-anchor="start">≥ 6.3V electrolytic</text>
+<text x="1285" y="681" font-size="18" fill="#15243b" font-weight="normal" text-anchor="start">Place close to ESP</text>
+<text x="1310" y="827" font-size="18" fill="#15243b" font-weight="normal" text-anchor="start">5V pin: leave open</text>
+<text x="1310" y="733" font-size="17" fill="#526078" font-weight="normal" text-anchor="start">Selected pins only.</text>
+<text x="1310" y="760" font-size="17" fill="#526078" font-weight="normal" text-anchor="start">Schematic positions,</text>
+<text x="1310" y="787" font-size="17" fill="#526078" font-weight="normal" text-anchor="start">not board pad layout.</text>
+<circle cx="1100" cy="885" r="9" fill="#526078"/>
+<text x="1125" y="875" font-size="24" fill="#15243b" font-weight="bold" text-anchor="start">GND</text>
+<text x="885" y="870" font-size="18" fill="#526078" font-weight="normal" text-anchor="start">Common ground</text>
+<rect x="50" y="955" width="1490" height="200" rx="12" fill="white" stroke="#dce2eb"/>
+<text x="75" y="991" font-size="19" fill="#15243b" font-weight="bold" text-anchor="start">POWER &amp; CONNECTION NOTES</text>
+<text x="75" y="1028" font-size="21" fill="#15243b" font-weight="normal" text-anchor="start">Tap one console port’s 3.3V rail → ESP 3V3 (port 1 shown). All controller passthroughs stay connected.</text>
+<text x="75" y="1063" font-size="21" fill="#15243b" font-weight="normal" text-anchor="start">Join all grounds to ESP GND. Capacitor: + to 3V3, − (striped side) to GND; keep leads short.</text>
+<text x="75" y="1098" font-size="21" fill="#15243b" font-weight="normal" text-anchor="start">Keep the four DATA lines separate. DATA is the middle contact; verify power/GND orientation.</text>
+<text x="75" y="1133" font-size="21" fill="#15243b" font-weight="normal" text-anchor="start">470 µF is the reported test value. Use a ≥ 6.3V capacitor. Console must be powered on and polling.</text>
+<text x="60" y="1190" font-size="18" fill="#526078" font-weight="normal" text-anchor="start">● = electrical junction. Crossings without a dot do not connect. Wire colors indicate function, not cable insulation.</text>
+</svg>

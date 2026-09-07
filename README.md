@@ -25,6 +25,18 @@ hand-counted NOP delays → the Xtensa cycle counter (`xthal_get_ccount`) scaled
 
 ## Wiring
 
+![Four-controller passthrough wiring](docs/n64-esp32-wiring.png)
+
+[Download the wiring graphic (SVG)](docs/n64-esp32-wiring.svg). The diagram uses
+logical terminal positions, not physical board pad positions. Power the ESP by
+tapping one console controller port’s 3.3V rail into the ESP **3V3** pin (port 1
+is shown). Console power still passes through to each controller. Connect a
+**470 µF electrolytic capacitor** across ESP 3V3 and GND, close to the board with
+short leads: **positive (+) to 3V3**, **negative (striped side) to GND**. Use a
+voltage rating of at least 6.3V. The 470 µF value is the reported value from the
+earlier power tests. Leave USB unplugged and the ESP 5V pin unconnected in this
+console-powered arrangement.
+
 The Super Mini's onboard RGB LED defaults to solid red while powered. This can be
 disabled with the controller command below; the preference survives reboots. Its GPIO is
 configured with `POWER_LED_PIN=48` in `platformio.ini` for all S3 environments.
@@ -34,7 +46,7 @@ The generic `esp32dev` environments leave the LED disabled unless that flag is s
 |---------------|-------|
 | GND           | GND   |
 | DATA (middle) | GPIO 13/12/11/10 (`N64_PIN_1..N64_PIN_4` in [src/main.cpp](src/main.cpp)) |
-| 3.3V          | — (not needed for sniffing) |
+| 3.3V (tap one console port) | 3V3, with 470 µF capacitor to GND |
 
 The N64 data line is 3.3V logic with a pull-up on the console side, so it connects directly to an
 ESP32 input — no level shifting needed. **Share a common ground** with the console/controller.
