@@ -25,6 +25,11 @@ hand-counted NOP delays → the Xtensa cycle counter (`xthal_get_ccount`) scaled
 
 ## Wiring
 
+The Super Mini's onboard RGB LED turns solid red as soon as the firmware starts,
+before controller capture or WiFi setup, and stays red while powered. Its GPIO is
+configured with `POWER_LED_PIN=48` in `platformio.ini` for all S3 environments.
+The generic `esp32dev` environments leave the LED disabled unless that flag is set.
+
 | N64 connector | ESP32 |
 |---------------|-------|
 | GND           | GND   |

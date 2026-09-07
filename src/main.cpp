@@ -813,9 +813,46 @@ static void startNetwork() {
   startOTA();
 }
 
-/** One-time init: serial, the input pin, and a startup banner. */
+/** Latch red once at boot, then release the LED's RMT TX resources. */
+static void turnOnPowerLed() {
+#ifdef POWER_LED_PIN
+  // Use the same legacy RMT driver as capture, avoiding Arduino's separate
+  // RMT allocator. Channel 0 is TX-capable on the S3; capture uses RX 4-7.
+  rmt_config_t cfg = RMT_DEFAULT_CONFIG_TX((gpio_num_t)POWER_LED_PIN,
+                                           RMT_CHANNEL_0);
+  cfg.clk_div = 8; // 80 MHz / 8 = 100 ns per tick.
+  esp_err_t err = rmt_config(&cfg);
+  if (err == ESP_OK) {
+    err = rmt_driver_install(cfg.channel, 0, 0);
+  }
+  if (err != ESP_OK) {
+    Serial.printf("Power LED init failed: %d\n", (int)err);
+    return;
+  }
+
+  // WS2812 sends green, red, blue, MSB first. Use maximum red brightness.
+  const uint32_t color = 0x00FF00;
+  rmt_item32_t bits[24] = {};
+  for (size_t i = 0; i < 24; ++i) {
+    bool one = (color & (1UL << (23 - i))) != 0;
+    bits[i].level0 = 1;
+    bits[i].duration0 = one ? 8 : 4;
+    bits[i].level1 = 0;
+    bits[i].duration1 = one ? 4 : 8;
+  }
+  err = rmt_write_items(cfg.channel, bits, 24, true);
+  delayMicroseconds(300); // Idle low latches the color, which persists.
+  rmt_driver_uninstall(cfg.channel);
+  if (err != ESP_OK) {
+    Serial.printf("Power LED write failed: %d\n", (int)err);
+  }
+#endif
+}
+
+/** One-time init: power LED, serial, input pins, and a startup banner. */
 void setup() {
   Serial.begin(SERIAL_BAUD);
+  turnOnPowerLed();
 
   // The N64 line has a pull-up on the console side. Enabling the (weak)
   // internal pull-up too means disconnected pins read idle-high instead of
