@@ -21,12 +21,18 @@
 #include <ArduinoOTA.h>
 #include <ESPAsyncWebServer.h>
 #include <ESPmDNS.h>
+#include <Preferences.h>
 #include <WiFi.h>
 #include <WiFiManager.h>
 #include <driver/rmt.h>
 #include <freertos/ringbuf.h>
 
 #include "web_ui.h"
+#include "controller_commands.h"
+
+static ControllerCommands controllerCommands;
+static bool powerLedEnabled = true;
+static void processCommandFrame(size_t controller, const uint8_t *frame);
 
 // ---------- WiFi / setup portal ---------------------------------------------
 // No hardcoded credentials. On first boot (or whenever it can't reconnect) the
@@ -352,6 +358,8 @@ static bool readFrameFromRmt(size_t controller, uint8_t frame[N64_FRAMEBITS]) {
       uint8_t latestFrame[N64_FRAMEBITS];
       if (decodeFrameFromRmtItems(items, rxSize / sizeof(rmt_item32_t),
                                   latestFrame)) {
+        // Observe every frame so draining the queue cannot hide button edges.
+        processCommandFrame(controller, latestFrame);
         memcpy(frame, latestFrame, N64_FRAMEBITS);
         foundFrame = true;
       }
@@ -813,9 +821,11 @@ static void startNetwork() {
   startOTA();
 }
 
-/** Latch red once at boot, then release the LED's RMT TX resources. */
-static void turnOnPowerLed() {
+/** Latch a WS2812 color, then release the LED's RMT TX resources. */
+static void setStatusLed(uint32_t color) {
 #ifdef POWER_LED_PIN
+  static uint32_t lastColor = UINT32_MAX;
+  if (lastColor == color) return;
   // Use the same legacy RMT driver as capture, avoiding Arduino's separate
   // RMT allocator. Channel 0 is TX-capable on the S3; capture uses RX 4-7.
   rmt_config_t cfg = RMT_DEFAULT_CONFIG_TX((gpio_num_t)POWER_LED_PIN,
@@ -830,8 +840,7 @@ static void turnOnPowerLed() {
     return;
   }
 
-  // WS2812 sends green, red, blue, MSB first. Use maximum red brightness.
-  const uint32_t color = 0x00FF00;
+  // WS2812 sends green, red, blue, MSB first.
   rmt_item32_t bits[24] = {};
   for (size_t i = 0; i < 24; ++i) {
     bool one = (color & (1UL << (23 - i))) != 0;
@@ -845,14 +854,58 @@ static void turnOnPowerLed() {
   rmt_driver_uninstall(cfg.channel);
   if (err != ESP_OK) {
     Serial.printf("Power LED write failed: %d\n", (int)err);
+  } else {
+    lastColor = color;
   }
 #endif
+}
+
+static void processCommandFrame(size_t controller, const uint8_t *frame) {
+  if (!hasValidReservedBits(frame)) return;
+  const uint8_t *response = frame + N64_PREFIX;
+  const uint16_t buttons = (uint16_t(readByte(response, 0)) << 8) |
+                          readByte(response, 8);
+  controllerCommands.input(controller, buttons, millis());
+}
+
+static void serviceCommands() {
+  const uint32_t now = millis();
+  const ControllerCommands::Action action = controllerCommands.tick(now);
+  if (action == ControllerCommands::Action::ResetWiFi) {
+    clearWiFiAndRestart();
+  } else if (action == ControllerCommands::Action::TogglePowerLed) {
+    powerLedEnabled = !powerLedEnabled;
+    Preferences preferences;
+    if (preferences.begin("n64spy", false)) {
+      if (preferences.putBool("power-led", powerLedEnabled) == 0) {
+        Serial.println("Failed to save power LED preference.");
+      }
+      preferences.end();
+    } else {
+      Serial.println("Failed to open power LED preferences.");
+    }
+    Serial.printf("Power LED %s\n", powerLedEnabled ? "enabled" : "disabled");
+  }
+
+  switch (controllerCommands.led(now)) {
+  case ControllerCommands::Led::Green: setStatusLed(0xFF0000); break;
+  case ControllerCommands::Led::Magenta: setStatusLed(0x00FFFF); break;
+  case ControllerCommands::Led::Off: setStatusLed(0); break;
+  case ControllerCommands::Led::Normal:
+    setStatusLed(powerLedEnabled ? 0x00FF00 : 0);
+    break;
+  }
 }
 
 /** One-time init: power LED, serial, input pins, and a startup banner. */
 void setup() {
   Serial.begin(SERIAL_BAUD);
-  turnOnPowerLed();
+  Preferences preferences;
+  if (preferences.begin("n64spy", true)) {
+    powerLedEnabled = preferences.getBool("power-led", true);
+    preferences.end();
+  }
+  setStatusLed(powerLedEnabled ? 0x00FF00 : 0);
 
   // The N64 line has a pull-up on the console side. Enabling the (weak)
   // internal pull-up too means disconnected pins read idle-high instead of
@@ -906,6 +959,7 @@ static void checkResetButton() {
  */
 void loop() {
   checkResetButton();
+  serviceCommands();
   // Service any in-flight OTA upload. Cheap when idle; blocks here for the few
   // seconds of an actual flash (sniffing pauses, then the device reboots).
   ArduinoOTA.handle();

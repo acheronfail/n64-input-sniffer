@@ -25,8 +25,8 @@ hand-counted NOP delays → the Xtensa cycle counter (`xthal_get_ccount`) scaled
 
 ## Wiring
 
-The Super Mini's onboard RGB LED turns solid red as soon as the firmware starts,
-before controller capture or WiFi setup, and stays red while powered. Its GPIO is
+The Super Mini's onboard RGB LED defaults to solid red while powered. This can be
+disabled with the controller command below; the preference survives reboots. Its GPIO is
 configured with `POWER_LED_PIN=48` in `platformio.ini` for all S3 environments.
 The generic `esp32dev` environments leave the LED disabled unless that flag is set.
 
@@ -63,6 +63,30 @@ No WiFi credentials are hardcoded — they're configured once via a captive port
 To move the device to a different network, hold the **BOOT** button (`WIFI_RESET_PIN`, GPIO 0 on
 most dev boards) for ~3 seconds — either at power-up or any time during normal operation. That
 forgets the saved network and reboots into the setup portal.
+
+### Controller commands
+
+Press **L + R + D-pad down** together on any controller to enter command mode.
+The LED turns **green** for up to **5 seconds**. During that window, press a command
+button on the **same controller** (you can release the entry combination first):
+
+| Button | Action |
+|--------|--------|
+| **START** | Forget saved WiFi and reboot into the **N64Spy-Setup** captive network. |
+| **Z** | Toggle the normal red power LED on/off and save the preference. |
+
+A recognised command ends listening immediately. The LED flashes **magenta three
+times**, each with **500 ms on and 500 ms off**, then performs the action. Command
+feedback still lights up when the red power LED is disabled. Capture and web updates
+continue during the confirmation flashes.
+
+Buttons already held when entering command mode must be released and pressed again.
+Other buttons (and simultaneous START + Z presses) are ignored until a single command
+is pressed or the window expires. A timeout restores the normal LED setting.
+Release and press the entry combination again to start another command window.
+The console must be running and polling the controller, and commands are available
+after startup WiFi setup completes. As a passive sniffer, these presses also reach
+the game.
 
 The async server runs in its own task (on the other core), so it never disturbs the timing-critical
 bit-bang sniff. The setup portal runs only during startup, before that server begins, so the two
