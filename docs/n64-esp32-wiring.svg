@@ -1,6 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1220" viewBox="0 0 1600 1220"><title>N64 controller wiring — ESP32-S3 Super Mini top view</title><desc>Board component side facing viewer, USB at top. Right edge from top: 5V, GND, 3V3, GPIO13, GPIO12, GPIO11, GPIO10, GPIO9, GPIO8. Port 1 supplies 3V3 and ground to the ESP. A 470 microfarad capacitor connects positive to 3V3 and negative to GND. Controller data 1 through 4 connect to GPIO13 through GPIO10 respectively. Each controller retains its console power, data and ground passthrough.</desc><rect width="1600" height="1220" fill="#f5f7fb"/><style>text{font-family:DejaVu Sans,sans-serif}</style>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1360" viewBox="0 0 1600 1360"><title>N64 controller wiring — ESP32-S3 Super Mini top view</title><desc>WARNING: Do not connect USB-C while the adapter is connected to the console. Disconnect all four console plugs first, even if the console is off. The capacitor does not prevent backfeeding. Board component side facing viewer, USB at top. Right edge from top: 5V, GND, 3V3, GPIO13, GPIO12, GPIO11, GPIO10, GPIO9, GPIO8. Port 1 supplies 3V3 and ground to the ESP. A 470 microfarad capacitor connects positive to 3V3 and negative to GND. Controller data 1 through 4 connect to GPIO13 through GPIO10 respectively. Each controller retains its console power, data and ground passthrough.</desc><rect width="1600" height="1360" fill="#f5f7fb"/><style>text{font-family:DejaVu Sans,sans-serif}</style>
 <text x="60" y="65" font-size="38" fill="#15243b" font-weight="bold" text-anchor="start">N64 → ESP32-S3 Super Mini</text>
 <text x="60" y="104" font-size="23" fill="#526078" font-weight="normal" text-anchor="start">Console-powered ESP • single ground tap • 470 µF supply capacitor</text>
+<rect x="50" y="125" width="1500" height="125" rx="12" fill="#fff0ed" stroke="#cf394f"/>
+<text x="75" y="162" font-size="26" fill="#a51d31" font-weight="bold" text-anchor="start">WARNING — DO NOT CONNECT USB-C WHILE CONNECTED TO THE N64</text>
+<text x="75" y="195" font-size="21" fill="#15243b" font-weight="bold" text-anchor="start">Disconnect the adapter from ALL FOUR console ports before connecting USB-C. Unplug USB-C before reconnecting.</text>
+<text x="75" y="226" font-size="20" fill="#a51d31" font-weight="normal" text-anchor="start">Console switched off ≠ disconnected. USB can backfeed the console rail; the 470 µF capacitor does not prevent this.</text>
+<g transform="translate(0,140)">
 <text x="80" y="155" font-size="21" fill="#15243b" font-weight="bold" text-anchor="start">BOARD TOP VIEW · USB AT TOP</text>
 <text x="950" y="155" font-size="18" fill="#526078" font-weight="bold" text-anchor="start">CONSOLE PORTS</text>
 <text x="1350" y="155" font-size="18" fill="#526078" font-weight="bold" text-anchor="start">CONTROLLERS</text>
@@ -182,4 +187,4 @@
 <text x="75" y="1106" font-size="20" fill="#15243b" font-weight="normal" text-anchor="start">Place the 470 µF capacitor close to ESP power pins. Positive to 3V3; negative (striped side) to GND.</text>
 <text x="75" y="1138" font-size="20" fill="#15243b" font-weight="normal" text-anchor="start">Controller terminals are schematic: DATA is the middle contact; verify power/GND orientation before wiring.</text>
 <text x="60" y="1190" font-size="18" fill="#526078" font-weight="normal" text-anchor="start">● = electrical junction. Crossings without a dot do not connect. Wire colors indicate function, not cable insulation.</text>
-</svg>
+</g></svg>

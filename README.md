@@ -25,6 +25,12 @@ hand-counted NOP delays → the Xtensa cycle counter (`xthal_get_ccount`) scaled
 
 ## Wiring
 
+> [!WARNING]
+> **Do not connect USB-C while the adapter is connected to the N64 console.**
+> Fully disconnect the adapter from **all four console ports** before connecting USB-C to a computer or USB power source. Disconnect USB-C before reconnecting the adapter to the console.
+>
+> **Turning the console off is not enough.** USB power can backfeed the console’s 3.3V rail and potentially damage hardware. The 470 µF capacitor does not prevent backfeeding.
+
 ![Four-controller passthrough wiring](docs/n64-esp32-wiring.png)
 
 [Download the wiring graphic (SVG)](docs/n64-esp32-wiring.svg). The diagram uses
@@ -122,6 +128,8 @@ The state wire format (see `packState()` in [src/main.cpp](src/main.cpp) and the
 | 4    | stick Y (int8) |
 
 ## Build, upload, monitor
+
+**Before plugging in USB-C, disconnect the adapter from all four console ports—even if the console is switched off.**
 
 ```sh
 pio run                 # build
