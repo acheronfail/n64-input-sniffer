@@ -1,1 +1,20 @@
-.pio
+# PlatformIO and local editor state
+.pio/
+.vscode/
+.DS_Store
+
+# CAD autosaves and Python caches (keep named FCStd and 3MF revisions)
+/cad/**/__pycache__/
+/cad/**/*.py[cod]
+/cad/**/*.FCBak
+/cad/**/*.FCStd[0-9]*
+/cad/**/*.FCStd~
+/cad/**/*.log
+/cad/**/*.done
+/cad/**/*.error
+/cad/**/*.tmp
+/cad/**/.~lock.*
+
+# Full-resolution scans are tracked losslessly as .stl.gz; unpack to use.
+/cad/N64InputMod/reference/Top.stl
+/cad/N64InputMod/reference/Bottom.stl

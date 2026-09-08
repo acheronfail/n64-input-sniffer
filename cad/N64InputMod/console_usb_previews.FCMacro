@@ -1,0 +1,36 @@
+import FreeCAD as A,FreeCADGui as G,os,traceback,time
+from PySide import QtCore,QtWidgets
+from pivy import coin
+root=os.path.dirname(__file__)
+for marker in ['console-usb-preview.error','console-usb-preview.done']:
+ if os.path.exists(root+'/'+marker):os.remove(root+'/'+marker)
+try:
+ d=A.openDocument(root+'/N64InputMod.FCStd');v=G.activeDocument().activeView()
+ def only(names):
+  for o in d.Objects:
+   if hasattr(o,'ViewObject'):o.ViewObject.Visibility=o.Name in names
+ def snap(name,rear=False):
+  rotation=A.Rotation(0.3647052,0.2798481,0.1159169,0.8804762)
+  if rear:rotation=A.Rotation(A.Vector(0,0,1),180).multiply(rotation)
+  v.getCameraNode().orientation.setValue(coin.SbRotation(*rotation.Q))
+  for _ in range(3):v.fitAll();G.updateGui();QtWidgets.QApplication.processEvents();time.sleep(.2)
+  cam=v.getCameraNode();cam.orientation.setValue(coin.SbRotation(*rotation.Q));cam.nearDistance.setValue(.1);cam.farDistance.setValue(10000);v.redraw();G.updateGui();v.saveImage(root+'/'+name,1600,1000,'White')
+ for o in d.PrintParts.Group:
+  o.ViewObject.ShapeColor=(.66,.72,.77);o.ViewObject.LineColor=(.17,.22,.26);o.ViewObject.DisplayMode='Flat Lines'
+ for o in d.Hardware.Group:o.ViewObject.ShapeColor=(.25,.27,.3)
+ d.ESP32BoardEnvelope.ViewObject.ShapeColor=(.08,.5,.3);d.USBCEnvelope.ViewObject.ShapeColor=(.76,.78,.8)
+ d.BoardKeeper.ViewObject.ShapeColor=(.2,.65,.63);d.LightWindow.ViewObject.ShapeColor=(.30,.80,.69);d.LightWindow.ViewObject.Transparency=45
+ only([o.Name for o in d.PrintParts.Group+d.Hardware.Group]);snap('v0.12-console-side.png',True)
+ only(['BoardFitCoupon','BoardKeeper','ESP32BoardEnvelope','ESP32ComponentKeepout','USBCEnvelope'])
+ d.BoardFitCoupon.ViewObject.ShapeColor=(.66,.72,.77)
+ snap('v0.12-usb-mount-detail.png',True)
+ only([o.Name for o in d.PrintParts.Group+d.Hardware.Group+d.Console.Group]);snap('v0.12-on-console.png')
+ only([o.Name for o in d.PrintParts.Group+d.Hardware.Group]);snap('assembled.png')
+ # Keep an assembled view, with reference hardware visible, in the delivered CAD.
+ d.recompute();d.save();d.saveCopy(root+'/N64InputMod-v0.12.FCStd')
+ open(root+'/console-usb-preview.done','w').write('ok')
+except Exception:
+ open(root+'/console-usb-preview.error','w').write(traceback.format_exc())
+finally:
+ for doc in list(A.listDocuments()):A.closeDocument(doc)
+ QtCore.QTimer.singleShot(100,QtWidgets.QApplication.quit)

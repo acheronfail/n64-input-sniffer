@@ -1,0 +1,19 @@
+{
+  "MaleClampShoe1_changed_mm3": 0,
+  "MaleClampPad1_changed_mm3": 0,
+  "MaleClampShoe2_changed_mm3": 0,
+  "MaleClampPad2_changed_mm3": 0,
+  "MaleClampShoe3_changed_mm3": 0,
+  "MaleClampPad3_changed_mm3": 0,
+  "MaleClampShoe4_changed_mm3": 0,
+  "MaleClampPad4_changed_mm3": 0,
+  "BoardKeeper_changed_mm3": 0,
+  "UpperShell_changed_mm3": 0,
+  "LightWindow_changed_mm3": 0,
+  "FemaleFitCoupon_changed_mm3": 0,
+  "RearAlignmentGauge_changed_mm3": 0,
+  "RearAlignmentGaugeUpper_changed_mm3": 0,
+  "lower_change_outside_rear_stop_mm3": 0,
+  "rear_stop_shift_mm": 0.7999999999999972,
+  "rear_stop_thickness_mm": 1.6000000000000014
+}

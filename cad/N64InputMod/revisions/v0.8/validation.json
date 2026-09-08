@@ -1,0 +1,143 @@
+{
+  "status": "fit prototype; physical fit not yet verified",
+  "parts": {
+    "LowerShell": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 71527.18982342568,
+      "bounds": "BoundBox (-84.4692, -62.6006, -16, 84.4692, -4.50397, 10.2)"
+    },
+    "UpperShell": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 61875.33021967676,
+      "bounds": "BoundBox (-84.4692, -62.6006, 0.159999, 84.4692, -4.50397, 16)"
+    },
+    "LightWindow": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 526.5919999999999,
+      "bounds": "BoundBox (-8.8, -56.8, 13.95, 8.8, -39.2, 15.65)"
+    },
+    "BoardKeeper": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 356.1984168211768,
+      "bounds": "BoundBox (-16.5, -58.8, 8.75, 16.5, -35.08, 10.55)"
+    },
+    "RearAlignmentGauge": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 27451.30469599634,
+      "bounds": "BoundBox (-84.4692, -51, -16, 84.4692, -4.50397, 1.76674e-14)"
+    },
+    "RearAlignmentGaugeUpper": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 28551.16890753599,
+      "bounds": "BoundBox (-84.4692, -51, 0.159999, 84.4692, -4.50397, 16)"
+    },
+    "BoardFitCoupon": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 9882.54542465859,
+      "bounds": "BoundBox (-76, -62.6006, -16, 76, -33.48, 10.2)"
+    },
+    "FemaleFitCoupon": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 5945.251516468208,
+      "bounds": "BoundBox (-76, -62.6006, -16, 76, -42, 5.32907e-15)"
+    },
+    "MaleClampShoe1": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 172.80000000000007,
+      "bounds": "BoundBox (-69.7, -17.2016, 7.4, -57.7, -9.20159, 9.2)"
+    },
+    "MaleClampPad1": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 76.79999999999998,
+      "bounds": "BoundBox (-69.7, -17.2016, 6.6, -57.7, -9.20159, 7.4)"
+    },
+    "MaleClampShoe2": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 172.80000000000007,
+      "bounds": "BoundBox (-42, -19.1062, 7.4, -30, -11.1062, 9.2)"
+    },
+    "MaleClampPad2": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 76.79999999999998,
+      "bounds": "BoundBox (-42, -19.1062, 6.6, -30, -11.1062, 7.4)"
+    },
+    "MaleClampShoe3": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 172.80000000000007,
+      "bounds": "BoundBox (30, -19.1062, 7.4, 42, -11.1062, 9.2)"
+    },
+    "MaleClampPad3": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 76.79999999999998,
+      "bounds": "BoundBox (30, -19.1062, 6.6, 42, -11.1062, 7.4)"
+    },
+    "MaleClampShoe4": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 172.80000000000007,
+      "bounds": "BoundBox (57.7, -17.2016, 7.4, 69.7, -9.20159, 9.2)"
+    },
+    "MaleClampPad4": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 76.79999999999998,
+      "bounds": "BoundBox (57.7, -17.2016, 6.6, 69.7, -9.20159, 7.4)"
+    }
+  },
+  "collisions": [],
+  "parameters": {
+    "port_x": [
+      -63.7,
+      -36,
+      36,
+      63.7
+    ],
+    "rear_y": -9.0,
+    "front_y": -62.0,
+    "half_width": 84.0,
+    "bottom_z": -16.0,
+    "top_z": 16.0,
+    "wall": 2.4,
+    "connector_clearance": 0.22,
+    "nose_y": 7.0,
+    "curve_radius": 1450.0,
+    "pcb_width": 18.0,
+    "pcb_length": 22.52,
+    "pcb_thickness": 1.6,
+    "pcb_z": 7.0,
+    "pcb_front_y": -59.0,
+    "pcb_clearance": 0.2,
+    "keeper_gap": 0.15,
+    "keeper_thickness": 1.8,
+    "seam_gap": 0.16,
+    "usb_opening_width": 10.0,
+    "usb_opening_height": 4.0,
+    "usb_corner_radius": 0.7,
+    "usb_seam_tab_width": 28.0,
+    "usb_seam_inner_y": -58.9,
+    "keeper_head_diameter": 4.2,
+    "closure_head_diameter": 4.2,
+    "clamp_head_diameter": 6.4,
+    "countersink_angle_deg": 90.0,
+    "closure_nut_af": 4.3,
+    "closure_nut_pocket_z": 2.0,
+    "closure_nut_pocket_height": 2.0
+  },
+  "shell_overlap_mm3": 0.0,
+  "keeper_overlap_mm3": 0.0,
+  "clamp_shell_overlap_mm3": 0.0
+}

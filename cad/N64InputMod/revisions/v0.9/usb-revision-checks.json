@@ -1,0 +1,14 @@
+{
+  "keeper_difference_mm3": 0.0,
+  "lower_shell_difference_outside_usb_mm3": 0.0,
+  "lower_shell_removed_mm3": 0.0,
+  "unchanged_parts": {
+    "UpperShell": 0.0,
+    "FemaleFitCoupon": 0.0,
+    "RearAlignmentGauge": 0.0,
+    "RearAlignmentGaugeUpper": 0.0,
+    "LightWindow": 0.0
+  },
+  "usb_housing_interference_mm3": 0.0,
+  "passed": true
+}

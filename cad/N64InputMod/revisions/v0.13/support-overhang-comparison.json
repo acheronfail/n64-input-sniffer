@@ -1,0 +1,14 @@
+{
+  "v0.4": {
+    "female_bases_horizontal_overhang_mm2": 1591.2489993834024,
+    "lower_alignment_pads_horizontal_overhang_mm2": 49.17808994688676,
+    "upper_alignment_pads_horizontal_overhang_mm2": 38.563910631259205,
+    "LED_ledge_horizontal_overhang_mm2": 99.0
+  },
+  "v0.5": {
+    "female_bases_horizontal_overhang_mm2": 0.0,
+    "lower_alignment_pads_horizontal_overhang_mm2": 0.0,
+    "upper_alignment_pads_horizontal_overhang_mm2": 0.0,
+    "LED_ledge_horizontal_overhang_mm2": 41.75996154785389
+  }
+}

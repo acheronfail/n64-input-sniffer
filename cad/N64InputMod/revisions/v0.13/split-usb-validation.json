@@ -1,0 +1,12 @@
+{
+  "LowerShell_change_outside_seam_mm3": 0.0,
+  "UpperShell_change_outside_seam_mm3": 0.0,
+  "BoardKeeper_changed_mm3": 0.0,
+  "FemaleFitCoupon_changed_mm3": 0.0,
+  "RearAlignmentGauge_changed_mm3": 0.0,
+  "RearAlignmentGaugeUpper_changed_mm3": 0.0,
+  "LightWindow_changed_mm3": 0.0,
+  "lower_notch_open_mm3": 0.0,
+  "upper_notch_open_mm3": 0.0,
+  "assembly_sweep_overlap_mm3": 0.0
+}

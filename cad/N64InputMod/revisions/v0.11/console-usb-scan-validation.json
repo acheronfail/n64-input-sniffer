@@ -1,0 +1,57 @@
+{
+  "revision": "v0.11",
+  "scan": "Top_aligned.stl (approximate registration)",
+  "sample_count": 1035,
+  "minimum_sampled_guard_end_clearance_mm": 0.7932186619851955,
+  "USB_socket_face_y_mm": -11.799999999999997,
+  "guard_end_y_mm": 0.5,
+  "axial_25mm_access_envelope_hits_console": true,
+  "axial_sample_rays": [
+    {
+      "x_mm": -4,
+      "z_mm": 9,
+      "console_surface_y_mm": 1.6808873847432644
+    },
+    {
+      "x_mm": -4,
+      "z_mm": 10.2,
+      "console_surface_y_mm": 1.7720094686584322
+    },
+    {
+      "x_mm": -4,
+      "z_mm": 11.4,
+      "console_surface_y_mm": 1.8594439597623513
+    },
+    {
+      "x_mm": 0,
+      "z_mm": 9,
+      "console_surface_y_mm": 23.424172297370767
+    },
+    {
+      "x_mm": 0,
+      "z_mm": 10.2,
+      "console_surface_y_mm": 2.5289934363650537
+    },
+    {
+      "x_mm": 0,
+      "z_mm": 11.4,
+      "console_surface_y_mm": 1.8470787503681314
+    },
+    {
+      "x_mm": 4,
+      "z_mm": 9,
+      "console_surface_y_mm": 23.380589991317557
+    },
+    {
+      "x_mm": 4,
+      "z_mm": 10.2,
+      "console_surface_y_mm": 2.3877703512846966
+    },
+    {
+      "x_mm": 4,
+      "z_mm": 11.4,
+      "console_surface_y_mm": 1.813179802695761
+    }
+  ],
+  "limitations": "Sampled scan check only; does not certify exact console registration, every cable shape, or electrical disconnection before partial withdrawal permits USB access."
+}

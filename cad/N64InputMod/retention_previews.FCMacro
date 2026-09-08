@@ -1,0 +1,69 @@
+import FreeCAD as A,FreeCADGui as G,Mesh,Part,os,json,traceback,time
+from PySide import QtCore,QtWidgets
+from pivy import coin
+from pathlib import Path
+r=Path(__file__).resolve().parent
+try:
+ d=A.openDocument(str(r/'N64InputMod.FCStd'));p=json.loads((r/'parameters.json').read_text())
+ Part.export(d.PrintParts.Group,str(r/'N64InputMod.step'))
+ full=d.MalePort1.Shape.fuse(d.MaleMatingProjection1.Shape).removeSplitter()
+ full.translate(A.Vector(-120-p['male_port_x'][0],-(p['nose_y']+p['port_x'][0]**2/p['curve_radius']),0))
+ assert full.isValid() and len(full.Solids)==1
+ for name in ['n64-input-ControllerPortMale.step','n64-input-ControllerPortMale-v0.14.step']:
+  full.exportStep(str(r.parent/name))
+ complete=[d.getObject('MalePort'+str(i)).Shape.fuse(d.getObject('MaleMatingProjection'+str(i)).Shape) for i in range(1,5)]
+ compound=Part.makeCompound(complete)
+ Mesh.Mesh(compound.tessellate(.05)).write(str(r/'MaleConnectorAssembly.stl'))
+ measured=json.loads((r/'port-spacing-measurements.json').read_text())
+ for name in ['Top','Bottom']:
+  origin=next(s['symmetry_centre_x_mm'] for s in measured['scans'] if s['scan']==name+'.stl')
+  d.getObject('Console'+name).Placement.Base=A.Vector(-origin,p['male_mating_length'],0)
+  d.getObject('Console'+name).ViewObject.ShapeColor=(.7,.7,.69)
+ for o in d.Objects:
+  if hasattr(o,'ViewObject'):
+   o.ViewObject.Visibility=False
+   if hasattr(o.ViewObject,'ShapeColor'):
+    o.ViewObject.ShapeColor=(.68,.73,.78);o.ViewObject.LineColor=(.18,.22,.27);o.ViewObject.DisplayMode='Flat Lines'
+ for o in d.Hardware.Group:
+  o.ViewObject.ShapeColor=(.25,.28,.32)
+  if 'MatingProjection' in o.Name:o.ViewObject.ShapeColor=(.06,.07,.08)
+  if 'Screw' in o.Name:o.ViewObject.ShapeColor=(.7,.72,.75)
+ for o in d.PrintParts.Group:
+  if o.Name.startswith('MalePortKeeper'):o.ViewObject.ShapeColor=(.28,.51,.77)
+  if o.Name.startswith('FemalePortKeeper'):o.ViewObject.ShapeColor=(.17,.61,.59)
+ d.BoardKeeper.ViewObject.ShapeColor=(.17,.61,.59)
+ d.ESP32BoardEnvelope.ViewObject.ShapeColor=(.08,.48,.28)
+ d.LightWindow.ViewObject.ShapeColor=(.3,.8,.69);d.LightWindow.ViewObject.Transparency=45
+ for o in d.Console.Group:o.ViewObject.DisplayMode='Shaded'
+ view=G.activeDocument().activeView()
+ def only(names):
+  for o in d.Objects:
+   if hasattr(o,'ViewObject'):o.ViewObject.Visibility=o.Name in names
+ def snap(name,rear=False):
+  rotation=A.Rotation(.3647052,.2798481,.1159169,.8804762)
+  if rear:rotation=A.Rotation(A.Vector(0,0,1),180).multiply(rotation)
+  view.getCameraNode().orientation.setValue(coin.SbRotation(*rotation.Q))
+  for _ in range(3):view.fitAll();G.updateGui();QtWidgets.QApplication.processEvents();time.sleep(.15)
+  cam=view.getCameraNode();cam.nearDistance.setValue(.1);cam.farDistance.setValue(10000)
+  view.redraw();G.updateGui();view.saveImage(str(r/name),1800,1100,'White')
+ printed=[o.Name for o in d.PrintParts.Group];hardware=[o.Name for o in d.Hardware.Group]
+ only(printed+hardware);snap('v0.15-assembled.png',True)
+ only([n for n in printed+hardware if n not in ['UpperShell','LightWindow']]);snap('v0.15-lid-removed.png',True)
+ # Explode only one male and one female keeper to illustrate the independent fasteners.
+ moved=['MalePortKeeper3','FemalePortKeeper3','MaleKeeperScrew3L','MaleKeeperScrew3R','FemaleKeeperScrew3L','FemaleKeeperScrew3R']
+ for name in moved:d.getObject(name).Placement.Base.z+=12
+ snap('v0.15-keeper-detail.png',True)
+ for name in moved:d.getObject(name).Placement.Base.z-=12
+ only(printed+hardware+[o.Name for o in d.Console.Group]);snap('v0.15-on-console.png')
+ only(printed+hardware);snap('v0.15-assembled.png',True)
+ report=json.loads((r/'validation.json').read_text())
+ for o in d.PrintParts.Group:
+  report['parts'][o.Name]={'valid':o.Shape.isValid(),'solids':len(o.Shape.Solids),'volume_mm3':o.Shape.Volume,'bounds':str(o.Shape.BoundBox)}
+ (r/'validation.json').write_text(json.dumps(report,indent=2)+'\n')
+ d.recompute();d.save();d.saveCopy(str(r/'N64InputMod-v0.15.FCStd'))
+ (r/'retention-preview.done').write_text('ok')
+except Exception:
+ (r/'retention-preview.error').write_text(traceback.format_exc())
+finally:
+ for doc in list(A.listDocuments()):A.closeDocument(doc)
+ QtCore.QTimer.singleShot(100,QtWidgets.QApplication.quit)

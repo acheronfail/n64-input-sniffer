@@ -1,0 +1,53 @@
+{
+  "revision": "v0.14",
+  "checks": {
+    "LowerShell.stl": {
+      "watertight": true,
+      "bed_z_mm": 0.0,
+      "sha256": "fcd44c9384e4bba03ef2c64f2cee5c78fa82a3e5f71704ec08e9f36e8d83d0a2"
+    },
+    "UpperShell.stl": {
+      "watertight": true,
+      "bed_z_mm": 0.0,
+      "sha256": "a841db2f0c853c06da2ed32766abfe0155c3b5653aa1c4db0cdcc2e5cf83233c"
+    },
+    "BoardKeeper.stl": {
+      "watertight": true,
+      "bed_z_mm": 0.0,
+      "sha256": "f8d07639eefdf88738b4f03291369a1fd37e49b5f1e2aa9aaae44fd8fe7b4bd0"
+    },
+    "MalePortKeeper1.stl": {
+      "watertight": true,
+      "bed_z_mm": 0.0,
+      "sha256": "fee896b37e07f3a95b47dd17c25ba388afc5968e6e5c1ce3c7914d2bc0c88933"
+    },
+    "MalePortKeeper2.stl": {
+      "watertight": true,
+      "bed_z_mm": 0.0,
+      "sha256": "fcd0ae7d281ed40470163e6b86e821a1d02b42e7fb49877bd9736475d7f5ffa9"
+    },
+    "MalePortKeeper3.stl": {
+      "watertight": true,
+      "bed_z_mm": 0.0,
+      "sha256": "dc7de9f9fd17d724d0883c1affa0ca5319c5f2e2556c2a0936792d1ada88083e"
+    },
+    "MalePortKeeper4.stl": {
+      "watertight": true,
+      "bed_z_mm": 0.0,
+      "sha256": "6e150fce3acc7c3d39721086ff8ed825d1bcb13a64097cb5a2460057ac4452a4"
+    },
+    "FemalePortKeeper.stl": {
+      "watertight": true,
+      "bed_z_mm": 0.0,
+      "sha256": "ad93f3cbc31aedcbbc9aaaab94db22fa8c4040bdd620612d50b4ce0d236cf4bc"
+    },
+    "LightWindow.stl": {
+      "watertight": true,
+      "bed_z_mm": 0.0,
+      "sha256": "9ac210e97a5f919ed29d4f41e7460bcb481591db98fe37af77db73ddad813801"
+    }
+  },
+  "zip_crc_pass": true,
+  "physical_fit_verified": false,
+  "sliced": false
+}

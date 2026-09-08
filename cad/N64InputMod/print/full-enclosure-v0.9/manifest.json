@@ -1,0 +1,102 @@
+{
+  "revision": "v0.9",
+  "status": "Proceeding to full enclosure at owner request; separate male retention gauge test waived, not physically verified",
+  "files": [
+    {
+      "file": "LowerShell.stl",
+      "print_quantity": 1,
+      "material_or_note": "Use the material/profile that passed the coupon test",
+      "orientation": "Broad lower face on bed",
+      "size_mm": [
+        168.59066772460938,
+        57.42921829223633,
+        26.200000762939453
+      ],
+      "bed_z_mm": 0.0,
+      "triangles": 24016,
+      "max_edge_length_change_mm": 1.9073486328125e-06,
+      "source_sha256": "9f7b88a690b21864cc11856bdf6c7a29a5f4c5af1e84a5f2806f93fcab9d7622",
+      "sha256": "d7467541d3c465319881f8a198278e0eed46744ec188b778f8ee10770ff5d9d5"
+    },
+    {
+      "file": "UpperShell.stl",
+      "print_quantity": 1,
+      "material_or_note": "Same as lower shell",
+      "orientation": "Outside roof on bed",
+      "size_mm": [
+        168.59066772460938,
+        57.42921829223633,
+        15.84000015258789
+      ],
+      "bed_z_mm": 0.0,
+      "triangles": 25872,
+      "max_edge_length_change_mm": 1.9222497940063477e-06,
+      "source_sha256": "9337d89e996dc91da30956666ec4d98410a4eaee913f9da8863bcc119effadae",
+      "sha256": "5bd07945cd6f792ac1e1726d75071fbf618380464b6e4ef85aa103823097c133"
+    },
+    {
+      "file": "BoardKeeper.stl",
+      "print_quantity": 1,
+      "material_or_note": "Rigid material matching the enclosure",
+      "orientation": "Broad lower face on bed",
+      "size_mm": [
+        32.99891662597656,
+        23.71999740600586,
+        1.8000001907348633
+      ],
+      "bed_z_mm": 0.0,
+      "triangles": 1768,
+      "max_edge_length_change_mm": 1.1920928955078125e-06,
+      "source_sha256": "5be941ede73f7e21ad7f87a717f328dafb60240a894a8b2614c9bf831effabca",
+      "sha256": "94dfd903fbc0f129516ee24e2fb605470be0d2dacb0035203eb49e24bc5b461f"
+    },
+    {
+      "file": "MaleClampShoe.stl",
+      "print_quantity": 4,
+      "material_or_note": "Rigid material matching the enclosure",
+      "orientation": "Broad lower face on bed",
+      "size_mm": [
+        11.999996185302734,
+        8.0,
+        1.799999713897705
+      ],
+      "bed_z_mm": 0.0,
+      "triangles": 12,
+      "max_edge_length_change_mm": 0.0,
+      "source_sha256": "6c17f7c811ad9a1e9fceef9809e3e541888bd86fd3c9db8d94f40217d9cda428",
+      "sha256": "3716105ec3b6eb5f8135cb90927b589ec19166e8624e5208989ed390829ecfec"
+    },
+    {
+      "file": "MaleClampPad.stl",
+      "print_quantity": 4,
+      "material_or_note": "Flexible TPU, or cut equivalent soft rubber sheet",
+      "orientation": "Broad lower face on bed",
+      "size_mm": [
+        11.999996185302734,
+        8.0,
+        0.8000001907348633
+      ],
+      "bed_z_mm": 0.0,
+      "triangles": 12,
+      "max_edge_length_change_mm": 0.0,
+      "source_sha256": "329a3177179fc2706fb3491959d1f92cff8385dd2d3de6d433986faffc94e1e7",
+      "sha256": "4623d0052fc3508da1cb4f51b9d1c72fe5ce7d21ab77044610f6e9ed44239ddb"
+    },
+    {
+      "file": "LightWindow.stl",
+      "print_quantity": 1,
+      "material_or_note": "Optional translucent material",
+      "orientation": "Broad lower face on bed",
+      "size_mm": [
+        17.600000381469727,
+        17.599998474121094,
+        1.6999998092651367
+      ],
+      "bed_z_mm": 0.0,
+      "triangles": 12,
+      "max_edge_length_change_mm": 0.0,
+      "source_sha256": "89128347479993c662d625cfc5675a23c30ca8c2aa56a61b73feb58d34ef7ed2",
+      "sha256": "08304c01767da33899128e7cb3c75b8ec8a73623ae6c216cf79a646f20ce9423"
+    }
+  ]
+}

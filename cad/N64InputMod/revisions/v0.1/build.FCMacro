@@ -1,0 +1,4 @@
+# Open/run this macro in FreeCAD. Keep build.py and parameters.json alongside it.
+import os
+p=os.path.dirname(__file__)
+exec(compile(open(os.path.join(p,'build.py')).read(),os.path.join(p,'build.py'),'exec'),{'__file__':os.path.join(p,'build.py'),'__name__':'__main__'})

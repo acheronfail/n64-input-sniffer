@@ -1,0 +1,169 @@
+{
+  "female_coupon_symmetric_difference_mm3": 0.0,
+  "male_loading_path_samples": [
+    {
+      "part": "MalePort1",
+      "lift_mm": 0,
+      "lower_gauge_overlap_mm3": 0.0
+    },
+    {
+      "part": "MalePort1",
+      "lift_mm": 0.5,
+      "lower_gauge_overlap_mm3": 0.0
+    },
+    {
+      "part": "MalePort1",
+      "lift_mm": 1,
+      "lower_gauge_overlap_mm3": 0.0
+    },
+    {
+      "part": "MalePort1",
+      "lift_mm": 2,
+      "lower_gauge_overlap_mm3": 0.0
+    },
+    {
+      "part": "MalePort1",
+      "lift_mm": 4,
+      "lower_gauge_overlap_mm3": 0.0
+    },
+    {
+      "part": "MalePort1",
+      "lift_mm": 8,
+      "lower_gauge_overlap_mm3": 0.0
+    },
+    {
+      "part": "MalePort1",
+      "lift_mm": 16,
+      "lower_gauge_overlap_mm3": 0.0
+    },
+    {
+      "part": "MalePort1",
+      "lift_mm": 25,
+      "lower_gauge_overlap_mm3": 0.0
+    },
+    {
+      "part": "MalePort2",
+      "lift_mm": 0,
+      "lower_gauge_overlap_mm3": 0.0
+    },
+    {
+      "part": "MalePort2",
+      "lift_mm": 0.5,
+      "lower_gauge_overlap_mm3": 0.0
+    },
+    {
+      "part": "MalePort2",
+      "lift_mm": 1,
+      "lower_gauge_overlap_mm3": 0.0
+    },
+    {
+      "part": "MalePort2",
+      "lift_mm": 2,
+      "lower_gauge_overlap_mm3": 0.0
+    },
+    {
+      "part": "MalePort2",
+      "lift_mm": 4,
+      "lower_gauge_overlap_mm3": 0.0
+    },
+    {
+      "part": "MalePort2",
+      "lift_mm": 8,
+      "lower_gauge_overlap_mm3": 0.0
+    },
+    {
+      "part": "MalePort2",
+      "lift_mm": 16,
+      "lower_gauge_overlap_mm3": 0.0
+    },
+    {
+      "part": "MalePort2",
+      "lift_mm": 25,
+      "lower_gauge_overlap_mm3": 0.0
+    },
+    {
+      "part": "MalePort3",
+      "lift_mm": 0,
+      "lower_gauge_overlap_mm3": 0.0
+    },
+    {
+      "part": "MalePort3",
+      "lift_mm": 0.5,
+      "lower_gauge_overlap_mm3": 0.0
+    },
+    {
+      "part": "MalePort3",
+      "lift_mm": 1,
+      "lower_gauge_overlap_mm3": 0.0
+    },
+    {
+      "part": "MalePort3",
+      "lift_mm": 2,
+      "lower_gauge_overlap_mm3": 0.0
+    },
+    {
+      "part": "MalePort3",
+      "lift_mm": 4,
+      "lower_gauge_overlap_mm3": 0.0
+    },
+    {
+      "part": "MalePort3",
+      "lift_mm": 8,
+      "lower_gauge_overlap_mm3": 0.0
+    },
+    {
+      "part": "MalePort3",
+      "lift_mm": 16,
+      "lower_gauge_overlap_mm3": 0.0
+    },
+    {
+      "part": "MalePort3",
+      "lift_mm": 25,
+      "lower_gauge_overlap_mm3": 0.0
+    },
+    {
+      "part": "MalePort4",
+      "lift_mm": 0,
+      "lower_gauge_overlap_mm3": 0.0
+    },
+    {
+      "part": "MalePort4",
+      "lift_mm": 0.5,
+      "lower_gauge_overlap_mm3": 0.0
+    },
+    {
+      "part": "MalePort4",
+      "lift_mm": 1,
+      "lower_gauge_overlap_mm3": 0.0
+    },
+    {
+      "part": "MalePort4",
+      "lift_mm": 2,
+      "lower_gauge_overlap_mm3": 0.0
+    },
+    {
+      "part": "MalePort4",
+      "lift_mm": 4,
+      "lower_gauge_overlap_mm3": 0.0
+    },
+    {
+      "part": "MalePort4",
+      "lift_mm": 8,
+      "lower_gauge_overlap_mm3": 0.0
+    },
+    {
+      "part": "MalePort4",
+      "lift_mm": 16,
+      "lower_gauge_overlap_mm3": 0.0
+    },
+    {
+      "part": "MalePort4",
+      "lift_mm": 25,
+      "lower_gauge_overlap_mm3": 0.0
+    }
+  ],
+  "pcb_keeper_overlap_mm3": 0.0,
+  "component_keeper_overlap_mm3": 0.0,
+  "usb_keeper_overlap_mm3": 0.0,
+  "passed": true
+}

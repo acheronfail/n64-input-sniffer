@@ -1,0 +1,52 @@
+import FreeCAD as A,FreeCADGui as G,os,traceback,time
+from PySide import QtCore,QtWidgets
+from pivy import coin
+root=os.path.dirname(__file__)
+try:
+ d=A.openDocument(root+'/N64InputMod.FCStd')
+ v=G.activeDocument().activeView()
+ for o in d.Objects:
+  if hasattr(o,'ViewObject'):o.ViewObject.Visibility=False
+ for o in d.PrintParts.Group:
+  o.ViewObject.ShapeColor=(.66,.72,.77);o.ViewObject.LineColor=(.17,.22,.26);o.ViewObject.DisplayMode='Flat Lines'
+ def only(names):
+  for o in d.Objects:
+   if hasattr(o,'ViewObject'):o.ViewObject.Visibility=o.Name in names
+ def snap(name):
+  v.viewAxonometric()
+  for _ in range(3):v.fitAll();G.updateGui();QtWidgets.QApplication.processEvents();time.sleep(.2)
+  cam=v.getCameraNode();cam.nearDistance.setValue(.1);cam.farDistance.setValue(10000);v.redraw();G.updateGui()
+  v.saveImage(root+'/'+name,1600,1000,'White')
+ only(['LowerShell']);snap('v0.12-lower-interior.png')
+ old_lower=d.LowerShell.Placement
+ d.LowerShell.Placement=A.Placement(A.Vector(),A.Rotation(A.Vector(1,0,0),180))
+ snap('v0.12-bottom-countersinks.png');d.LowerShell.Placement=old_lower
+
+ only(['LowerShell','BoardKeeper','ESP32BoardEnvelope','ESP32ComponentKeepout','USBCEnvelope'])
+ d.ESP32BoardEnvelope.ViewObject.ShapeColor=(.08,.5,.3)
+ d.ESP32ComponentKeepout.ViewObject.ShapeColor=(.35,.38,.4)
+ d.USBCEnvelope.ViewObject.ShapeColor=(.76,.78,.8)
+ d.BoardKeeper.ViewObject.ShapeColor=(.2,.65,.63)
+ snap('v0.12-board-position.png')
+
+ only(['UpperShell']);old=d.UpperShell.Placement
+ d.UpperShell.Placement=A.Placement(A.Vector(0,0,0),A.Rotation(A.Vector(1,0,0),180))
+ snap('v0.12-upper-interior.png');d.UpperShell.Placement=old
+ only([o.Name for o in d.PrintParts.Group]);d.LightWindow.ViewObject.ShapeColor=(.30,.80,.69);d.LightWindow.ViewObject.Transparency=45
+ snap('v0.12-assembled.png')
+ only(['LowerShell','UpperShell','BoardKeeper','LightWindow'])
+ saved_placements={name:d.getObject(name).Placement for name in ['UpperShell','LightWindow','BoardKeeper']}
+ for name,dz in [('UpperShell',26),('LightWindow',26),('BoardKeeper',10)]:
+  obj=d.getObject(name);obj.Placement.Base=obj.Placement.Base+A.Vector(0,0,dz)
+ d.BoardKeeper.ViewObject.ShapeColor=(.2,.65,.63)
+ snap('v0.12-exploded.png')
+ # Restore the assembly before saving the native document.
+ for name,placement in saved_placements.items():d.getObject(name).Placement=placement
+ only([o.Name for o in d.PrintParts.Group]);v.viewAxonometric();v.fitAll();d.recompute();d.save()
+ open(root+'/final-preview.done','w').write('ok')
+except Exception:
+ open(root+'/final-preview.error','w').write(traceback.format_exc())
+def close_preview():
+ A.closeDocument(d.Name)
+ G.getMainWindow().close()
+QtCore.QTimer.singleShot(500,close_preview)

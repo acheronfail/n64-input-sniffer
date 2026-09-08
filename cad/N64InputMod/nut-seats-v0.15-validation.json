@@ -1,0 +1,100 @@
+{
+  "revision": "v0.15",
+  "nuts": [
+    {
+      "xy": [
+        -18,
+        -60
+      ],
+      "minimum_checked_wall_mm": 1.5,
+      "missing_wall_mm3": 0.0,
+      "cavity_obstruction_mm3": 0.0,
+      "bearing_missing_mm3": 0.0,
+      "cap_missing_mm3": 0.0,
+      "insertion_sweep_obstruction_mm3": 0.0,
+      "screw_path_obstruction_mm3": 0.0
+    },
+    {
+      "xy": [
+        18,
+        -60
+      ],
+      "minimum_checked_wall_mm": 1.5,
+      "missing_wall_mm3": 0.0,
+      "cavity_obstruction_mm3": 0.0,
+      "bearing_missing_mm3": 0.0,
+      "cap_missing_mm3": 0.0,
+      "insertion_sweep_obstruction_mm3": 0.0,
+      "screw_path_obstruction_mm3": 0.0
+    },
+    {
+      "xy": [
+        -18,
+        -19
+      ],
+      "minimum_checked_wall_mm": 1.5,
+      "missing_wall_mm3": 0.0,
+      "cavity_obstruction_mm3": 0.0,
+      "bearing_missing_mm3": 0.0,
+      "cap_missing_mm3": 0.0,
+      "insertion_sweep_obstruction_mm3": 0.0,
+      "screw_path_obstruction_mm3": 0.0
+    },
+    {
+      "xy": [
+        18,
+        -19
+      ],
+      "minimum_checked_wall_mm": 1.5,
+      "missing_wall_mm3": 0.0,
+      "cavity_obstruction_mm3": 0.0,
+      "bearing_missing_mm3": 0.0,
+      "cap_missing_mm3": 0.0,
+      "insertion_sweep_obstruction_mm3": 0.0,
+      "screw_path_obstruction_mm3": 0.0
+    },
+    {
+      "xy": [
+        -78,
+        -38.5
+      ],
+      "minimum_checked_wall_mm": 1.5,
+      "missing_wall_mm3": 0.0,
+      "cavity_obstruction_mm3": 0.0,
+      "bearing_missing_mm3": 0.0,
+      "cap_missing_mm3": 0.0,
+      "insertion_sweep_obstruction_mm3": 0.0,
+      "screw_path_obstruction_mm3": 0.0
+    },
+    {
+      "xy": [
+        78,
+        -38.5
+      ],
+      "minimum_checked_wall_mm": 1.5,
+      "missing_wall_mm3": 0.0,
+      "cavity_obstruction_mm3": 0.0,
+      "bearing_missing_mm3": 0.0,
+      "cap_missing_mm3": 0.0,
+      "insertion_sweep_obstruction_mm3": 0.0,
+      "screw_path_obstruction_mm3": 0.0
+    }
+  ],
+  "unchanged_parts": {
+    "MalePortKeeper1_unchanged_mm3": 0.0,
+    "MalePortKeeper2_unchanged_mm3": 0.0,
+    "MalePortKeeper3_unchanged_mm3": 0.0,
+    "MalePortKeeper4_unchanged_mm3": 0.0,
+    "FemalePortKeeper1_unchanged_mm3": 0.0,
+    "FemalePortKeeper2_unchanged_mm3": 0.0,
+    "FemalePortKeeper3_unchanged_mm3": 0.0,
+    "FemalePortKeeper4_unchanged_mm3": 0.0,
+    "BoardKeeper_unchanged_mm3": 0.0,
+    "LightWindow_unchanged_mm3": 0.0
+  },
+  "nut_proxy": {
+    "across_flats_mm": 4,
+    "height_mm": 1.6
+  },
+  "all_six_have_complete_walls_seats_and_caps": true
+}

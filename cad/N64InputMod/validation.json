@@ -1,0 +1,191 @@
+{
+  "status": "fit prototype; physical fit not yet verified",
+  "parts": {
+    "LowerShell": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 112697.04440128009,
+      "bounds": "BoundBox (-84.2867, -71.97, -16, 84.2867, 13.4138, 10.8)"
+    },
+    "UpperShell": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 54893.48860643212,
+      "bounds": "BoundBox (-84.2867, -71.97, 0.16, 84.2867, 13.4138, 16)"
+    },
+    "LightWindow": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 526.5919999999999,
+      "bounds": "BoundBox (-8.8, -15.3, 13.95, 8.8, 2.3, 15.65)"
+    },
+    "BoardKeeper": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 356.198416821177,
+      "bounds": "BoundBox (-16.5, -19.42, 8.75, 16.4755, 4.3, 10.55)"
+    },
+    "RearAlignmentGauge": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 34944.021878134474,
+      "bounds": "BoundBox (-84, -61, -16, 84, 8, 3)"
+    },
+    "RearAlignmentGaugeUpper": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 13903.004745042817,
+      "bounds": "BoundBox (-84, -61, 0.16, 84, 8, 16)"
+    },
+    "BoardFitCoupon": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 11183.574501906012,
+      "bounds": "BoundBox (-80, -21.1, -16, 80, 13.4138, 10.2)"
+    },
+    "FemaleFitCoupon": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 6258.737427815547,
+      "bounds": "BoundBox (-76, -72.6006, -16, 76, -52, 9)"
+    },
+    "MalePortKeeper1": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 5276.693021417831,
+      "bounds": "BoundBox (-77.34, -30.3016, 0.22, -50.74, 12.7984, 12.8)"
+    },
+    "MalePortKeeper2": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 5274.791814953922,
+      "bounds": "BoundBox (-49.3, -32.2062, 0.22, -22.7, 10.673, 12.8)"
+    },
+    "MalePortKeeper3": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 5274.477649440465,
+      "bounds": "BoundBox (22.7, -32.2062, 0.22, 49.3, 10.673, 12.8)"
+    },
+    "MalePortKeeper4": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 5275.750523757322,
+      "bounds": "BoundBox (50.74, -30.3016, 0.22, 77.34, 12.7984, 12.8)"
+    },
+    "FemalePortKeeper1": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 1212.5613702574753,
+      "bounds": "BoundBox (-76.5, -60, 0.22, -50.9, -47.4, 12.8)"
+    },
+    "FemalePortKeeper2": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 1212.5613702574758,
+      "bounds": "BoundBox (-48.8, -60, 0.22, -23.2, -47.4, 12.8)"
+    },
+    "FemalePortKeeper3": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 1212.5613702574776,
+      "bounds": "BoundBox (23.2, -60, 0.22, 48.8, -47.4, 12.8)"
+    },
+    "FemalePortKeeper4": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 1212.5613702574747,
+      "bounds": "BoundBox (50.9, -60, 0.22, 76.5, -47.4, 12.8)"
+    }
+  },
+  "collisions": [],
+  "parameters": {
+    "port_x": [
+      -63.7,
+      -36,
+      36,
+      63.7
+    ],
+    "rear_y": 9.0,
+    "front_y": -72.0,
+    "half_width": 84.0,
+    "bottom_z": -16.0,
+    "top_z": 16.0,
+    "wall": 2.4,
+    "connector_clearance": 0.22,
+    "nose_y": 7.0,
+    "curve_radius": 1450.0,
+    "pcb_width": 18.0,
+    "pcb_length": 22.52,
+    "pcb_thickness": 1.6,
+    "pcb_z": 7.0,
+    "pcb_front_y": -69.0,
+    "pcb_clearance": 0.2,
+    "keeper_gap": 0.15,
+    "keeper_thickness": 1.8,
+    "seam_gap": 0.16,
+    "usb_opening_width": 10.0,
+    "usb_opening_height": 4.0,
+    "usb_corner_radius": 0.7,
+    "usb_seam_tab_width": 28.0,
+    "usb_seam_inner_y": -68.9,
+    "keeper_head_diameter": 4.2,
+    "closure_head_diameter": 4.2,
+    "countersink_angle_deg": 90.0,
+    "closure_nut_af": 4.3,
+    "closure_nut_pocket_z": 2.0,
+    "closure_nut_pocket_height": 2.0,
+    "pcb_rear_stop_thickness": 1.6,
+    "pcb_rear_stop_setback": 0.8,
+    "male_tail_extra_depth": 1.25,
+    "pcb_console_side": 1,
+    "pcb_console_inset": 1.5,
+    "male_port_x": [
+      -64.04,
+      -36,
+      36,
+      64.04
+    ],
+    "female_keeper_top": 12.8,
+    "female_keeper_thickness": 2.0,
+    "female_keeper_pilot": 1.6,
+    "male_collar_depth": 38.0,
+    "male_keeper_top": 12.8,
+    "male_keeper_thickness": 2.0,
+    "male_keeper_pilot": 1.6,
+    "male_mating_diameter": 16.0,
+    "male_mating_height": 12.0,
+    "male_mating_length": 12.0,
+    "male_mating_clearance": 0.35,
+    "closure_screw_xy": [
+      [
+        -18,
+        -60
+      ],
+      [
+        18,
+        -60
+      ],
+      [
+        -18,
+        -19
+      ],
+      [
+        18,
+        -19
+      ],
+      [
+        -78,
+        -38.5
+      ],
+      [
+        78,
+        -38.5
+      ]
+    ],
+    "closure_boss_radius": 4.3
+  },
+  "shell_overlap_mm3": 0.0,
+  "keeper_overlap_mm3": 0.0,
+  "retainer_shell_overlap_mm3": 0.0
+}

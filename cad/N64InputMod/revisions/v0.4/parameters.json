@@ -1,0 +1,31 @@
+{
+  "port_x": [
+    -63.7,
+    -36,
+    36,
+    63.7
+  ],
+  "rear_y": -9.0,
+  "front_y": -62.0,
+  "half_width": 84.0,
+  "bottom_z": -16.0,
+  "top_z": 16.0,
+  "wall": 2.4,
+  "connector_clearance": 0.22,
+  "nose_y": 7.0,
+  "curve_radius": 1450.0,
+  "pcb_width": 18.0,
+  "pcb_length": 22.52,
+  "pcb_thickness": 1.6,
+  "pcb_z": -8.6,
+  "pcb_front_y": -59.0,
+  "pcb_clearance": 0.2,
+  "keeper_gap": 0.15,
+  "keeper_thickness": 1.8,
+  "seam_gap": 0.16,
+  "usb_opening_width": 10.0,
+  "usb_opening_height": 4.0,
+  "usb_corner_radius": 0.7,
+  "usb_seam_tab_width": 18.0,
+  "usb_seam_inner_y": -58.9
+}

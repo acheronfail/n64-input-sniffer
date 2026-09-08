@@ -1,0 +1,20 @@
+{
+  "keeper_shape_change_mm3": 0,
+  "window_shape_change_mm3": 0,
+  "LowerShell_connector_region_-63.7_change_mm3": 0,
+  "UpperShell_connector_region_-63.7_change_mm3": 0,
+  "LowerShell_connector_region_-36_change_mm3": 0,
+  "UpperShell_connector_region_-36_change_mm3": 0,
+  "LowerShell_connector_region_36_change_mm3": 0,
+  "UpperShell_connector_region_36_change_mm3": 0,
+  "LowerShell_connector_region_63.7_change_mm3": 0,
+  "UpperShell_connector_region_63.7_change_mm3": 0,
+  "lower_USB_notch_blocked_mm3": 0,
+  "upper_USB_notch_blocked_mm3": 0,
+  "lid_assembly_sweep_collision_mm3": 0,
+  "keeper_screw_head_lid_collision_mm3": 0,
+  "board_lift_mm": 15.6,
+  "PCB_top_to_window_underside_mm": 5.35,
+  "component_envelope_to_lid_min_distance_mm": 1.3000000000000007,
+  "keeper_screw_head_to_lid_min_distance_mm": 1.3499999999999996
+}

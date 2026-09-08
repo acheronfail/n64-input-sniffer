@@ -1,0 +1,20 @@
+{
+  "revision": "v0.14",
+  "print_part_regeneration_difference_mm3": {
+    "MalePortKeeper1": 0.0,
+    "MalePortKeeper2": 0.0,
+    "MalePortKeeper3": 0.0,
+    "MalePortKeeper4": 0.0,
+    "FemalePortKeeper1": 0.0,
+    "FemalePortKeeper2": 0.0,
+    "FemalePortKeeper3": 0.0,
+    "FemalePortKeeper4": 0.0,
+    "BoardKeeper": 0.0,
+    "LowerShell": 0.0,
+    "UpperShell": 0.0,
+    "LightWindow": 0.0
+  },
+  "extended_source_STEP_valid": true,
+  "extended_source_STEP_solids": 1,
+  "extended_source_bounds": "BoundBox (-131, -33.5, -11, -109, 12, 11)"
+}

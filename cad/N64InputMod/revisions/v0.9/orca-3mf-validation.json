@@ -1,0 +1,24 @@
+{
+  "orca_version": "2.4.2",
+  "import_success": true,
+  "plates": [
+    6,
+    4,
+    1
+  ],
+  "parts": 11,
+  "max_world_vertex_difference_mm": 9.265137634884013e-08,
+  "minimum_z_mm": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ]
+}

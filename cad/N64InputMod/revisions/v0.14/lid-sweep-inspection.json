@@ -1,0 +1,194 @@
+[
+  {
+    "z": 0.25,
+    "part": "MalePortKeeper1",
+    "volume": 1.3328399999999885,
+    "bounds": "BoundBox (-73.64, -25.2016, 10.8, -54.44, -21.9216, 10.83)"
+  },
+  {
+    "z": 0.25,
+    "part": "MalePortKeeper2",
+    "volume": 1.3328399999999885,
+    "bounds": "BoundBox (-45.6, -27.1062, 10.8, -26.4, -23.8262, 10.83)"
+  },
+  {
+    "z": 0.25,
+    "part": "MalePortKeeper3",
+    "volume": 1.3328399999999885,
+    "bounds": "BoundBox (26.4, -27.1062, 10.8, 45.6, -23.8262, 10.83)"
+  },
+  {
+    "z": 0.25,
+    "part": "MalePortKeeper4",
+    "volume": 1.3328399999999887,
+    "bounds": "BoundBox (54.44, -25.2016, 10.8, 73.64, -21.9216, 10.83)"
+  },
+  {
+    "z": 0.25,
+    "part": "FemalePortKeeper1",
+    "volume": 1.0820399999999857,
+    "bounds": "BoundBox (-73.3, -55.28, 10.8, -54.1, -53, 10.83)"
+  },
+  {
+    "z": 0.25,
+    "part": "FemalePortKeeper2",
+    "volume": 1.0820399999999855,
+    "bounds": "BoundBox (-45.6, -55.28, 10.8, -26.4, -53, 10.83)"
+  },
+  {
+    "z": 0.25,
+    "part": "FemalePortKeeper3",
+    "volume": 1.0820399999999855,
+    "bounds": "BoundBox (26.4, -55.28, 10.8, 45.6, -53, 10.83)"
+  },
+  {
+    "z": 0.25,
+    "part": "FemalePortKeeper4",
+    "volume": 1.0820399999999855,
+    "bounds": "BoundBox (54.1, -55.28, 10.8, 73.3, -53, 10.83)"
+  },
+  {
+    "z": 1,
+    "part": "MalePortKeeper1",
+    "volume": 34.65384,
+    "bounds": "BoundBox (-73.64, -25.2016, 10.8, -54.44, -21.9216, 11.58)"
+  },
+  {
+    "z": 1,
+    "part": "MalePortKeeper2",
+    "volume": 34.65384000000002,
+    "bounds": "BoundBox (-45.6, -27.1062, 10.8, -26.4, -23.8262, 11.58)"
+  },
+  {
+    "z": 1,
+    "part": "MalePortKeeper3",
+    "volume": 34.65384000000002,
+    "bounds": "BoundBox (26.4, -27.1062, 10.8, 45.6, -23.8262, 11.58)"
+  },
+  {
+    "z": 1,
+    "part": "MalePortKeeper4",
+    "volume": 34.65384000000002,
+    "bounds": "BoundBox (54.44, -25.2016, 10.8, 73.64, -21.9216, 11.58)"
+  },
+  {
+    "z": 1,
+    "part": "FemalePortKeeper1",
+    "volume": 28.133040000000005,
+    "bounds": "BoundBox (-73.3, -55.28, 10.8, -54.1, -53, 11.58)"
+  },
+  {
+    "z": 1,
+    "part": "FemalePortKeeper2",
+    "volume": 28.133040000000005,
+    "bounds": "BoundBox (-45.6, -55.28, 10.8, -26.4, -53, 11.58)"
+  },
+  {
+    "z": 1,
+    "part": "FemalePortKeeper3",
+    "volume": 28.13304000000001,
+    "bounds": "BoundBox (26.4, -55.28, 10.8, 45.6, -53, 11.58)"
+  },
+  {
+    "z": 1,
+    "part": "FemalePortKeeper4",
+    "volume": 28.133040000000005,
+    "bounds": "BoundBox (54.1, -55.28, 10.8, 73.3, -53, 11.58)"
+  },
+  {
+    "z": 3,
+    "part": "MalePortKeeper1",
+    "volume": 88.85600000000021,
+    "bounds": "BoundBox (-73.64, -25.2016, 10.8, -54.44, -21.9216, 12.8)"
+  },
+  {
+    "z": 3,
+    "part": "MalePortKeeper2",
+    "volume": 88.85600000000014,
+    "bounds": "BoundBox (-45.6, -27.1062, 10.8, -26.4, -23.8262, 12.8)"
+  },
+  {
+    "z": 3,
+    "part": "MalePortKeeper3",
+    "volume": 88.85600000000001,
+    "bounds": "BoundBox (26.4, -27.1062, 10.8, 45.6, -23.8262, 12.8)"
+  },
+  {
+    "z": 3,
+    "part": "MalePortKeeper4",
+    "volume": 88.856,
+    "bounds": "BoundBox (54.44, -25.2016, 10.8, 73.64, -21.9216, 12.8)"
+  },
+  {
+    "z": 3,
+    "part": "FemalePortKeeper1",
+    "volume": 72.13600000000018,
+    "bounds": "BoundBox (-73.3, -55.28, 10.8, -54.1, -53, 12.8)"
+  },
+  {
+    "z": 3,
+    "part": "FemalePortKeeper2",
+    "volume": 72.13600000000017,
+    "bounds": "BoundBox (-45.6, -55.28, 10.8, -26.4, -53, 12.8)"
+  },
+  {
+    "z": 3,
+    "part": "FemalePortKeeper3",
+    "volume": 72.13600000000021,
+    "bounds": "BoundBox (26.4, -55.28, 10.8, 45.6, -53, 12.8)"
+  },
+  {
+    "z": 3,
+    "part": "FemalePortKeeper4",
+    "volume": 72.13600000000017,
+    "bounds": "BoundBox (54.1, -55.28, 10.8, 73.3, -53, 12.8)"
+  },
+  {
+    "z": 8,
+    "part": "MalePortKeeper1",
+    "volume": 21.355743118948862,
+    "bounds": "BoundBox (-73.64, -23.4816, 10.8, -54.44, -21.9216, 12.8)"
+  },
+  {
+    "z": 8,
+    "part": "MalePortKeeper2",
+    "volume": 21.355743118948837,
+    "bounds": "BoundBox (-45.6, -25.3862, 10.8, -26.4, -23.8262, 12.8)"
+  },
+  {
+    "z": 8,
+    "part": "MalePortKeeper3",
+    "volume": 21.355743118948805,
+    "bounds": "BoundBox (26.4, -25.3862, 10.8, 45.6, -23.8262, 12.8)"
+  },
+  {
+    "z": 8,
+    "part": "MalePortKeeper4",
+    "volume": 21.355743118948816,
+    "bounds": "BoundBox (54.44, -23.4816, 10.8, 73.64, -21.9216, 12.8)"
+  },
+  {
+    "z": 8,
+    "part": "FemalePortKeeper1",
+    "volume": 3.743999999999984,
+    "bounds": "BoundBox (-73.3, -55.28, 10.8, -54.1, -53.72, 12.8)"
+  },
+  {
+    "z": 8,
+    "part": "FemalePortKeeper2",
+    "volume": 3.7439999999999776,
+    "bounds": "BoundBox (-45.6, -55.28, 10.8, -26.4, -53.72, 12.8)"
+  },
+  {
+    "z": 8,
+    "part": "FemalePortKeeper3",
+    "volume": 3.743999999999953,
+    "bounds": "BoundBox (26.4, -55.28, 10.8, 45.6, -53.72, 12.8)"
+  },
+  {
+    "z": 8,
+    "part": "FemalePortKeeper4",
+    "volume": 3.743999999999967,
+    "bounds": "BoundBox (54.1, -55.28, 10.8, 73.3, -53.72, 12.8)"
+  }
+]

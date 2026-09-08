@@ -1,0 +1,52 @@
+{
+  "revision": "v0.14",
+  "registration_basis": "Full-resolution scan surface intersections for the extended v0.14 model.\n\nRegistration retains v0.13's intended tip engagement: adding 12 mm of missing\nmating projection shifts both console scans +12 mm in Y. X is recentered using\nthe independently measured scan symmetry. This is an explicit assembly\nassumption, not a measurement of installed socket/contact depth.\n",
+  "mating_projection_mm": 12.0,
+  "decimation": false,
+  "checks": {
+    "Top": {
+      "full_resolution_triangles": 2500458,
+      "ROI_triangles": 202894,
+      "models": {
+        "LowerShell": {
+          "intersecting_triangle_pairs": 0
+        },
+        "UpperShell": {
+          "intersecting_triangle_pairs": 0
+        },
+        "MaleConnectorAssembly": {
+          "intersecting_triangle_pairs": 0
+        }
+      }
+    },
+    "Bottom": {
+      "full_resolution_triangles": 2500528,
+      "ROI_triangles": 209464,
+      "models": {
+        "LowerShell": {
+          "intersecting_triangle_pairs": 0
+        },
+        "UpperShell": {
+          "intersecting_triangle_pairs": 0
+        },
+        "MaleConnectorAssembly": {
+          "intersecting_triangle_pairs": 0
+        }
+      }
+    }
+  },
+  "scan_transforms": {
+    "Top": [
+      -0.4959739933814742,
+      83.5,
+      2.2
+    ],
+    "Bottom": [
+      -0.4987962140120761,
+      115.5,
+      -29.3
+    ]
+  },
+  "surface_intersections_pass": true,
+  "limitations": "Surface intersection check under stated scan registration; no socket/contact geometry, insertion-depth certification, load test or calibrated scan accuracy."
+}

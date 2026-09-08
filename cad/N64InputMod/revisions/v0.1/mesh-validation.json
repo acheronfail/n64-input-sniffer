@@ -1,0 +1,37 @@
+{
+  "RearAlignmentGaugeUpper.stl": {
+    "boundary_edges": 0,
+    "nonmanifold_edges": 0,
+    "watertight_after_0_0001mm_weld": true
+  },
+  "RearAlignmentGauge.stl": {
+    "boundary_edges": 0,
+    "nonmanifold_edges": 0,
+    "watertight_after_0_0001mm_weld": true
+  },
+  "BoardFitCoupon.stl": {
+    "boundary_edges": 0,
+    "nonmanifold_edges": 0,
+    "watertight_after_0_0001mm_weld": true
+  },
+  "FemaleFitCoupon.stl": {
+    "boundary_edges": 0,
+    "nonmanifold_edges": 0,
+    "watertight_after_0_0001mm_weld": true
+  },
+  "LowerShell.stl": {
+    "boundary_edges": 0,
+    "nonmanifold_edges": 0,
+    "watertight_after_0_0001mm_weld": true
+  },
+  "LightWindow.stl": {
+    "boundary_edges": 0,
+    "nonmanifold_edges": 0,
+    "watertight_after_0_0001mm_weld": true
+  },
+  "UpperShell.stl": {
+    "boundary_edges": 0,
+    "nonmanifold_edges": 0,
+    "watertight_after_0_0001mm_weld": true
+  }
+}

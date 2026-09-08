@@ -1,0 +1,73 @@
+{
+  "parts": 12,
+  "plate_counts": [
+    7,
+    4,
+    1
+  ],
+  "bed_bounds_and_no_overlap": true,
+  "keeper_size_mm": [
+    32.998916600000015,
+    23.71999740000001,
+    1.80000019
+  ],
+  "orca_import_export": "passed with OrcaSlicer 2.4.2",
+  "all_three_plates_sliced": true,
+  "supports_enabled": false,
+  "embedded_gcode_matches_checked_toolpaths": true,
+  "pauses": [
+    {
+      "layer": 34,
+      "height": 5.48
+    },
+    {
+      "layer": 88,
+      "height": 14.12
+    }
+  ],
+  "slice_result": {
+    "error_string": "Success.",
+    "export_time": 1,
+    "layer_height": 0.1599999964237213,
+    "plate_index": 0,
+    "prepare_time": 0,
+    "return_code": 0,
+    "sliced_plates": [
+      {
+        "id": 1,
+        "sliced_time": 11,
+        "sliced_time_with_cache": 3,
+        "triangle_count": 52092,
+        "warning_message": ""
+      },
+      {
+        "id": 2,
+        "sliced_time": 0,
+        "sliced_time_with_cache": 0,
+        "triangle_count": 48,
+        "warning_message": ""
+      },
+      {
+        "id": 3,
+        "sliced_time": 0,
+        "sliced_time_with_cache": 0,
+        "triangle_count": 12,
+        "warning_message": ""
+      }
+    ],
+    "sparse_infill_density": 15.0,
+    "upward_compatible_machine": [
+      "Bambu Lab P1P 0.4 nozzle",
+      "Bambu Lab X1 0.4 nozzle",
+      "Bambu Lab X1 Carbon 0.4 nozzle",
+      "Bambu Lab X1E 0.4 nozzle",
+      "Bambu Lab A1 0.4 nozzle",
+      "Bambu Lab H2D 0.4 nozzle",
+      "Bambu Lab H2D Pro 0.4 nozzle",
+      "Bambu Lab H2S 0.4 nozzle",
+      "Bambu Lab P2S 0.4 nozzle"
+    ],
+    "wall_loops": 2
+  },
+  "sha256": "526704fdb8e952efbf0732813699690ab193f663dab7611c0d3c0bcbbe7ff7f2"
+}

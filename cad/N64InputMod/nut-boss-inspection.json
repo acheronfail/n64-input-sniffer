@@ -1,0 +1,102 @@
+{
+  "existing": [
+    {
+      "xy": [
+        -77,
+        -49
+      ],
+      "missing_wall_mm3": 22.791106608924515
+    },
+    {
+      "xy": [
+        77,
+        -49
+      ],
+      "missing_wall_mm3": 22.791106608924526
+    },
+    {
+      "xy": [
+        -19,
+        -19
+      ],
+      "missing_wall_mm3": 2.7447237926532413
+    },
+    {
+      "xy": [
+        19,
+        -19
+      ],
+      "missing_wall_mm3": 2.744723792655848
+    },
+    {
+      "xy": [
+        -79,
+        -18
+      ],
+      "missing_wall_mm3": 31.838899564979748
+    },
+    {
+      "xy": [
+        79,
+        -18
+      ],
+      "missing_wall_mm3": 31.838899564979847
+    }
+  ],
+  "proposed": [
+    {
+      "xy": [
+        -18,
+        -60
+      ],
+      "post_hardware_overlap_mm3": 0.0,
+      "post_keeper_sweep_overlap_mm3": 0.0,
+      "nut_wall_outside_case_mm3": 0.0
+    },
+    {
+      "xy": [
+        18,
+        -60
+      ],
+      "post_hardware_overlap_mm3": 0.0,
+      "post_keeper_sweep_overlap_mm3": 0.0,
+      "nut_wall_outside_case_mm3": 0.0
+    },
+    {
+      "xy": [
+        -18,
+        -19
+      ],
+      "post_hardware_overlap_mm3": 0.0,
+      "post_keeper_sweep_overlap_mm3": 0.0,
+      "nut_wall_outside_case_mm3": 0.0
+    },
+    {
+      "xy": [
+        18,
+        -19
+      ],
+      "post_hardware_overlap_mm3": 0.0,
+      "post_keeper_sweep_overlap_mm3": 0.0,
+      "nut_wall_outside_case_mm3": 0.0
+    },
+    {
+      "xy": [
+        -78,
+        -38.5
+      ],
+      "post_hardware_overlap_mm3": 0.0,
+      "post_keeper_sweep_overlap_mm3": 0.0,
+      "nut_wall_outside_case_mm3": 0.0
+    },
+    {
+      "xy": [
+        78,
+        -38.5
+      ],
+      "post_hardware_overlap_mm3": 0.0,
+      "post_keeper_sweep_overlap_mm3": 0.0,
+      "nut_wall_outside_case_mm3": 0.0
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+import FreeCAD as A,FreeCADGui as G,Mesh,os,traceback
+from PySide import QtCore,QtWidgets
+import time
+from pivy import coin
+root=os.path.dirname(__file__)
+for marker in ['preview.error','preview.done']:
+ if os.path.exists(root+'/'+marker):os.remove(root+'/'+marker)
+try:
+ d=A.openDocument(root+'/N64InputMod.FCStd')
+ for o in d.Objects:
+  if hasattr(o,'ViewObject'):o.ViewObject.Visibility=False
+ for o in d.PrintParts.Group+d.Hardware.Group:
+  o.ViewObject.Visibility=True
+  if o.TypeId=='Part::Feature':o.ViewObject.ShapeColor=(.20,.23,.26);o.ViewObject.LineColor=(.08,.09,.11);o.ViewObject.DisplayMode='Flat Lines'
+ d.ESP32BoardEnvelope.ViewObject.ShapeColor=(.08,.45,.30)
+ d.ESP32ComponentKeepout.ViewObject.ShapeColor=(.50,.52,.55)
+ d.USBCEnvelope.ViewObject.ShapeColor=(.75,.77,.79)
+ d.LightWindow.ViewObject.ShapeColor=(.4,.85,.68);d.LightWindow.ViewObject.Transparency=65
+ v=G.activeDocument().activeView()
+ def fit():
+  for _ in range(3):
+   v.fitAll();G.updateGui();QtWidgets.QApplication.processEvents();time.sleep(.25)
+  cam=v.getCameraNode();cam.nearDistance.setValue(.1);cam.farDistance.setValue(10000);v.redraw();G.updateGui()
+ v.viewAxonometric();fit()
+ v.saveImage(root+'/assembled.png',1600,1000,'White')
+ d.UpperShell.ViewObject.Visibility=False;d.LightWindow.ViewObject.Visibility=False
+ fit();v.saveImage(root+'/interior.png',1600,1000,'White')
+ d.UpperShell.ViewObject.Visibility=True;d.LightWindow.ViewObject.Visibility=True
+ for name in ['Top','Bottom']:
+  o=d.getObject('Console'+name)
+  if o is None:
+   o=d.addObject('Mesh::Feature','Console'+name);o.Mesh=Mesh.Mesh(root+'/reference/'+name+'_aligned.stl');d.Console.addObject(o)
+  o.ViewObject.Visibility=True
+  o.ViewObject.ShapeColor=(.38,.39,.41);o.ViewObject.DisplayMode='Shaded';o.ViewObject.Lighting='Two side'
+ v.viewAxonometric();fit();v.saveImage(root+'/on-console.png',1600,1100,'White')
+ for o in d.Console.Group:o.ViewObject.Visibility=False
+ v.fitAll();d.recompute();d.save()
+ open(root+'/preview.done','w').write('ok')
+except Exception:
+ open(root+'/preview.error','w').write(traceback.format_exc())
+def close_preview():
+ for name in list(A.listDocuments()):A.closeDocument(name)
+ G.getMainWindow().close()
+QtCore.QTimer.singleShot(500, close_preview)

@@ -1,0 +1,210 @@
+{
+  "revision": "v0.14",
+  "printer": "Bambu Lab P1S 0.4 nozzle",
+  "bed": "Supertack Plate",
+  "plate_counts": [
+    2,
+    9,
+    1
+  ],
+  "slices": {
+    "error_string": "Success.",
+    "export_time": 1,
+    "layer_height": 0.1599999964237213,
+    "plate_index": 0,
+    "prepare_time": 0,
+    "return_code": 0,
+    "sliced_plates": [
+      {
+        "id": 1,
+        "sliced_time": 11,
+        "sliced_time_with_cache": 3,
+        "triangle_count": 47904,
+        "warning_message": ""
+      },
+      {
+        "id": 2,
+        "sliced_time": 4,
+        "sliced_time_with_cache": 2,
+        "triangle_count": 36136,
+        "warning_message": ""
+      },
+      {
+        "id": 3,
+        "sliced_time": 0,
+        "sliced_time_with_cache": 0,
+        "triangle_count": 12,
+        "warning_message": ""
+      }
+    ],
+    "sparse_infill_density": 15.0,
+    "upward_compatible_machine": [
+      "Bambu Lab P1P 0.4 nozzle",
+      "Bambu Lab X1 0.4 nozzle",
+      "Bambu Lab X1 Carbon 0.4 nozzle",
+      "Bambu Lab X1E 0.4 nozzle",
+      "Bambu Lab A1 0.4 nozzle",
+      "Bambu Lab H2D 0.4 nozzle",
+      "Bambu Lab H2D Pro 0.4 nozzle",
+      "Bambu Lab H2S 0.4 nozzle",
+      "Bambu Lab P2S 0.4 nozzle"
+    ],
+    "wall_loops": 2
+  },
+  "geometry": [
+    {
+      "name": "MalePortKeeper4.stl",
+      "triangles": 5970,
+      "max_vertex_error_mm": 1.398925633111503e-07,
+      "source_sha256": "6e150fce3acc7c3d39721086ff8ed825d1bcb13a64097cb5a2460057ac4452a4"
+    },
+    {
+      "name": "FemalePortKeeper.stl",
+      "triangles": 3380,
+      "max_vertex_error_mm": 4.370116357677034e-08,
+      "source_sha256": "ad93f3cbc31aedcbbc9aaaab94db22fa8c4040bdd620612d50b4ce0d236cf4bc"
+    },
+    {
+      "name": "FemalePortKeeper.stl",
+      "triangles": 3380,
+      "max_vertex_error_mm": 4.370116357677034e-08,
+      "source_sha256": "ad93f3cbc31aedcbbc9aaaab94db22fa8c4040bdd620612d50b4ce0d236cf4bc"
+    },
+    {
+      "name": "FemalePortKeeper.stl",
+      "triangles": 3380,
+      "max_vertex_error_mm": 4.370116357677034e-08,
+      "source_sha256": "ad93f3cbc31aedcbbc9aaaab94db22fa8c4040bdd620612d50b4ce0d236cf4bc"
+    },
+    {
+      "name": "FemalePortKeeper.stl",
+      "triangles": 3380,
+      "max_vertex_error_mm": 4.370116357677034e-08,
+      "source_sha256": "ad93f3cbc31aedcbbc9aaaab94db22fa8c4040bdd620612d50b4ce0d236cf4bc"
+    },
+    {
+      "name": "MalePortKeeper1.stl",
+      "triangles": 4458,
+      "max_vertex_error_mm": 1.398925633111503e-07,
+      "source_sha256": "fee896b37e07f3a95b47dd17c25ba388afc5968e6e5c1ce3c7914d2bc0c88933"
+    },
+    {
+      "name": "MalePortKeeper2.stl",
+      "triangles": 4958,
+      "max_vertex_error_mm": 1.0493164026570412e-06,
+      "source_sha256": "fcd0ae7d281ed40470163e6b86e821a1d02b42e7fb49877bd9736475d7f5ffa9"
+    },
+    {
+      "name": "MalePortKeeper3.stl",
+      "triangles": 5462,
+      "max_vertex_error_mm": 1.0493164026570412e-06,
+      "source_sha256": "dc7de9f9fd17d724d0883c1affa0ca5319c5f2e2556c2a0936792d1ada88083e"
+    },
+    {
+      "name": "BoardKeeper.stl",
+      "triangles": 1768,
+      "max_vertex_error_mm": 4.9609354846325004e-08,
+      "source_sha256": "f8d07639eefdf88738b4f03291369a1fd37e49b5f1e2aa9aaae44fd8fe7b4bd0"
+    },
+    {
+      "name": "LowerShell.stl",
+      "triangles": 34710,
+      "max_vertex_error_mm": 6.718750000800355e-08,
+      "source_sha256": "fcd44c9384e4bba03ef2c64f2cee5c78fa82a3e5f71704ec08e9f36e8d83d0a2"
+    },
+    {
+      "name": "UpperShell.stl",
+      "triangles": 13194,
+      "max_vertex_error_mm": 4.999998282073648e-08,
+      "source_sha256": "a841db2f0c853c06da2ed32766abfe0155c3b5653aa1c4db0cdcc2e5cf83233c"
+    },
+    {
+      "name": "LightWindow.stl",
+      "triangles": 12,
+      "max_vertex_error_mm": 7.34871719032526e-10,
+      "source_sha256": "9ac210e97a5f919ed29d4f41e7460bcb481591db98fe37af77db73ddad813801"
+    }
+  ],
+  "embedded_gcode_matches_verified_files": true,
+  "pause_validation": {
+    "revision": "v0.14",
+    "pauses": [
+      {
+        "layer": 88,
+        "height": 14.12,
+        "line": 560390
+      }
+    ],
+    "all_six_caps_begin_after_pause": true,
+    "other_plates_have_no_pause": true,
+    "pockets": {
+      "M2_1": {
+        "centre_xy_mm": [
+          51.0,
+          182.73012161254883
+        ],
+        "first_cap_extrusion": {
+          "height": 14.12,
+          "line": 562878
+        },
+        "cap_segments": 13
+      },
+      "M2_2": {
+        "centre_xy_mm": [
+          205.0,
+          182.73012161254883
+        ],
+        "first_cap_extrusion": {
+          "height": 14.12,
+          "line": 560753
+        },
+        "cap_segments": 14
+      },
+      "M2_3": {
+        "centre_xy_mm": [
+          109.0,
+          152.73012161254883
+        ],
+        "first_cap_extrusion": {
+          "height": 14.12,
+          "line": 562106
+        },
+        "cap_segments": 21
+      },
+      "M2_4": {
+        "centre_xy_mm": [
+          147.0,
+          152.73012161254883
+        ],
+        "first_cap_extrusion": {
+          "height": 14.12,
+          "line": 561759
+        },
+        "cap_segments": 22
+      },
+      "M2_5": {
+        "centre_xy_mm": [
+          49.0,
+          151.73012161254883
+        ],
+        "first_cap_extrusion": {
+          "height": 14.12,
+          "line": 562506
+        },
+        "cap_segments": 18
+      },
+      "M2_6": {
+        "centre_xy_mm": [
+          207.0,
+          151.73012161254883
+        ],
+        "first_cap_extrusion": {
+          "height": 14.12,
+          "line": 560433
+        },
+        "cap_segments": 19
+      }
+    }
+  },
+  "sha256": "0c9a49e16966a346c2cc274db6fefd5e4bd1be23025a66645a4ec10ba8c81b73"
+}

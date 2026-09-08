@@ -1,0 +1,15 @@
+{
+  "parts": 12,
+  "plate_counts": [
+    7,
+    4,
+    1
+  ],
+  "bed_bounds_and_no_overlap": true,
+  "keeper_size_mm": [
+    32.998916600000015,
+    23.71999740000001,
+    1.80000019
+  ],
+  "orca_import_export": "passed"
+}

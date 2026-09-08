@@ -1,0 +1,150 @@
+{
+  "revision": "v0.15",
+  "status": "Independent contour retention; enlarged case; CAD and scan checks recorded separately; physical fit unverified",
+  "files": [
+    {
+      "file": "LowerShell.stl",
+      "print_quantity": 1,
+      "material_or_note": "Rigid material matching the proven enclosure print",
+      "orientation": "Broad lower face on bed",
+      "size_mm": [
+        168.59066772460938,
+        85.40032196044922,
+        26.799999237060547
+      ],
+      "bed_z_mm": 0.0,
+      "triangles": 35536,
+      "max_edge_length_change_mm": 3.814697265625e-06,
+      "source_sha256": "92c84e360371c77b8c0edb9862f82fcc32e2ef7a891ccf366d2ba47b85f4e222",
+      "sha256": "d6bc72eaa09349b4990986a326fceb842fa0fe5e3705809622bff112968fad01"
+    },
+    {
+      "file": "UpperShell.stl",
+      "print_quantity": 1,
+      "material_or_note": "Same as lower shell",
+      "orientation": "Outside roof on bed",
+      "size_mm": [
+        168.59066772460938,
+        85.40032196044922,
+        15.84000015258789
+      ],
+      "bed_z_mm": 0.0,
+      "triangles": 14190,
+      "max_edge_length_change_mm": 7.62939453125e-06,
+      "source_sha256": "037574d8ad235f372cf2d4c55645b9e905f6be69ea1b473c8d194701394dd876",
+      "sha256": "21f8f8d1d2d4bc45c07282ce07ba4df02d4ae0fbcf9728765532fce54ab9ee65"
+    },
+    {
+      "file": "BoardKeeper.stl",
+      "print_quantity": 1,
+      "material_or_note": "Reuse existing keeper if available",
+      "orientation": "Broad lower face on bed",
+      "size_mm": [
+        32.99891662597656,
+        23.720001220703125,
+        1.8000001907348633
+      ],
+      "bed_z_mm": 0.0,
+      "triangles": 1768,
+      "max_edge_length_change_mm": 1.1920928955078125e-06,
+      "source_sha256": "b0ca6e70857dd850220f6c442f821d5ebfffd7a3e1731e3f5cde902cd891f39b",
+      "sha256": "d9746131354c423e36591a4ca78e379a2798e7980178d266f31b5aa5c003cf3d"
+    },
+    {
+      "file": "MalePortKeeper1.stl",
+      "print_quantity": 1,
+      "material_or_note": "Rigid material; numbered left to right by increasing CAD X",
+      "orientation": "Flat top face on bed",
+      "size_mm": [
+        26.599994659423828,
+        43.099998474121094,
+        12.579999923706055
+      ],
+      "bed_z_mm": 0.0,
+      "triangles": 4458,
+      "max_edge_length_change_mm": 1.9073486328125e-06,
+      "source_sha256": "3cef21d474aea1173219c5db77e04cf4bd673a4b18213cc7c736b98aed7f99f0",
+      "sha256": "3e8e3b200f8585e7189e50458254d9a70092d4e16e05f5ad8a99f31d7165f608"
+    },
+    {
+      "file": "MalePortKeeper2.stl",
+      "print_quantity": 1,
+      "material_or_note": "Rigid material; numbered left to right by increasing CAD X",
+      "orientation": "Flat top face on bed",
+      "size_mm": [
+        26.599998474121094,
+        42.879241943359375,
+        12.579999923706055
+      ],
+      "bed_z_mm": 0.0,
+      "triangles": 4958,
+      "max_edge_length_change_mm": 2.0265579223632812e-06,
+      "source_sha256": "afb0b9da8b99006d342d178f89f03b3fa89106c16d2d38d75f5f885b8e82ce6a",
+      "sha256": "8f19435d21a21850066f65e1d35563cad812c4217c639feab515f74ba6adfd9a"
+    },
+    {
+      "file": "MalePortKeeper3.stl",
+      "print_quantity": 1,
+      "material_or_note": "Rigid material; numbered left to right by increasing CAD X",
+      "orientation": "Flat top face on bed",
+      "size_mm": [
+        26.599998474121094,
+        42.879241943359375,
+        12.579999923706055
+      ],
+      "bed_z_mm": 0.0,
+      "triangles": 5462,
+      "max_edge_length_change_mm": 2.0265579223632812e-06,
+      "source_sha256": "0c57bf7e477b3cc17e45be42082c052575c313a5e4d2e42789965ad5940c86be",
+      "sha256": "fc45d6e56169781b3ccc3c68165df7dd0ab1768070eeaa8bfd1e81becf33b80b"
+    },
+    {
+      "file": "MalePortKeeper4.stl",
+      "print_quantity": 1,
+      "material_or_note": "Rigid material; numbered left to right by increasing CAD X",
+      "orientation": "Flat top face on bed",
+      "size_mm": [
+        26.599994659423828,
+        43.099998474121094,
+        12.579999923706055
+      ],
+      "bed_z_mm": 0.0,
+      "triangles": 5970,
+      "max_edge_length_change_mm": 1.914799213409424e-06,
+      "source_sha256": "cf7ba56b28dc26bdd6f9ec4736ab17017a2240e1dae2c290ab068cd0f43eebf4",
+      "sha256": "f4e3a68f7a8d473c56159944874bd800a9809ed37d85275285233b9981f01257"
+    },
+    {
+      "file": "FemalePortKeeper.stl",
+      "print_quantity": 4,
+      "material_or_note": "Rigid material; all four identical",
+      "orientation": "Flat top face on bed",
+      "size_mm": [
+        25.599998474121094,
+        12.599998474121094,
+        12.579999923706055
+      ],
+      "bed_z_mm": 0.0,
+      "triangles": 3380,
+      "max_edge_length_change_mm": 8.940696716308594e-07,
+      "source_sha256": "383d1552af41a7b688e681d7e392a4323a19652631c38c8dbb86efa1d8c77bb5",
+      "sha256": "688f8da40d31e8c9f760c51dbf5aac367dda428bb69555fb6b615c88db1dd54d"
+    },
+    {
+      "file": "LightWindow.stl",
+      "print_quantity": 1,
+      "material_or_note": "Optional translucent material; reuse existing window",
+      "orientation": "Broad lower face on bed",
+      "size_mm": [
+        17.600000381469727,
+        17.600000381469727,
+        1.6999998092651367
+      ],
+      "bed_z_mm": 0.0,
+      "triangles": 12,
+      "max_edge_length_change_mm": 0.0,
+      "source_sha256": "222eb90ccae815e5a5cb41bffeae9fb90daa96910513309843ddf31251902e80",
+      "sha256": "cdef0220416dc11c9333c2e3d080ed4f9f35fdec6d80e93c169697b95686c262"
+    }
+  ]
+}

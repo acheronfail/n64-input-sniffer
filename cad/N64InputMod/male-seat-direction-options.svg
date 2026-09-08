@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="720" viewBox="0 0 1400 720">
+<defs>
+ <marker id="arrowDown" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#c54f29"/></marker>
+ <marker id="arrowUp" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#147a68"/></marker>
+</defs>
+<rect width="1400" height="720" fill="#f4f6f8"/>
+<g font-family="DejaVu Sans, sans-serif" fill="#243441">
+ <text x="48" y="57" font-size="29" font-weight="bold">Two possible changes to the circled lower seat</text>
+ <text x="48" y="92" font-size="18" fill="#5b6872">Simplified cross-section looking into the connector opening. Movement exaggerated for clarity.</text>
+ <rect x="35" y="122" width="645" height="545" rx="16" fill="white"/>
+ <rect x="720" y="122" width="645" height="545" rx="16" fill="white"/>
+ <text x="65" y="164" font-size="24" font-weight="bold">A — Make the recess deeper</text>
+ <text x="65" y="198" font-size="18">Remove 1.25 mm from the lower cradle.</text>
+ <text x="750" y="164" font-size="24" font-weight="bold">B — Raise the support surface</text>
+ <text x="750" y="198" font-size="18">Add 1.25 mm beneath the connector.</text>
+ <!-- Option A: new opening has its supporting surface lower. -->
+ <path d="M115 280 H180 V430 Q180 465 220 465 H485 Q525 465 525 430 V280 H590 V545 H115 Z" fill="#b9c5cf" stroke="#354d5e" stroke-width="3"/>
+ <path d="M180 365 Q180 400 220 400 H485 Q525 400 525 365 V430 Q525 465 485 465 H220 Q180 465 180 430 Z" fill="#ffe0d5"/>
+ <path d="M180 280 V365 Q180 400 220 400 H485 Q525 400 525 365 V280" fill="none" stroke="#71808b" stroke-width="3" stroke-dasharray="9 7"/>
+ <path d="M180 280 V430 Q180 465 220 465 H485 Q525 465 525 430 V280" fill="none" stroke="#354d5e" stroke-width="3"/>
+ <path d="M353 411 V450" stroke="#c54f29" stroke-width="5" marker-end="url(#arrowDown)"/>
+ <text x="386" y="442" font-size="19" fill="#a74020">1.25 mm DOWN</text>
+ <text x="243" y="323" font-size="19" fill="#5b6872">Connector opening</text>
+ <text x="147" y="514" font-size="18">Printed lower shell</text>
+ <text x="65" y="587" font-size="20" font-weight="bold" fill="#a74020">More vertical room for the connector</text>
+ <text x="65" y="621" font-size="17">Peach area = material removed</text>
+ <!-- Option B: same rim, new supporting surface higher. -->
+ <path d="M800 280 H865 V365 Q865 400 905 400 H1170 Q1210 400 1210 365 V280 H1275 V545 H800 Z" fill="#b9c5cf" stroke="#354d5e" stroke-width="3"/>
+ <path d="M865 300 Q865 335 905 335 H1170 Q1210 335 1210 300 V365 Q1210 400 1170 400 H905 Q865 400 865 365 Z" fill="#a9dfcf"/>
+ <path d="M865 280 V365 Q865 400 905 400 H1170 Q1210 400 1210 365 V280" fill="none" stroke="#71808b" stroke-width="3" stroke-dasharray="9 7"/>
+ <path d="M865 280 V300 Q865 335 905 335 H1170 Q1210 335 1210 300 V280" fill="none" stroke="#354d5e" stroke-width="3"/>
+ <path d="M1038 389 V350" stroke="#147a68" stroke-width="5" marker-end="url(#arrowUp)"/>
+ <text x="1062" y="376" font-size="19" fill="#116555">1.25 mm UP</text>
+ <text x="928" y="266" font-size="19" fill="#5b6872">Connector opening</text>
+ <text x="832" y="514" font-size="18">Printed lower shell</text>
+ <text x="750" y="587" font-size="20" font-weight="bold" fill="#116555">Connector sits higher; less room below</text>
+ <text x="750" y="621" font-size="17">Green area = material added</text>
+ <path d="M48 693 H105" stroke="#71808b" stroke-width="3" stroke-dasharray="9 7"/>
+ <text x="120" y="700" font-size="17">Dashed line = current surface. The actual model has not been changed.</text>
+</g>
+</svg>

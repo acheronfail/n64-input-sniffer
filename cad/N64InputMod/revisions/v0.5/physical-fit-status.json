@@ -1,0 +1,24 @@
+{
+  "recorded_date": "2026-09-07",
+  "revision": "v0.3",
+  "evidence": "Owner feedback in this task; not instrumented measurements",
+  "confirmed": [
+    "Board cradle and keeper fit and secure retention",
+    "USB-C opening fit",
+    "Female connector seat fit",
+    "Male connector seat fit"
+  ],
+  "pending": [
+    "Revised male clamp axial retention",
+    "Four-plug engagement with the console",
+    "Full enclosure assembly and cable-load testing",
+    "ESP32 LED visibility through top window",
+    "Physical print check of v0.4 split USB seam and v0.5 support-reduction geometry"
+  ],
+  "stage": "Full enclosure print authorized",
+  "accepted_without_separate_test": [
+    "Owner chose to skip the separate male-clamp gauge test and proceed; adhesive is an accepted fallback if retention is insufficient"
+  ],
+  "next_step": "Print and assemble full enclosure",
+  "current_cad_revision": "v0.5"
+}

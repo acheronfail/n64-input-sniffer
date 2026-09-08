@@ -1,0 +1,48 @@
+{
+  "revision": "v0.11",
+  "checks": {
+    "BoardKeeper_rigid_transform_error_mm3": 0,
+    "LightWindow_rigid_transform_error_mm3": 0,
+    "ESP32BoardEnvelope_rigid_transform_error_mm3": 0,
+    "ESP32ComponentKeepout_rigid_transform_error_mm3": 0,
+    "USBCEnvelope_rigid_transform_error_mm3": 0,
+    "MalePort1_change_mm3": 0,
+    "FemalePort1_change_mm3": 0,
+    "MaleClampShoe1_change_mm3": 0,
+    "MaleClampPad1_change_mm3": 0,
+    "MalePort2_change_mm3": 0,
+    "FemalePort2_change_mm3": 0,
+    "MaleClampShoe2_change_mm3": 0,
+    "MaleClampPad2_change_mm3": 0,
+    "MalePort3_change_mm3": 0,
+    "FemalePort3_change_mm3": 0,
+    "MaleClampShoe3_change_mm3": 0,
+    "MaleClampPad3_change_mm3": 0,
+    "MalePort4_change_mm3": 0,
+    "FemalePort4_change_mm3": 0,
+    "MaleClampShoe4_change_mm3": 0,
+    "MaleClampPad4_change_mm3": 0,
+    "LowerShell_outside_centre_-100_change_mm3": 0,
+    "LowerShell_outside_centre_18_change_mm3": 0,
+    "UpperShell_outside_centre_-100_change_mm3": 0,
+    "UpperShell_outside_centre_18_change_mm3": 0,
+    "lid_vertical_assembly_sweep_mm3": 0,
+    "front_USB_aperture_missing_wall_mm3": 0,
+    "new_USB_axial_path_blocked_by_enclosure_mm3": 0,
+    "keeper_screw_head_lid_collision_mm3": 0
+  },
+  "dimensions": {
+    "PCB_bounds": "BoundBox (-9, -36.02, 7, 9, -13.5, 8.6)",
+    "USB_socket_face_y_mm": -11.799999999999997,
+    "USB_guard_end_y_mm": 0.5,
+    "guard_bore_width_mm": 18.0,
+    "guard_bore_height_mm": 6.8,
+    "keeper_to_upper_shell_clearance_mm": 0.5173072565584578,
+    "keeper_head_to_lid_clearance_mm": 1.3499999999999996
+  },
+  "limits": [
+    "Console scan alignment is approximate.",
+    "Ordinary axial USB cable access is obstructed by the installed console; all cable designs and partial connector engagement are not certified.",
+    "Check physical console clearance, cable insertion with adapter removed, and inability to connect USB while any console contacts remain engaged."
+  ]
+}

@@ -1,0 +1,23 @@
+import FreeCAD as A,FreeCADGui as G,Part,traceback,time
+from pathlib import Path
+from PySide import QtCore,QtWidgets
+r=Path(__file__).resolve().parent
+try:
+ old=A.openDocument(str(r/'revisions/v0.14/N64InputMod.FCStd'))
+ new=A.openDocument(str(r/'N64InputMod.FCStd'))
+ shapes=[]
+ for d,x,y,dx in [(old,79,-18,-10),(new,78,-38.5,10)]:
+  s=d.UpperShell.Shape.common(Part.makeBox(12,12,5.96,A.Vector(x-6,y-6,2.04)))
+  s.translate(A.Vector(-x,-y,-8));s.rotate(A.Vector(0,0,0),A.Vector(1,0,0),180);s.translate(A.Vector(dx,0,0));shapes.append(s)
+ A.closeDocument(old.Name);A.closeDocument(new.Name)
+ d=A.newDocument('NutSeatComparison')
+ for name,s,color in [('OldClippedPocket',shapes[0],(.72,.48,.43)),('NewCompletePocket',shapes[1],(.24,.64,.53))]:
+  o=d.addObject('Part::Feature',name);o.Shape=s;o.ViewObject.ShapeColor=color;o.ViewObject.LineColor=(.15,.2,.23);o.ViewObject.DisplayMode='Flat Lines'
+ view=G.activeDocument().activeView();view.viewAxonometric()
+ for _ in range(3):view.fitAll();G.updateGui();QtWidgets.QApplication.processEvents();time.sleep(.2)
+ view.saveImage(str(r/'v0.15-nut-pocket-comparison.png'),1400,700,'White')
+ (r/'nut-comparison.done').write_text('ok')
+except Exception:(r/'nut-comparison.error').write_text(traceback.format_exc())
+finally:
+ for name in list(A.listDocuments()):A.closeDocument(name)
+ QtCore.QTimer.singleShot(100,QtWidgets.QApplication.quit)

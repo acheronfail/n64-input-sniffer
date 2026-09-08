@@ -1,0 +1,37 @@
+{
+  "checks": {
+    "BoardKeeper_translated_shape_change_mm3": 0,
+    "LightWindow_translated_shape_change_mm3": 0,
+    "ESP32BoardEnvelope_translated_shape_change_mm3": 0,
+    "USBCEnvelope_translated_shape_change_mm3": 0,
+    "MalePort1_moved_mm3": 0,
+    "FemalePort1_translated_shape_change_mm3": 0,
+    "LowerShell_male_1_forward_seat_changed_mm3": 0,
+    "UpperShell_male_1_forward_seat_changed_mm3": 0,
+    "MalePort2_moved_mm3": 0,
+    "FemalePort2_translated_shape_change_mm3": 0,
+    "LowerShell_male_2_forward_seat_changed_mm3": 0,
+    "UpperShell_male_2_forward_seat_changed_mm3": 0,
+    "MalePort3_moved_mm3": 0,
+    "FemalePort3_translated_shape_change_mm3": 0,
+    "LowerShell_male_3_forward_seat_changed_mm3": 0,
+    "UpperShell_male_3_forward_seat_changed_mm3": 0,
+    "MalePort4_moved_mm3": 0,
+    "FemalePort4_translated_shape_change_mm3": 0,
+    "LowerShell_male_4_forward_seat_changed_mm3": 0,
+    "UpperShell_male_4_forward_seat_changed_mm3": 0,
+    "lid_assembly_sweep_overlap_mm3": 0
+  },
+  "dimensions": {
+    "male_1_depth_increase_at_-34.5_mm": 1.25,
+    "male_1_depth_increase_at_-31.5_mm": 1.2500000000000364,
+    "male_2_depth_increase_at_-34.5_mm": 1.25,
+    "male_2_depth_increase_at_-31.5_mm": 1.2499999999999858,
+    "male_3_depth_increase_at_-34.5_mm": 1.25,
+    "male_3_depth_increase_at_-31.5_mm": 1.2499999999999858,
+    "male_4_depth_increase_at_-34.5_mm": 1.25,
+    "male_4_depth_increase_at_-31.5_mm": 1.2500000000000524,
+    "LowerShell_depth_increase_mm": 10.000000000000107,
+    "UpperShell_depth_increase_mm": 10.000000000000107
+  }
+}

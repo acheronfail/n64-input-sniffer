@@ -1,0 +1,52 @@
+{
+  "revision": "v0.12",
+  "checks": {
+    "BoardKeeper_rigid_transform_error_mm3": 0,
+    "LightWindow_rigid_transform_error_mm3": 0,
+    "ESP32BoardEnvelope_rigid_transform_error_mm3": 0,
+    "ESP32ComponentKeepout_rigid_transform_error_mm3": 0,
+    "USBCEnvelope_rigid_transform_error_mm3": 0,
+    "MalePort1_change_mm3": 0,
+    "FemalePort1_change_mm3": 0,
+    "MaleClampShoe1_change_mm3": 0,
+    "MaleClampPad1_change_mm3": 0,
+    "MalePort2_change_mm3": 0,
+    "FemalePort2_change_mm3": 0,
+    "MaleClampShoe2_change_mm3": 0,
+    "MaleClampPad2_change_mm3": 0,
+    "MalePort3_change_mm3": 0,
+    "FemalePort3_change_mm3": 0,
+    "MaleClampShoe3_change_mm3": 0,
+    "MaleClampPad3_change_mm3": 0,
+    "MalePort4_change_mm3": 0,
+    "FemalePort4_change_mm3": 0,
+    "MaleClampShoe4_change_mm3": 0,
+    "MaleClampPad4_change_mm3": 0,
+    "LowerShell_outside_centre_-100_change_mm3": 0,
+    "LowerShell_outside_centre_18_change_mm3": 0,
+    "UpperShell_outside_centre_-100_change_mm3": 0,
+    "UpperShell_outside_centre_18_change_mm3": 0,
+    "lid_vertical_assembly_sweep_mm3": 0,
+    "front_USB_aperture_missing_wall_mm3": 0,
+    "new_USB_axial_path_blocked_by_enclosure_mm3": 0,
+    "keeper_screw_head_lid_collision_mm3": 0,
+    "BoardKeeper_unchanged_from_v011_mm3": 0,
+    "ESP32BoardEnvelope_unchanged_from_v011_mm3": 0,
+    "USBCEnvelope_unchanged_from_v011_mm3": 0,
+    "LowerShell_added_material_vs_v011_mm3": 0,
+    "LowerShell_shroud_remaining_mm3": 0,
+    "UpperShell_added_material_vs_v011_mm3": 0,
+    "UpperShell_shroud_remaining_mm3": 0
+  },
+  "dimensions": {
+    "PCB_bounds": "BoundBox (-9, -36.02, 7, 9, -13.5, 8.6)",
+    "USB_socket_face_y_mm": -11.799999999999997,
+    "keeper_to_upper_shell_clearance_mm": 0.5173072565584578,
+    "keeper_head_to_lid_clearance_mm": 1.3499999999999996
+  },
+  "limits": [
+    "Console scan alignment is approximate.",
+    "Rear-facing USB and the warnings are the intended precaution; this design is not an electrical or mechanical interlock.",
+    "Disconnect all four console plugs before connecting USB-C."
+  ]
+}
