@@ -82,5 +82,8 @@
       -38.5
     ]
   ],
-  "closure_boss_radius": 4.3
+  "closure_boss_radius": 4.3,
+  "female_keeper_screw_offset": 9.0,
+  "male_keeper_lip_clearance": 0.7,
+  "led_window_inward_shift": 6.0
 }

@@ -1,0 +1,64 @@
+{
+  "revision": "v0.16",
+  "checks": {
+    "female_1_terminal_passage_obstruction_mm3": 0,
+    "female_1_-1_pilot_wall_missing_mm3": 0,
+    "female_1_1_pilot_wall_missing_mm3": 0,
+    "female_2_terminal_passage_obstruction_mm3": 0,
+    "female_2_-1_pilot_wall_missing_mm3": 0,
+    "female_2_1_pilot_wall_missing_mm3": 0,
+    "female_3_terminal_passage_obstruction_mm3": 0,
+    "female_3_-1_pilot_wall_missing_mm3": 0,
+    "female_3_1_pilot_wall_missing_mm3": 0,
+    "female_4_terminal_passage_obstruction_mm3": 0,
+    "female_4_-1_pilot_wall_missing_mm3": 0,
+    "female_4_1_pilot_wall_missing_mm3": 0,
+    "male_1_tip_flip_error_mm3": 0,
+    "male_1_base_housing_seat_change_mm3": 0,
+    "male_1_keeper_seating_sweep_mm3": 0,
+    "male_1_lip_roof_missing_mm3": 0,
+    "male_2_tip_flip_error_mm3": 0,
+    "male_2_base_housing_seat_change_mm3": 0,
+    "male_2_keeper_seating_sweep_mm3": 0,
+    "male_2_lip_roof_missing_mm3": 0,
+    "male_3_tip_flip_error_mm3": 0,
+    "male_3_base_housing_seat_change_mm3": 0,
+    "male_3_keeper_seating_sweep_mm3": 0,
+    "male_3_lip_roof_missing_mm3": 0,
+    "male_4_tip_flip_error_mm3": 0,
+    "male_4_base_housing_seat_change_mm3": 0,
+    "male_4_keeper_seating_sweep_mm3": 0,
+    "male_4_lip_roof_missing_mm3": 0,
+    "LightWindow_shift_error_mm3": 0,
+    "LEDWindowSupportTaper_shift_error_mm3": 0
+  },
+  "female_terminal_passage_width_mm": 12.8,
+  "male_lip_relief": [
+    {
+      "port": 1,
+      "keeper_removed_material_mm3": 300.7996527922995,
+      "lip_clearance_mm": 0.7,
+      "roof_checked_mm": 1.08
+    },
+    {
+      "port": 2,
+      "keeper_removed_material_mm3": 299.64696167610106,
+      "lip_clearance_mm": 0.7,
+      "roof_checked_mm": 1.08
+    },
+    {
+      "port": 3,
+      "keeper_removed_material_mm3": 299.6471333561934,
+      "lip_clearance_mm": 0.7,
+      "roof_checked_mm": 1.08
+    },
+    {
+      "port": 4,
+      "keeper_removed_material_mm3": 300.7998146237315,
+      "lip_clearance_mm": 0.7,
+      "roof_checked_mm": 1.08
+    }
+  ],
+  "window_shift_toward_centre_mm": 6,
+  "physical_fit_verified": false
+}

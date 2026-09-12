@@ -1,4 +1,4 @@
-"""Full-resolution scan surface intersections for the extended v0.14 model.
+"""Full-resolution scan surface intersections for the extended v0.16 model.
 
 Registration retains v0.13's intended tip engagement: adding 12 mm of missing
 mating projection shifts both console scans +12 mm in Y. X is recentered using
@@ -27,7 +27,7 @@ for name in ['LowerShell','UpperShell','MaleConnectorAssembly']:
  tri=np.fromfile(r/(name+'.stl'),dtype=dt,offset=84)['v'].astype(float)
  models[name]=poly(tri)
 measure=json.loads((r/'port-spacing-measurements.json').read_text())
-report={'revision':'v0.14','registration_basis':__doc__,'mating_projection_mm':p['male_mating_length'],'decimation':False,'checks':{},'scan_transforms':{}}
+report={'revision':'v0.16','registration_basis':__doc__,'mating_projection_mm':p['male_mating_length'],'decimation':False,'checks':{},'scan_transforms':{}}
 for name,dy,dz in [('Top',71.5,2.2),('Bottom',103.5,-29.3)]:
  origin=next(s['symmetry_centre_x_mm'] for s in measure['scans'] if s['scan']==name+'.stl')
  delta=(-origin,dy+p['male_mating_length'],dz)

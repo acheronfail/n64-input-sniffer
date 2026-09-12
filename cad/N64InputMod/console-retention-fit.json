@@ -1,6 +1,6 @@
 {
-  "revision": "v0.14",
-  "registration_basis": "Full-resolution scan surface intersections for the extended v0.14 model.\n\nRegistration retains v0.13's intended tip engagement: adding 12 mm of missing\nmating projection shifts both console scans +12 mm in Y. X is recentered using\nthe independently measured scan symmetry. This is an explicit assembly\nassumption, not a measurement of installed socket/contact depth.\n",
+  "revision": "v0.16",
+  "registration_basis": "Full-resolution scan surface intersections for the extended v0.16 model.\n\nRegistration retains v0.13's intended tip engagement: adding 12 mm of missing\nmating projection shifts both console scans +12 mm in Y. X is recentered using\nthe independently measured scan symmetry. This is an explicit assembly\nassumption, not a measurement of installed socket/contact depth.\n",
   "mating_projection_mm": 12.0,
   "decimation": false,
   "checks": {

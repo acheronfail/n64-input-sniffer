@@ -1,8 +1,8 @@
 # CAD workspace
 
-The current version is **v0.15**. Open [N64InputMod/N64InputMod-v0.15.FCStd](N64InputMod/N64InputMod-v0.15.FCStd). The unversioned `N64InputMod.FCStd` contains the same model data at this commit (the archive metadata differs).
+The current version is **v0.16**. Open [N64InputMod/N64InputMod-v0.16.FCStd](N64InputMod/N64InputMod-v0.16.FCStd). The unversioned `N64InputMod.FCStd` contains the same model data at this commit (the archive metadata differs).
 
-See [model notes](N64InputMod/README.md) for dimensions, validation, regeneration and assembly, and [v0.15 print instructions](N64InputMod/print/full-enclosure-v0.15/PRINT-AND-ASSEMBLE.md). The versioned Orca-complete 3MF includes the saved slicer project and sliced plates.
+See [model notes](N64InputMod/README.md) for dimensions, validation, regeneration and assembly, and [v0.16 print instructions](N64InputMod/print/full-enclosure-v0.16/PRINT-AND-ASSEMBLE.md). The versioned Orca-complete 3MF includes the saved slicer project and sliced plates.
 
 ## Working on the next iteration
 
@@ -17,6 +17,6 @@ gzip -dk cad/N64InputMod/reference/Bottom.stl.gz
 
 The unpacked originals already exist in the migrated workspace and are ignored. The aligned display meshes are tracked directly.
 
-Save named FreeCAD and 3MF versions, refresh the applicable print exports and assembly notes, review `git status` and the diff, then commit each iteration. v0.15 is the baseline for continued work. Existing versioned models, print packages, previews, validation reports and `revisions/` snapshots preserve the earlier iteration history in this initial import. Historical snapshots are preserved as recorded and may contain old absolute paths; use the current scripts for ongoing work.
+Save named FreeCAD and 3MF versions, refresh the applicable print exports and assembly notes, review `git status` and the diff, then commit each iteration. v0.16 is the baseline for continued work. Existing versioned models, print packages, previews, validation reports and `revisions/` snapshots preserve the earlier iteration history in this initial import. Historical snapshots are preserved as recorded and may contain old absolute paths; use the current scripts for ongoing work.
 
 Backups, caches, logs and temporary completion/error markers remain local and ignored. STEP/STL geometry, FCStd models, 3MF projects, ZIP print packages, parameters, scripts, macros, documentation and saved validation reports are tracked.

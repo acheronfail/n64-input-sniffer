@@ -58,10 +58,14 @@ for i,fx in enumerate(P['port_x']):
  y=P['nose_y']+bow(fx)
  m=male0.copy();m.translate(V(x,y,0));hardware.append(feature('MalePort'+str(i+1),m,refs,(.17,.18,.20)))
  # Measured external mating envelope: coaxial 16 mm circle clipped to 12 mm
- # height, flat side up. Contacts/internal cavities are intentionally omitted.
+ # height, flat side DOWN, opposite the housing flat. Contacts/internal cavities are intentionally omitted.
  rad=P['male_mating_diameter']/2;length=P['male_mating_length']
  projection=Part.makeCylinder(rad,length,V(x,y,0),V(0,1,0))
+ # Clip with the cylinder seam outside the kept arc, then rotate the valid
+ # profile. Clipping through the seam can create an invalid trimmed face in OCC.
  projection=projection.common(box(x-rad-1,y,-rad,2*rad+2,length,P['male_mating_height']))
+ projection.rotate(V(x,y,0),V(0,1,0),180)
+ assert projection.isValid() and len(projection.Solids)==1
  mating_hardware.append(feature('MaleMatingProjection'+str(i+1),projection,refs,(.08,.09,.10)))
  cutters.append(clearance(projection,P['male_mating_clearance']))
  f=female0.copy();f.translate(V(fx,P['front_y']+13,0));hardware.append(feature('FemalePort'+str(i+1),f,refs,(.29,.30,.32)))
@@ -111,16 +115,17 @@ shell=shell.cut(usb)
 # v0.14: contour keepers attach to the lower shell; no housing screws or pads.
 retainer_parts=[]
 # Broad replaceable translucent window accommodates LED placement variations.
-window=box(-7.5,fr+6.5,12.8,15,15,10)
-ledge=box(-9,fr+5,13.8,18,18,10)
+window_shift=P['led_window_inward_shift']
+window=box(-7.5,fr+6.5+window_shift,12.8,15,15,10)
+ledge=box(-9,fr+5+window_shift,13.8,18,18,10)
 shell=shell.cut(board_transform(window.fuse(ledge)))
 # A 45-degree underside supports the LED recess, retaining a 0.6 mm flat land.
 def window_wire(size,z):
- h=size/2;cy=fr+14
+ h=size/2;cy=fr+14+window_shift
  pts=[V(-h,cy-h,z),V(h,cy-h,z),V(h,cy+h,z),V(-h,cy+h,z)]
  return Part.makePolygon(pts+[pts[0]])
 window_taper=Part.makeLoft([window_wire(15,12.9),window_wire(16.8,13.8)],True,True)
-window_ring=box(-9.4,fr+4.6,12.9,18.8,18.8,.9).cut(window_taper)
+window_ring=box(-9.4,fr+4.6+window_shift,12.9,18.8,18.8,.9).cut(window_taper)
 window_ring=board_transform(window_ring);window_taper=board_transform(window_taper)
 shell=shell.fuse(window_ring).cut(window_taper).removeSplitter()
 feature('LEDWindowSupportTaper',window_ring)
@@ -150,6 +155,11 @@ for i,x in enumerate(P.get('male_port_x',P['port_x'])):
  retainer=shell.common(box(x-13.3,y-31.5,P['connector_clearance'],26.6,34.5,kt-P['connector_clearance']))
  back=box(x-9.6,sy-2.6,kz,19.2,9.6,kt-kz)
  retainer=retainer.fuse(back)
+ # Extra clearance only around the curved front housing lip. The lower
+ # seat stays snug; retain the axial capture band and at least 1.1 mm roof.
+ lip_region=box(x-15,y-12,-1,30,13,16)
+ lip_relief=clearance(hardware[2*i].Shape,P['male_keeper_lip_clearance']).common(lip_region)
+ retainer=retainer.cut(lip_relief)
  # Open the flat upper housing area while keeping front/rear capture bands.
  retainer=retainer.cut(box(x-8,y-27.2,6.8,16,15.2,10))
  posts=[]
@@ -181,10 +191,10 @@ for i,x in enumerate(P['port_x']):
  kz=P['female_keeper_top']-P['female_keeper_thickness'];kt=P['female_keeper_top']
  sy=fr+22
  ring=box(x-12.8,fr+12,P['connector_clearance'],25.6,4.5,kt-P['connector_clearance'])
- back=box(x-9.6,fr+15.5,kz,19.2,9.1,kt-kz)
+ back=box(x-12.8,fr+15.5,kz,25.6,9.1,kt-kz)
  retainer=ring.fuse(back).cut(clearance(f))
  posts=[]
- for sx in [x-7,x+7]:
+ for sx in [x-P['female_keeper_screw_offset'],x+P['female_keeper_screw_offset']]:
   post=box(sx-2.6,fr+18.5,bz+wall,5.2,7.5,kz-(bz+wall))
   pilot=Part.makeCylinder(P['female_keeper_pilot']/2,8,V(sx,sy,kz-8))
   posts.append(post.cut(pilot))
@@ -276,7 +286,7 @@ base=base.removeSplitter();lid=lid.removeSplitter()
 bo=feature('LowerShell',base,parts);bo.Label='Lower shell · extended housing seats · independent keeper posts'
 lo=feature('UpperShell',lid,parts);lo.Label='Upper shell · independent connector retention · no clamp hardware'
 # Separate translucent insert, pressed into upper recess with a little adhesive if required.
-wi=feature('LightWindow',board_transform(box(-8.8,fr+5.2,13.95,17.6,17.6,1.7)),parts,(.65,.9,.83));wi.Label='Optional translucent LED window'
+wi=feature('LightWindow',board_transform(box(-8.8,fr+5.2+window_shift,13.95,17.6,17.6,1.7)),parts,(.65,.9,.83));wi.Label='Optional translucent LED window'
 if A.GuiUp:wi.ViewObject.Transparency=65
 pcb=feature('ESP32BoardEnvelope',board_transform(box(-W/2,usby,pcbz,W,L,P['pcb_thickness'])),refs,(.12,.40,.32))
 feature('ESP32ComponentKeepout',board_transform(box(-6.5,usby+7,pcbz+1.6,13,12,3)),refs,(.55,.56,.59))
@@ -334,7 +344,7 @@ full=hardware[0].Shape.fuse(mating_hardware[0].Shape).removeSplitter()
 full.translate(V(-120-P.get('male_port_x',P['port_x'])[0],-(P['nose_y']+bow(P['port_x'][0])),0))
 assert full.isValid() and len(full.Solids)==1
 full.exportStep(str(ROOT.parent/'n64-input-ControllerPortMale.step'))
-full.exportStep(str(ROOT.parent/'n64-input-ControllerPortMale-v0.14.step'))
+full.exportStep(str(ROOT.parent/'n64-input-ControllerPortMale-v0.16.step'))
 D.recompute();D.saveAs(str(ROOT/'N64InputMod.FCStd'))
-D.saveCopy(str(ROOT/'N64InputMod-v0.15.FCStd'))
+D.saveCopy(str(ROOT/'N64InputMod-v0.16.FCStd'))
 print(json.dumps(report,indent=2))

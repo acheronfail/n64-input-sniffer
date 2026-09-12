@@ -1,0 +1,80 @@
+{
+  "revision": "v0.16",
+  "pauses": [
+    {
+      "layer": 88,
+      "height": 14.12,
+      "line": 572579
+    }
+  ],
+  "all_six_caps_begin_after_pause": true,
+  "other_plates_have_no_pause": true,
+  "pockets": {
+    "M2_1": {
+      "centre_xy_mm": [
+        110.0,
+        193.73012161254883
+      ],
+      "first_cap_extrusion": {
+        "height": 14.12,
+        "line": 573559
+      },
+      "cap_segments": 22
+    },
+    "M2_2": {
+      "centre_xy_mm": [
+        146.0,
+        193.73012161254883
+      ],
+      "first_cap_extrusion": {
+        "height": 14.12,
+        "line": 573862
+      },
+      "cap_segments": 21
+    },
+    "M2_3": {
+      "centre_xy_mm": [
+        110.0,
+        152.73012161254883
+      ],
+      "first_cap_extrusion": {
+        "height": 14.12,
+        "line": 574618
+      },
+      "cap_segments": 21
+    },
+    "M2_4": {
+      "centre_xy_mm": [
+        146.0,
+        152.73012161254883
+      ],
+      "first_cap_extrusion": {
+        "height": 14.12,
+        "line": 574343
+      },
+      "cap_segments": 22
+    },
+    "M2_5": {
+      "centre_xy_mm": [
+        50.0,
+        172.23012161254883
+      ],
+      "first_cap_extrusion": {
+        "height": 14.12,
+        "line": 575204
+      },
+      "cap_segments": 21
+    },
+    "M2_6": {
+      "centre_xy_mm": [
+        206.0,
+        172.23012161254883
+      ],
+      "first_cap_extrusion": {
+        "height": 14.12,
+        "line": 572812
+      },
+      "cap_segments": 21
+    }
+  }
+}

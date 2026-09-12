@@ -4,20 +4,20 @@
     "LowerShell": {
       "valid": true,
       "solids": 1,
-      "volume_mm3": 112697.04440128009,
+      "volume_mm3": 112942.33089360505,
       "bounds": "BoundBox (-84.2867, -71.97, -16, 84.2867, 13.4138, 10.8)"
     },
     "UpperShell": {
       "valid": true,
       "solids": 1,
-      "volume_mm3": 54893.48860643212,
+      "volume_mm3": 54893.48848267884,
       "bounds": "BoundBox (-84.2867, -71.97, 0.16, 84.2867, 13.4138, 16)"
     },
     "LightWindow": {
       "valid": true,
       "solids": 1,
       "volume_mm3": 526.5919999999999,
-      "bounds": "BoundBox (-8.8, -15.3, 13.95, 8.8, 2.3, 15.65)"
+      "bounds": "BoundBox (-8.8, -21.3, 13.95, 8.8, -3.7, 15.65)"
     },
     "BoardKeeper": {
       "valid": true,
@@ -34,7 +34,7 @@
     "RearAlignmentGaugeUpper": {
       "valid": true,
       "solids": 1,
-      "volume_mm3": 13903.004745042817,
+      "volume_mm3": 13799.254745217331,
       "bounds": "BoundBox (-84, -61, 0.16, 84, 8, 16)"
     },
     "BoardFitCoupon": {
@@ -46,55 +46,55 @@
     "FemaleFitCoupon": {
       "valid": true,
       "solids": 1,
-      "volume_mm3": 6258.737427815547,
+      "volume_mm3": 6248.737427815544,
       "bounds": "BoundBox (-76, -72.6006, -16, 76, -52, 9)"
     },
     "MalePortKeeper1": {
       "valid": true,
       "solids": 1,
-      "volume_mm3": 5276.693021417831,
+      "volume_mm3": 4975.8934500788855,
       "bounds": "BoundBox (-77.34, -30.3016, 0.22, -50.74, 12.7984, 12.8)"
     },
     "MalePortKeeper2": {
       "valid": true,
       "solids": 1,
-      "volume_mm3": 5274.791814953922,
+      "volume_mm3": 4975.144180381816,
       "bounds": "BoundBox (-49.3, -32.2062, 0.22, -22.7, 10.673, 12.8)"
     },
     "MalePortKeeper3": {
       "valid": true,
       "solids": 1,
-      "volume_mm3": 5274.477649440465,
+      "volume_mm3": 4974.829889323843,
       "bounds": "BoundBox (22.7, -32.2062, 0.22, 49.3, 10.673, 12.8)"
     },
     "MalePortKeeper4": {
       "valid": true,
       "solids": 1,
-      "volume_mm3": 5275.750523757322,
+      "volume_mm3": 4974.950222076837,
       "bounds": "BoundBox (50.74, -30.3016, 0.22, 77.34, 12.7984, 12.8)"
     },
     "FemalePortKeeper1": {
       "valid": true,
       "solids": 1,
-      "volume_mm3": 1212.5613702574753,
+      "volume_mm3": 1316.2413702574754,
       "bounds": "BoundBox (-76.5, -60, 0.22, -50.9, -47.4, 12.8)"
     },
     "FemalePortKeeper2": {
       "valid": true,
       "solids": 1,
-      "volume_mm3": 1212.5613702574758,
+      "volume_mm3": 1316.2413702574752,
       "bounds": "BoundBox (-48.8, -60, 0.22, -23.2, -47.4, 12.8)"
     },
     "FemalePortKeeper3": {
       "valid": true,
       "solids": 1,
-      "volume_mm3": 1212.5613702574776,
+      "volume_mm3": 1316.241370257478,
       "bounds": "BoundBox (23.2, -60, 0.22, 48.8, -47.4, 12.8)"
     },
     "FemalePortKeeper4": {
       "valid": true,
       "solids": 1,
-      "volume_mm3": 1212.5613702574747,
+      "volume_mm3": 1316.2413702574747,
       "bounds": "BoundBox (50.9, -60, 0.22, 76.5, -47.4, 12.8)"
     }
   },
@@ -183,7 +183,10 @@
         -38.5
       ]
     ],
-    "closure_boss_radius": 4.3
+    "closure_boss_radius": 4.3,
+    "female_keeper_screw_offset": 9.0,
+    "male_keeper_lip_clearance": 0.7,
+    "led_window_inward_shift": 6.0
   },
   "shell_overlap_mm3": 0.0,
   "keeper_overlap_mm3": 0.0,

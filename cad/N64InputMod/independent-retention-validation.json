@@ -1,5 +1,5 @@
 {
-  "revision": "v0.15",
+  "revision": "v0.16",
   "checks": {
     "MalePort1_unchanged_mm3": 0.0,
     "MalePort2_unchanged_mm3": 0.0,
@@ -77,18 +77,18 @@
     "female_4_lift_blocked_mm3": 17.351043515525873,
     "female_4_forward_blocked_mm3": 9.450713026049582,
     "female_4_backward_blocked_mm3": 59.60707756948183,
-    "male_1_lift_blocked_mm3": 95.96570923771459,
-    "male_1_forward_blocked_mm3": 76.55247560569926,
-    "male_1_backward_blocked_mm3": 97.37262452181574,
-    "male_2_lift_blocked_mm3": 95.90319319201112,
-    "male_2_forward_blocked_mm3": 76.55247560480245,
-    "male_2_backward_blocked_mm3": 97.37262452177353,
-    "male_3_lift_blocked_mm3": 95.90319318788933,
-    "male_3_forward_blocked_mm3": 76.55247560464679,
-    "male_3_backward_blocked_mm3": 97.37262452183859,
-    "male_4_lift_blocked_mm3": 95.96570924018881,
-    "male_4_forward_blocked_mm3": 76.55247560544987,
-    "male_4_backward_blocked_mm3": 97.37262452179223
+    "male_1_lift_blocked_mm3": 103.61622936885963,
+    "male_1_forward_blocked_mm3": 78.28560247696315,
+    "male_1_backward_blocked_mm3": 121.50455100793769,
+    "male_2_lift_blocked_mm3": 103.43528973834341,
+    "male_2_forward_blocked_mm3": 78.28560247591356,
+    "male_2_backward_blocked_mm3": 121.50455100791362,
+    "male_3_lift_blocked_mm3": 103.434994642653,
+    "male_3_forward_blocked_mm3": 78.28560247573444,
+    "male_3_backward_blocked_mm3": 121.50455100791592,
+    "male_4_lift_blocked_mm3": 103.6154151942659,
+    "male_4_forward_blocked_mm3": 78.28560247667686,
+    "male_4_backward_blocked_mm3": 121.50455100796987
   },
   "physical_fit_verified": false,
   "console_scan_axial_clearance": "See console-retention-fit.json: extended mating envelopes checked separately under the explicitly revised scan registration; installed socket depth remains unverified."
