@@ -1,17 +1,18 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { decodeFrame, emptyState, stickOffset } from '$lib/controller';
+	import { decodeFrame, emptyState, createFrameBuffer } from '$lib/controller';
+	import ControllerDashboard from '$lib/components/ControllerDashboard.svelte';
 
-	let controller = $state(emptyState());
+	let controllers = $state(Array.from({ length: 4 }, emptyState));
+	let received = $state([false, false, false, false]);
 	let connection = $state('connecting…');
 	let connected = $state(false);
-	let disconnected = $state(false);
 
 	onMount(() => {
 		let ws: WebSocket | null = null;
 		let reconnectTimer: ReturnType<typeof setTimeout> | undefined;
 		let animationFrame: number | undefined;
-		let latest: ReturnType<typeof decodeFrame> = null;
+		const pending = createFrameBuffer();
 		let disposed = false;
 
 		function connect() {
@@ -21,13 +22,11 @@
 			ws.onopen = () => {
 				connection = 'connected';
 				connected = true;
-				disconnected = false;
 			};
 			ws.onclose = (event) => {
 				if (disposed) return;
 				connection = `disconnected (${event.code}) — retrying…`;
 				connected = false;
-				disconnected = true;
 				ws = null;
 				reconnectTimer = setTimeout(connect, 1000);
 			};
@@ -36,14 +35,14 @@
 				if (!(event.data instanceof ArrayBuffer)) return;
 				const frame = decodeFrame(new Uint8Array(event.data));
 				if (!frame) return;
-				latest = frame;
+				pending.push(frame);
 				if (animationFrame !== undefined) return;
 				animationFrame = requestAnimationFrame(() => {
 					animationFrame = undefined;
-					if (!latest) return;
-					// Legacy four-byte frames leave the last known pad label intact.
-					controller = { ...latest, padIndex: latest.padIndex ?? controller.padIndex };
-					latest = null;
+					for (const [index, frame] of pending.drain()) {
+						controllers[index] = frame;
+						received[index] = true;
+					}
 				});
 			};
 		}
@@ -72,58 +71,4 @@
 	<link rel="icon" href="data:," />
 </svelte:head>
 
-<div class="wrap">
-	<h1>N64 SPY</h1>
-	<div id="conn" class:up={connected} class:down={disconnected}>{connection}</div>
-	<div id="pad">pad: {controller.padIndex === null ? '--' : controller.padIndex + 1}</div>
-
-	<div class="pad">
-		<!-- Left column: shoulders, D-pad -->
-		<div class="col">
-			<div id="L" class="btn wide grey" class:on={controller.buttons.L}>L</div>
-			<div class="dpad">
-				<div id="UP" class="btn small grey up" class:on={controller.buttons.UP}></div>
-				<div id="LEFT" class="btn small grey left" class:on={controller.buttons.LEFT}></div>
-				<div id="RIGHT" class="btn small grey right" class:on={controller.buttons.RIGHT}></div>
-				<div id="DOWN" class="btn small grey down" class:on={controller.buttons.DOWN}></div>
-			</div>
-		</div>
-
-		<!-- Center column: Start, Z, analog stick -->
-		<div class="col">
-			<div id="START" class="btn wide grey" class:on={controller.buttons.START}>START</div>
-			<div id="Z" class="btn wide grey" class:on={controller.buttons.Z}>Z</div>
-			<div class="stick">
-				<div
-					id="dot"
-					class="dot"
-					style:transform={`translate(${stickOffset(controller.x)}px, ${-stickOffset(controller.y)}px)`}
-				></div>
-			</div>
-			<div class="axis">
-				x:<span id="sx">{controller.x}</span> y:<span id="sy">{controller.y}</span>
-			</div>
-		</div>
-
-		<!-- Right column: shoulder, A/B, C cluster -->
-		<div class="col">
-			<div id="R" class="btn wide grey" class:on={controller.buttons.R}>R</div>
-			<div class="ab">
-				<div id="B" class="btn round green" class:on={controller.buttons.B}>B</div>
-				<div id="A" class="btn round blue" class:on={controller.buttons.A}>A</div>
-			</div>
-			<div class="cpad">
-				<div id="CUP" class="btn small yellow cu" class:on={controller.buttons.CUP}>C&#9650;</div>
-				<div id="CLEFT" class="btn small yellow cl" class:on={controller.buttons.CLEFT}>
-					C&#9664;
-				</div>
-				<div id="CRIGHT" class="btn small yellow cr" class:on={controller.buttons.CRIGHT}>
-					C&#9654;
-				</div>
-				<div id="CDOWN" class="btn small yellow cd" class:on={controller.buttons.CDOWN}>
-					C&#9660;
-				</div>
-			</div>
-		</div>
-	</div>
-</div>
+<ControllerDashboard {controllers} {received} {connection} {connected} />

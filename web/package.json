@@ -13,9 +13,14 @@
 		"lint": "prettier --check .",
 		"format": "prettier --write .",
 		"test:unit": "vitest",
-		"test": "npm run test:unit -- --run"
+		"test": "npm run test:unit -- --run",
+		"storybook": "storybook dev -p 6006 --no-open",
+		"build-storybook": "storybook build"
 	},
 	"devDependencies": {
+		"@storybook/addon-a11y": "^10.6.0",
+		"@storybook/addon-docs": "^10.6.0",
+		"@storybook/sveltekit": "^10.6.0",
 		"@sveltejs/adapter-static": "^3.0.10",
 		"@sveltejs/kit": "^2.63.0",
 		"@sveltejs/vite-plugin-svelte": "^7.1.2",
@@ -23,6 +28,7 @@
 		"prettier": "^3.8.3",
 		"prettier-plugin-svelte": "^4.1.0",
 		"prettier-plugin-tailwindcss": "^0.8.0",
+		"storybook": "^10.6.0",
 		"svelte": "^5.56.1",
 		"svelte-check": "^4.6.0",
 		"tailwindcss": "^4.3.0",

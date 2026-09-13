@@ -21,6 +21,7 @@ export type ControllerState = {
 export function decodeFrame(raw: Uint8Array): ControllerState | null {
 	if (raw.length !== 4 && raw.length !== 5) return null;
 	const offset = raw.length === 5 ? 1 : 0;
+	if (offset && raw[0] > 3) return null;
 	const buttons = {} as Record<Button, boolean>;
 	for (const [id, mask] of Object.entries(B0)) buttons[id as Button] = !!(raw[offset] & mask);
 	for (const [id, mask] of Object.entries(B1)) buttons[id as Button] = !!(raw[offset + 1] & mask);
@@ -38,4 +39,19 @@ export function emptyState(): ControllerState {
 
 export function stickOffset(value: number): number {
 	return Math.max(-1, Math.min(1, value / 90)) * 38;
+}
+
+// Keep one pending frame per controller; legacy frames belong to controller 1.
+export function createFrameBuffer() {
+	const pending = new Map<number, ControllerState>();
+	return {
+		push(frame: ControllerState) {
+			pending.set(frame.padIndex ?? 0, frame);
+		},
+		drain() {
+			const frames = [...pending.entries()];
+			pending.clear();
+			return frames;
+		}
+	};
 }
