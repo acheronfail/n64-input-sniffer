@@ -13,28 +13,29 @@ static void checkCommand(uint16_t button, Action expected, uint32_t start) {
   commands.input(0, Commands::Chord, start);
   assert(commands.led(start) == Led::Green);
   commands.input(0, Commands::Chord | button, start + 1);
-  for (uint32_t phase = 0; phase < 6; ++phase) {
-    const uint32_t now = start + 1 + phase * 500;
+  for (uint32_t phase = 0; phase < 8; ++phase) {
+    const uint32_t now = start + 1 + phase * 125;
     assert(commands.tick(now) == Action::None);
     assert(commands.led(now) == (phase % 2 ? Led::Off : Led::Magenta));
     // More presses while confirming must not replace or restart the command.
     commands.input(0, Commands::Chord | Commands::Start | Commands::Z, now);
-    assert(commands.tick(now + 499) == Action::None);
+    assert(commands.tick(now + 124) == Action::None);
+    assert(commands.led(now + 124) == (phase % 2 ? Led::Off : Led::Magenta));
   }
-  assert(commands.tick(start + 3001) == expected);
-  assert(commands.led(start + 3001) == Led::Normal);
-  assert(commands.tick(start + 3002) == Action::None);
-  commands.input(0, Commands::Chord, start + 3003);
-  assert(commands.led(start + 3003) == Led::Normal); // Held chord cannot rearm.
-  commands.input(0, 0, start + 3004);
-  commands.input(0, Commands::Chord, start + 3005);
-  assert(commands.led(start + 3005) == Led::Green);
+  assert(commands.tick(start + 1001) == expected);
+  assert(commands.led(start + 1001) == Led::Normal);
+  assert(commands.tick(start + 1002) == Action::None);
+  commands.input(0, Commands::Chord, start + 1003);
+  assert(commands.led(start + 1003) == Led::Normal); // Held chord cannot rearm.
+  commands.input(0, 0, start + 1004);
+  commands.input(0, Commands::Chord, start + 1005);
+  assert(commands.led(start + 1005) == Led::Green);
 }
 
 int main() {
   checkCommand(Commands::Start, Action::ResetWiFi, 0);
   checkCommand(Commands::Z, Action::TogglePowerLed, 100);
-  checkCommand(Commands::Z, Action::TogglePowerLed, UINT32_MAX - 1000);
+  checkCommand(Commands::Z, Action::TogglePowerLed, UINT32_MAX - 500);
 
   Commands commands;
   commands.input(0, 0x0030, 0); // L + R alone is insufficient.
@@ -65,6 +66,6 @@ int main() {
   lastMoment.input(2, 0, 1);
   lastMoment.input(2, Commands::Z, 4999);
   assert(lastMoment.led(4999) == Led::Magenta);
-  assert(lastMoment.tick(7999) == Action::TogglePowerLed);
+  assert(lastMoment.tick(5999) == Action::TogglePowerLed);
   puts("Controller command tests passed.");
 }

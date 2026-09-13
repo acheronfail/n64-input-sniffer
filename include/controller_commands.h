@@ -12,7 +12,8 @@ public:
   static constexpr uint16_t Z = 0x2000;
   static constexpr uint16_t Chord = 0x0430; // D-pad down + L + R
   static constexpr uint32_t ListenMs = 5000;
-  static constexpr uint32_t FlashMs = 500;
+  static constexpr uint32_t ConfirmationFlashMs = 125;
+  static constexpr uint32_t ConfirmationFlashCount = 4;
 
   void input(size_t controller, uint16_t buttons, uint32_t now) {
     if (controller >= 4) return;
@@ -40,10 +41,11 @@ public:
     }
   }
 
-  // Return the action once, after three complete 500 ms on/off flashes.
+  // Return the action once, after four complete 125 ms on/off flashes (one second).
   Action tick(uint32_t now) {
     expire(now);
-    if (mode == Mode::Confirming && uint32_t(now - startedAt) >= 6 * FlashMs) {
+    if (mode == Mode::Confirming &&
+        uint32_t(now - startedAt) >= 2 * ConfirmationFlashCount * ConfirmationFlashMs) {
       mode = Mode::Idle;
       const Action result = pending;
       pending = Action::None;
@@ -55,7 +57,7 @@ public:
   Led led(uint32_t now) const {
     if (mode == Mode::Listening) return Led::Green;
     if (mode == Mode::Confirming) {
-      return ((uint32_t(now - startedAt) / FlashMs) % 2 == 0)
+      return ((uint32_t(now - startedAt) / ConfirmationFlashMs) % 2 == 0)
                  ? Led::Magenta : Led::Off;
     }
     return Led::Normal;

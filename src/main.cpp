@@ -18,6 +18,7 @@
  */
 
 #include <Arduino.h>
+#include <atomic>
 #include <ArduinoOTA.h>
 #include <ESPAsyncWebServer.h>
 #include <ESPmDNS.h>
@@ -29,9 +30,14 @@
 
 #include "web_ui.h"
 #include "controller_commands.h"
+#include "wifi_status_led.h"
 
 static ControllerCommands controllerCommands;
-static bool powerLedEnabled = true;
+static std::atomic<bool> powerLedEnabled{true};
+static std::atomic<bool> wifiLedConnected{false};
+static std::atomic<bool> wifiLedPortal{false};
+static std::atomic<uint32_t> wifiLedFailures{0};
+static std::atomic<ControllerCommands::Led> commandLed{ControllerCommands::Led::Normal};
 static void processCommandFrame(size_t controller, const uint8_t *frame);
 
 // ---------- WiFi / setup portal ---------------------------------------------
@@ -714,8 +720,14 @@ static void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client,
 /** Log link-level Wi-Fi transitions so browser drops can be correlated. */
 static void onWiFiEvent(WiFiEvent_t event, arduino_event_info_t info) {
   if (event == ARDUINO_EVENT_WIFI_STA_GOT_IP) {
+    wifiLedConnected.store(true);
     Serial.printf("[wifi] got ip=%s\n", WiFi.localIP().toString().c_str());
   } else if (event == ARDUINO_EVENT_WIFI_STA_DISCONNECTED) {
+    wifiLedConnected.store(false);
+    // WiFiManager deliberately disconnects while changing credentials.
+    if (info.wifi_sta_disconnected.reason != WIFI_REASON_ASSOC_LEAVE) {
+      wifiLedFailures.fetch_add(1);
+    }
     ++wifiDisconnectCount;
     Serial.printf("[wifi] disconnected reason=%d\n",
                   info.wifi_sta_disconnected.reason);
@@ -785,6 +797,8 @@ static void startNetwork() {
   // connects directly without the portal, leaving port 80 free for us.
   bool justConfigured = false;
   wm.setSaveConfigCallback([&]() { justConfigured = true; });
+  wm.setAPCallback([](WiFiManager *) { wifiLedPortal.store(true); });
+  wm.setPreSaveConfigCallback([]() { wifiLedPortal.store(false); });
 
   // Try saved creds, else open the captive portal to collect new ones. On
   // timeout we restart rather than hang forever, so a brief router outage just
@@ -796,29 +810,29 @@ static void startNetwork() {
   Serial.printf("Joining WiFi (or open the \"%s\" network to configure)...\n",
                 AP_NAME);
   bool connected = wm.autoConnect(AP_NAME);
-  const uint32_t portalStartedAt = millis();
   while (!connected && wm.getConfigPortalActive()) {
-    // Red is the middle byte in WS2812 GRB order. Setup feedback overrides
-    // the saved power LED preference, just like command confirmation does.
-    const bool on = ((uint32_t(millis() - portalStartedAt) /
-                      ControllerCommands::FlashMs) % 2) == 0;
-    setStatusLed(on ? 0x00FF00 : 0);
     connected = wm.process();
+    // A submitted credential attempt runs inside process(). The pre-save
+    // callback selects blue until it returns; failed attempts return to red.
+    wifiLedPortal.store(!connected && wm.getConfigPortalActive());
     delay(1);
   }
   if (!connected) {
     Serial.println("WiFi setup timed out; restarting.");
-    delay(1000);
+    wifiLedConnected.store(false);
+    wifiLedFailures.fetch_add(1);
+    delay(WiFiStatusLed::FailureMs + 50);
     ESP.restart();
   }
+
+  wifiLedConnected.store(true);
+  wifiLedPortal.store(false);
 
   if (justConfigured) {
     Serial.println("WiFi saved -- rebooting to start the web server cleanly.");
-    delay(500);
+    delay(WiFiStatusLed::SuccessMs + 50);
     ESP.restart();
   }
-
-  setStatusLed(powerLedEnabled ? 0x00FF00 : 0);
 
   Serial.printf("Connected. Open http://%s/", WiFi.localIP().toString().c_str());
   if (MDNS.begin(MDNS_HOST)) {
@@ -878,6 +892,18 @@ static void setStatusLed(uint32_t color) {
 #endif
 }
 
+// One writer owns the LED/RMT channel. Wi-Fi callbacks and the main loop
+// publish atomic inputs; neither blocks waiting for a flash sequence.
+static void statusLedTask(void *) {
+  WiFiStatusLed status;
+  for (;;) {
+    setStatusLed(status.color(millis(), wifiLedConnected.load(),
+                             wifiLedPortal.load(), wifiLedFailures.load(),
+                             powerLedEnabled.load(), commandLed.load()));
+    vTaskDelay(pdMS_TO_TICKS(10));
+  }
+}
+
 static void processCommandFrame(size_t controller, const uint8_t *frame) {
   if (!hasValidReservedBits(frame)) return;
   const uint8_t *response = frame + N64_PREFIX;
@@ -905,14 +931,7 @@ static void serviceCommands() {
     Serial.printf("Power LED %s\n", powerLedEnabled ? "enabled" : "disabled");
   }
 
-  switch (controllerCommands.led(now)) {
-  case ControllerCommands::Led::Green: setStatusLed(0xFF0000); break;
-  case ControllerCommands::Led::Magenta: setStatusLed(0x00FFFF); break;
-  case ControllerCommands::Led::Off: setStatusLed(0); break;
-  case ControllerCommands::Led::Normal:
-    setStatusLed(powerLedEnabled ? 0x00FF00 : 0);
-    break;
-  }
+  commandLed.store(controllerCommands.led(now));
 }
 
 /** One-time init: power LED, serial, input pins, and a startup banner. */
@@ -952,6 +971,13 @@ void setup() {
   Serial.println(
       "Sniffing up to 4 N64 controller data lines... press buttons to see input.");
 
+  // Start after capture initialization so only this task uses LED RMT from
+  // here onward, including during WiFiManager's blocking connection calls.
+  if (xTaskCreate(statusLedTask, "status-led", 3072, nullptr, 1, nullptr) != pdPASS) {
+    Serial.println("Status LED task creation failed; restarting.");
+    delay(1000);
+    ESP.restart();
+  }
   startNetwork();
 }
 

@@ -75,10 +75,22 @@ you don't need a wired serial connection to watch input.
 
 No WiFi credentials are hardcoded — they're configured once via a captive portal:
 
-While the setup portal is open, the LED flashes **red (500 ms on / 500 ms off)**
-to show that WiFi setup is needed, even if the normal power LED is disabled.
-Resetting WiFi returns to this flashing state after reboot. Controller commands
-become available once WiFi setup completes.
+The LED shows WiFi status even when the normal power LED is disabled:
+
+| State | LED pattern |
+| --- | --- |
+| Connecting or reconnecting | Blue, 500 ms on / 500 ms off, repeating. |
+| Connected (IP address obtained) | Two green flashes, 250 ms on / 250 ms off, then the normal power LED setting. |
+| Connection failed or lost | Three red flashes, 125 ms on / 125 ms off, then the connecting or setup-portal pattern. |
+| Setup portal waiting for credentials | Red, 500 ms on / 500 ms off, repeating. |
+
+Submitting credentials switches to the blue connecting pattern. A successful
+connection takes priority over a failure burst. A portal timeout shows the
+failure pattern before rebooting; saved credentials show success before the
+portal's cleanup reboot. Controller-command feedback takes priority over WiFi
+status, including its off phases. Commands become available once initial WiFi
+setup completes. Flashes run in a background task, including during connection
+attempts, without adding delays to controller capture or web updates.
 
 1. On first boot the ESP32 brings up an open WiFi network named **`N64Spy-Setup`**. Join it from a
    phone/laptop; a captive-portal config page pops up automatically. Pick your network, enter the
@@ -104,10 +116,10 @@ button on the **same controller** (you can release the entry combination first):
 | **START** | Forget saved WiFi and reboot into the **N64Spy-Setup** captive network. |
 | **Z** | Toggle the normal red power LED on/off and save the preference. |
 
-A recognised command ends listening immediately. The LED flashes **magenta three
-times**, each with **500 ms on and 500 ms off**, then performs the action. Command
-feedback still lights up when the red power LED is disabled. Capture and web updates
-continue during the confirmation flashes.
+A recognised command ends listening immediately. The LED flashes **magenta four
+times within one second**, each with **125 ms on and 125 ms off**, then performs
+the action. Command feedback still lights up when the red power LED is disabled.
+Capture and web updates continue during the confirmation flashes.
 
 Buttons already held when entering command mode must be released and pressed again.
 Other buttons (and simultaneous START + Z presses) are ignored until a single command
