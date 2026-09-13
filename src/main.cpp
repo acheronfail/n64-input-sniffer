@@ -31,6 +31,8 @@
 #include "web_ui.h"
 #include "controller_commands.h"
 #include "wifi_status_led.h"
+#include "n64_decoder.h"
+#include "ws_delivery.h"
 
 static ControllerCommands controllerCommands;
 static std::atomic<bool> powerLedEnabled{true};
@@ -78,47 +80,16 @@ static void processCommandFrame(size_t controller, const uint8_t *frame);
 #define N64_PIN_2 12
 #define N64_PIN_3 11
 #define N64_PIN_4 10
-// console command bits that precede the controller's response
-#define N64_PREFIX 9
-// controller state bits
-#define N64_BITCOUNT 32
-#define N64_FRAMEBITS (N64_PREFIX + N64_BITCOUNT)
-
-// The console's controller-state poll: command byte 0x01 (0000_0001) followed
-// by a stop bit (1).
-#define N64_POLL_COMMAND 0x01
 
 #define SERIAL_BAUD 115200
-
-// Cap websocket updates to a UI-friendly rate. Under bursts we keep only the
-// newest state and skip intermediate frames rather than flooding AsyncTCP.
-#define WS_MIN_SEND_INTERVAL_US 20000
-#define WS_MAX_TRACKED_CLIENTS 8
-// If a client stays unwritable for this many send attempts, drop it so one
-// stuck browser cannot keep accumulating pressure.
-#define WS_BLOCKED_STREAK_LIMIT 60
 
 // How long loop() waits (with interrupts ENABLED) for a frame to begin before
 // returning. Bounding this is what keeps the interrupt watchdog fed and the
 // RTOS scheduled when the line is idle / no console attached.
 #define FRAME_WAIT_US 5000
 
-// N64 bit low time: ~1us means logical '1', ~3us means logical '0'.
-#define N64_LOW_ONE_MAX_US 2
-
-// Accept only plausible N64 low pulse widths to avoid decoding noise as bits.
-#define N64_LOW_MIN_US 1
-#define N64_LOW_MAX_US 4
-
-// Each N64 bit cell is about 4us total (low + high). Keep a tolerant range.
-#define N64_CELL_MIN_US 3
-#define N64_CELL_MAX_US 6
-
 // End an RMT receive once the bus has stayed at one level this long.
 #define RMT_IDLE_THRESHOLD_US 12
-
-// Keep enough items for whole transactions plus some jitter/noise margin.
-#define RMT_MAX_CAPTURE_BITS 96
 
 // On ESP32-S3 with the legacy RMT API, channels 4-7 are RX-capable.
 static constexpr int kN64Pins[N64_CONTROLLER_COUNT] = {
@@ -133,20 +104,17 @@ static RingbufHandle_t n64RmtRingbufs[N64_CONTROLLER_COUNT] = {nullptr, nullptr,
 static AsyncWebServer server(80);
 static AsyncWebSocket ws("/ws");
 
-// Last broadcast state per controller, so a client connecting mid-session gets
-// current values without waiting for the next button change.
+// Last captured state per controller, for change detection and serial logging.
+// WsDelivery owns a separate snapshot for browser delivery.
 static uint8_t lastPayload[N64_CONTROLLER_COUNT][4] = {
   {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}};
-// Pending websocket packet format: [controllerIndex, 4-byte state payload].
-static uint8_t pendingPacket[N64_CONTROLLER_COUNT][5] = {};
-static bool hasPendingPacket[N64_CONTROLLER_COUNT] = {false, false, false, false};
-static uint32_t lastWsSendAtUs = 0;
+static WsDelivery wsDelivery;
+static portMUX_TYPE wsDeliveryMux = portMUX_INITIALIZER_UNLOCKED;
 static uint32_t wsDiscardCount = 0;
 static uint32_t wsDisconnectCount = 0;
 static uint32_t wsSlowCloseCount = 0;
 static uint32_t wifiDisconnectCount = 0;
 static uint32_t lastWsDiagAtMs = 0;
-static uint8_t nextPendingController = 0;
 
 // A port is considered "connected" while valid poll-response frames are seen
 // recently. This is activity-based detection (not direct cable detection).
@@ -162,53 +130,6 @@ static bool controllerProbing[N64_CONTROLLER_COUNT] = {false, false, false,
                                                        false};
 static uint32_t controllerProbeStartedMs[N64_CONTROLLER_COUNT] = {0, 0, 0, 0};
 static uint32_t controllerLastProbeAtMs[N64_CONTROLLER_COUNT] = {0, 0, 0, 0};
-
-struct TrackedWsClient {
-  uint32_t id;
-  uint16_t blockedStreak;
-  bool active;
-};
-
-static TrackedWsClient trackedWsClients[WS_MAX_TRACKED_CLIENTS] = {};
-
-static inline bool isPollResponse(const uint8_t *frame);
-
-static TrackedWsClient *findTrackedClient(uint32_t id) {
-  for (size_t i = 0; i < WS_MAX_TRACKED_CLIENTS; ++i) {
-    if (trackedWsClients[i].active && trackedWsClients[i].id == id) {
-      return &trackedWsClients[i];
-    }
-  }
-  return nullptr;
-}
-
-static TrackedWsClient *upsertTrackedClient(uint32_t id) {
-  TrackedWsClient *slot = findTrackedClient(id);
-  if (slot != nullptr) {
-    return slot;
-  }
-
-  for (size_t i = 0; i < WS_MAX_TRACKED_CLIENTS; ++i) {
-    if (!trackedWsClients[i].active) {
-      trackedWsClients[i].active = true;
-      trackedWsClients[i].id = id;
-      trackedWsClients[i].blockedStreak = 0;
-      return &trackedWsClients[i];
-    }
-  }
-
-  return nullptr;
-}
-
-static void removeTrackedClient(uint32_t id) {
-  TrackedWsClient *slot = findTrackedClient(id);
-  if (slot == nullptr) {
-    return;
-  }
-  slot->active = false;
-  slot->id = 0;
-  slot->blockedStreak = 0;
-}
 
 /** Configure one controller's RMT RX channel for 1us pulse capture. */
 static bool startRmtCapture(size_t controller) {
@@ -290,60 +211,6 @@ static void stopControllerRx(size_t controller) {
   controllerRxRunning[controller] = false;
 }
 
-/** Convert a low pulse width in microseconds to an N64 bit value. */
-static inline uint8_t decodeBitFromLowUs(uint32_t lowUs) {
-  return (lowUs <= N64_LOW_ONE_MAX_US) ? 1U : 0U;
-}
-
-/** Validate that one low/high pulse pair looks like a real N64 bit cell. */
-static inline bool isValidN64CellUs(uint32_t lowUs, uint32_t highUs) {
-  if (lowUs < N64_LOW_MIN_US || lowUs > N64_LOW_MAX_US) {
-    return false;
-  }
-
-  uint32_t total = lowUs + highUs;
-  return total >= N64_CELL_MIN_US && total <= N64_CELL_MAX_US;
-}
-
-/**
- * Decode an RMT packet into an N64 frame (9-bit poll prefix + 32-bit response).
- * Returns true if a full poll-response frame is found.
- */
-static bool decodeFrameFromRmtItems(const rmt_item32_t *items, size_t count,
-                                    uint8_t frame[N64_FRAMEBITS]) {
-  uint8_t bits[RMT_MAX_CAPTURE_BITS];
-  size_t bitCount = 0;
-
-  for (size_t i = 0; i < count && bitCount < RMT_MAX_CAPTURE_BITS; ++i) {
-    const rmt_item32_t &item = items[i];
-
-    // Valid N64 traffic is low->high for each bit cell. Decode only those
-    // cells and ignore malformed/noisy segments.
-    if (item.level0 == 0 && item.level1 == 1 && item.duration0 > 0 &&
-        item.duration1 > 0 &&
-        isValidN64CellUs(item.duration0, item.duration1)) {
-      bits[bitCount++] = decodeBitFromLowUs(item.duration0);
-    }
-
-    if (item.level0 == 1 && item.level1 == 0 && item.duration0 > 0 &&
-        item.duration1 > 0 && bitCount < RMT_MAX_CAPTURE_BITS &&
-        isValidN64CellUs(item.duration1, item.duration0)) {
-      bits[bitCount++] = decodeBitFromLowUs(item.duration1);
-    }
-  }
-
-  if (bitCount != N64_FRAMEBITS) {
-    return false;
-  }
-
-  if (!isPollResponse(bits)) {
-    return false;
-  }
-
-  memcpy(frame, bits, N64_FRAMEBITS);
-  return true;
-}
-
 /** Poll one controller's RMT ring buffer and decode one N64 frame if present. */
 static bool readFrameFromRmt(size_t controller, uint8_t frame[N64_FRAMEBITS]) {
   if (controller >= N64_CONTROLLER_COUNT || n64RmtRingbufs[controller] == nullptr) {
@@ -375,34 +242,6 @@ static bool readFrameFromRmt(size_t controller, uint8_t frame[N64_FRAMEBITS]) {
   }
 
   return foundFrame;
-}
-
-/** Decode one MSB-first byte from the 8 bits of `bits` starting at `offset`. */
-static inline uint8_t readByte(const uint8_t *bits, int offset) {
-  uint8_t val = 0;
-  for (int i = 0; i < 8; ++i) {
-    if (bits[offset + i]) {
-      val |= (uint8_t)(1 << (7 - i));
-    }
-  }
-  return val;
-}
-
-/** True if the 9-bit prefix is the console's poll command (byte 0x01,
- * MSB-first) followed by a stop bit (1). */
-static inline bool isPollResponse(const uint8_t *frame) {
-  const uint8_t command = readByte(frame, 0); // first 8 prefix bits
-  const uint8_t stopBit = frame[8];           // 9th prefix bit
-  return command == N64_POLL_COMMAND && stopBit == 1;
-}
-
-/**
- * Bits 8 and 9 in the 32-bit controller response are unused and expected to be
- * zero on valid packets. This rejects many random/noisy false decodes.
- */
-static inline bool hasValidReservedBits(const uint8_t *frame) {
-  const uint8_t *r = frame + N64_PREFIX;
-  return r[8] == 0 && r[9] == 0;
 }
 
 /** Decoded N64 controller state. */
@@ -494,113 +333,43 @@ static void printState(size_t controller, const N64State &s) {
   Serial.println(buf);
 }
 
-/**
- * Pack the 32-bit controller response into 4 bytes for the wire. Each button
- * byte is MSB-first (matching readByte); the layout is mirrored by the bit
- * masks in web/src/lib/controller.ts:
- *   [0] A B Z START UP DOWN LEFT RIGHT
- *   [1] - - L R C-UP C-DOWN C-LEFT C-RIGHT   (top 2 bits are the unused 8,9)
- *   [2] stick X (int8)   [3] stick Y (int8)
- */
-static void packState(const uint8_t *frame, uint8_t out[4]) {
-  const uint8_t *r = frame + N64_PREFIX; // start of the 32-bit response
-  out[0] = readByte(r, 0);
-  out[1] = readByte(r, 8);
-  out[2] = readByte(r, 16);
-  out[3] = readByte(r, 24);
-}
-
 static bool anyPendingPackets() {
-  for (size_t i = 0; i < N64_CONTROLLER_COUNT; ++i) {
-    if (hasPendingPacket[i]) {
-      return true;
-    }
-  }
-  return false;
+  portENTER_CRITICAL(&wsDeliveryMux);
+  const bool pending = wsDelivery.pending();
+  portEXIT_CRITICAL(&wsDeliveryMux);
+  return pending;
 }
 
-/**
- * Push the newest pending state at a bounded rate. Under bursts we keep only
- * the latest unsent state instead of flooding websocket queues with stale
- * intermediate frames.
- */
+/** Retry the latest state independently for each client at a bounded rate. */
 static void flushPendingPayload() {
-  if (!anyPendingPackets()) {
-    return;
-  }
+  WsDelivery::Attempt attempt;
+  portENTER_CRITICAL(&wsDeliveryMux);
+  const bool ready = wsDelivery.prepare(micros(), attempt);
+  portEXIT_CRITICAL(&wsDeliveryMux);
+  if (!ready) return;
 
-  uint32_t nowUs = micros();
-  if ((uint32_t)(nowUs - lastWsSendAtUs) < WS_MIN_SEND_INTERVAL_US) {
-    return;
-  }
-
-  bool hasLiveClient = false;
-
-  int controllerToSend = -1;
-  for (size_t i = 0; i < N64_CONTROLLER_COUNT; ++i) {
-    size_t idx = (nextPendingController + i) % N64_CONTROLLER_COUNT;
-    if (hasPendingPacket[idx]) {
-      controllerToSend = (int)idx;
-      break;
-    }
-  }
-
-  if (controllerToSend < 0) {
-    return;
-  }
-
-  bool sentAny = false;
-  const uint8_t *packet = pendingPacket[controllerToSend];
-
-  for (size_t i = 0; i < WS_MAX_TRACKED_CLIENTS; ++i) {
-    TrackedWsClient &tracked = trackedWsClients[i];
-    if (!tracked.active) {
+  // Network calls stay outside the lock shared with AsyncTCP callbacks.
+  for (size_t i = 0; i < attempt.count; ++i) {
+    const uint32_t id = attempt.clients[i];
+    if (!ws.hasClient(id)) {
+      portENTER_CRITICAL(&wsDeliveryMux);
+      wsDelivery.disconnect(id);
+      portEXIT_CRITICAL(&wsDeliveryMux);
       continue;
     }
-
-    if (!ws.hasClient(tracked.id)) {
-      tracked.active = false;
-      tracked.id = 0;
-      tracked.blockedStreak = 0;
-      continue;
+    bool sent = false;
+    if (ws.availableForWrite(id)) {
+      sent = ws.binary(id, attempt.packet, sizeof(attempt.packet));
+      if (!sent) ++wsDiscardCount;
     }
-
-    hasLiveClient = true;
-
-    if (!ws.availableForWrite(tracked.id)) {
-      ++tracked.blockedStreak;
-      if (tracked.blockedStreak >= WS_BLOCKED_STREAK_LIMIT) {
-        Serial.printf("[ws] closing slow client id=%lu\n",
-                      (unsigned long)tracked.id);
-        ws.close(tracked.id, 1013, "server busy");
-        ++wsSlowCloseCount;
-        tracked.active = false;
-        tracked.id = 0;
-        tracked.blockedStreak = 0;
-      }
-      continue;
+    portENTER_CRITICAL(&wsDeliveryMux);
+    const bool close = wsDelivery.complete(attempt, i, sent);
+    portEXIT_CRITICAL(&wsDeliveryMux);
+    if (close) {
+      Serial.printf("[ws] closing slow client id=%lu\n", (unsigned long)id);
+      ws.close(id, 1013, "server busy");
+      ++wsSlowCloseCount;
     }
-
-    tracked.blockedStreak = 0;
-    if (ws.binary(tracked.id, packet, sizeof(pendingPacket[controllerToSend]))) {
-      sentAny = true;
-    } else {
-      ++wsDiscardCount;
-    }
-  }
-
-  if (!hasLiveClient) {
-    for (size_t i = 0; i < N64_CONTROLLER_COUNT; ++i) {
-      hasPendingPacket[i] = false;
-    }
-    return;
-  }
-
-  if (sentAny) {
-    hasPendingPacket[controllerToSend] = false;
-    nextPendingController =
-        (uint8_t)((controllerToSend + 1) % N64_CONTROLLER_COUNT);
-    lastWsSendAtUs = nowUs;
   }
 }
 
@@ -689,12 +458,15 @@ static void serviceControllerProbing() {
   }
 }
 
-/** Send the current state to a client as soon as it connects. */
+/** Queue initial snapshots through the same retry path as live updates. */
 static void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client,
                       AwsEventType type, void *arg, uint8_t *data, size_t len) {
   if (type == WS_EVT_CONNECT) {
     client->setCloseClientOnQueueFull(false);
-    if (upsertTrackedClient(client->id()) == nullptr) {
+    portENTER_CRITICAL(&wsDeliveryMux);
+    const bool tracked = wsDelivery.connect(client->id());
+    portEXIT_CRITICAL(&wsDeliveryMux);
+    if (!tracked) {
       Serial.printf("[ws] too many tracked clients; closing id=%lu\n",
                     (unsigned long)client->id());
       ws.close(client->id(), 1008, "too many clients");
@@ -702,14 +474,10 @@ static void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client,
     }
     Serial.printf("[ws] connect id=%lu from=%s\n", (unsigned long)client->id(),
                   client->remoteIP().toString().c_str());
-    for (size_t i = 0; i < N64_CONTROLLER_COUNT; ++i) {
-      uint8_t packet[5];
-      packet[0] = (uint8_t)i;
-      memcpy(packet + 1, lastPayload[i], sizeof(lastPayload[i]));
-      client->binary(packet, sizeof(packet));
-    }
   } else if (type == WS_EVT_DISCONNECT) {
-    removeTrackedClient(client->id());
+    portENTER_CRITICAL(&wsDeliveryMux);
+    wsDelivery.disconnect(client->id());
+    portEXIT_CRITICAL(&wsDeliveryMux);
     ++wsDisconnectCount;
     Serial.printf("[ws] disconnect id=%lu from=%s\n",
                   (unsigned long)client->id(),
@@ -1045,9 +813,9 @@ void loop() {
     // Broadcast (and log) only on change per controller.
     if (memcmp(lastPayload[controller], payload, sizeof(payload)) != 0) {
       memcpy(lastPayload[controller], payload, sizeof(payload));
-      pendingPacket[controller][0] = (uint8_t)controller;
-      memcpy(pendingPacket[controller] + 1, payload, sizeof(payload));
-      hasPendingPacket[controller] = true;
+      portENTER_CRITICAL(&wsDeliveryMux);
+      wsDelivery.update(controller, payload);
+      portEXIT_CRITICAL(&wsDeliveryMux);
       printState(controller, decodeState(frame));
     }
 

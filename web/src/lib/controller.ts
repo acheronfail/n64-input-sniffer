@@ -1,4 +1,4 @@
-// Keep these masks in sync with packState() in src/main.cpp.
+// Keep these masks in sync with packState() in include/n64_decoder.h.
 export const B0 = {
 	A: 0x80,
 	B: 0x40,

@@ -133,7 +133,7 @@ The async server runs in its own task (on the other core), so it never disturbs 
 bit-bang sniff. The setup portal runs only during startup, before that server begins, so the two
 never clash over port 80.
 
-The state wire format (see `packState()` in [src/main.cpp](src/main.cpp) and the bit masks in
+The state wire format (see `packState()` in [include/n64_decoder.h](include/n64_decoder.h) and the bit masks in
 [web/src/lib/controller.ts](web/src/lib/controller.ts)):
 
 | Byte | Bits (MSB→LSB) |
@@ -158,6 +158,12 @@ pio run                 # build
 pio run -t upload       # flash
 pio device monitor      # serial @ 115200
 ```
+
+## Tests
+
+Run all firmware host tests with `sh scripts/test_host.sh`; no ESP32 is needed.
+Run web unit tests with `cd web && npm test`. See [test/README](test/README) for
+coverage and hardware-testing limitations.
 
 ## Output
 

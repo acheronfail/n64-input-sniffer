@@ -1,11 +1,26 @@
+Run all firmware host tests from the repository root:
 
-This directory is intended for PlatformIO Test Runner and project tests.
+    sh scripts/test_host.sh
 
-Unit Testing is a software testing method by which individual units of
-source code, sets of one or more MCU program modules together with associated
-control data, usage procedures, and operating procedures, are tested to
-determine whether they are fit for use. Unit testing finds problems early
-in the development cycle.
+Requires a C++11 compiler (`c++`, or set CXX). Binaries are built in a temporary
+folder and removed on exit. These tests use the same headers as the firmware;
+no board, Arduino SDK, or network is required.
 
-More information about PlatformIO Unit Testing:
-- https://docs.platformio.org/en/latest/advanced/unit-testing/index.html
+- n64_decoder_test.cpp: literal poll/response fixtures converted to RMT pulse
+  items; both level orders, timing limits, each button/axis bit, invalid commands
+  and stop bits, reserved-bit validation, short/long captures, and noise.
+  Fixtures are synthetic, not recordings from a physical controller. The
+  decoder's existing behavior is preserved: malformed cells are skipped, and
+  reserved bits are checked separately before command handling/publication.
+- ws_delivery_test.cpp: independent retries for fast/slow clients, final-state
+  recovery without new input, failed sends, latest-state coalescing, initial
+  snapshots, fairness, rate limits, slow-client eviction/recovery, reconnects,
+  capacity, and microsecond-clock rollover.
+- controller_commands_test.cpp: command ownership, button edges, deadlines,
+  confirmation flashes, one-shot actions, and timer rollover.
+- wifi_status_led_test.cpp: Wi-Fi status patterns and command/power precedence.
+
+Web unit tests: `cd web && npm test`.
+Firmware integration build: `pio run -e esp32-s3-devkitc-1`.
+Hardware capture timing and actual network/AsyncTCP behavior still require a
+board test; the host delivery tests exercise the scheduling policy, not sockets.
