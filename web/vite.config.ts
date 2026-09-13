@@ -11,6 +11,30 @@ export default defineConfig({
 		proxy: ESP32_PROXY ? { '/ws': { target: ESP32_PROXY, ws: true } } : undefined
 	},
 	plugins: [
+		{
+			name: 'inline-bundle-import-meta',
+			apply: 'build',
+			configEnvironment(name, config) {
+				const output = (config.build?.rolldownOptions ?? config.build?.rollupOptions)?.output;
+				if (name !== 'client' || !output || Array.isArray(output) || output.format !== 'iife') {
+					return;
+				}
+				return {
+					build: {
+						rolldownOptions: {
+							transform: {
+								// Inline scripts resolve URLs against their document and have no module hooks.
+								define: {
+									'import.meta.url': 'document.baseURI',
+									'import.meta.resolve': 'undefined',
+									'import.meta.hot': 'undefined'
+								}
+							}
+						}
+					}
+				};
+			}
+		},
 		tailwindcss(),
 		sveltekit({
 			compilerOptions: {
