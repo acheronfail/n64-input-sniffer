@@ -758,6 +758,8 @@ static void clearWiFiAndRestart() {
   ESP.restart();
 }
 
+static void setStatusLed(uint32_t color);
+
 /**
  * Bring up WiFi via the captive setup portal and start mDNS + the web server.
  * Blocks in setup() until connected (or restarts on portal timeout), before the
@@ -788,9 +790,23 @@ static void startNetwork() {
   // timeout we restart rather than hang forever, so a brief router outage just
   // retries on the next boot.
   wm.setConfigPortalTimeout(180);
+  // Service the portal ourselves so its waiting state can blink the LED.
+  // Stay in setup until connected: controller commands still require WiFi.
+  wm.setConfigPortalBlocking(false);
   Serial.printf("Joining WiFi (or open the \"%s\" network to configure)...\n",
                 AP_NAME);
-  if (!wm.autoConnect(AP_NAME)) {
+  bool connected = wm.autoConnect(AP_NAME);
+  const uint32_t portalStartedAt = millis();
+  while (!connected && wm.getConfigPortalActive()) {
+    // Red is the middle byte in WS2812 GRB order. Setup feedback overrides
+    // the saved power LED preference, just like command confirmation does.
+    const bool on = ((uint32_t(millis() - portalStartedAt) /
+                      ControllerCommands::FlashMs) % 2) == 0;
+    setStatusLed(on ? 0x00FF00 : 0);
+    connected = wm.process();
+    delay(1);
+  }
+  if (!connected) {
     Serial.println("WiFi setup timed out; restarting.");
     delay(1000);
     ESP.restart();
@@ -801,6 +817,8 @@ static void startNetwork() {
     delay(500);
     ESP.restart();
   }
+
+  setStatusLed(powerLedEnabled ? 0x00FF00 : 0);
 
   Serial.printf("Connected. Open http://%s/", WiFi.localIP().toString().c_str());
   if (MDNS.begin(MDNS_HOST)) {

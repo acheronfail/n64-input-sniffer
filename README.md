@@ -75,6 +75,11 @@ you don't need a wired serial connection to watch input.
 
 No WiFi credentials are hardcoded — they're configured once via a captive portal:
 
+While the setup portal is open, the LED flashes **red (500 ms on / 500 ms off)**
+to show that WiFi setup is needed, even if the normal power LED is disabled.
+Resetting WiFi returns to this flashing state after reboot. Controller commands
+become available once WiFi setup completes.
+
 1. On first boot the ESP32 brings up an open WiFi network named **`N64Spy-Setup`**. Join it from a
    phone/laptop; a captive-portal config page pops up automatically. Pick your network, enter the
    password, and save. The credentials are stored in flash, and the ESP32 reconnects to your
