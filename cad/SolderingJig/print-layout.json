@@ -1,0 +1,68 @@
+[
+  {
+    "name": "JigBase",
+    "plate": 1,
+    "object_id": 2,
+    "centre_xy": [
+      105,
+      128
+    ],
+    "height": 28.0,
+    "bounds_xy": [
+      [
+        80.0,
+        83.0
+      ],
+      [
+        130.0,
+        173.0
+      ]
+    ],
+    "extruder": 5,
+    "triangles": 7096
+  },
+  {
+    "name": "MaleClamp",
+    "plate": 1,
+    "object_id": 4,
+    "centre_xy": [
+      170,
+      105
+    ],
+    "height": 11.0,
+    "bounds_xy": [
+      [
+        148.0,
+        100.0
+      ],
+      [
+        192.0,
+        110.0
+      ]
+    ],
+    "extruder": 5,
+    "triangles": 2952
+  },
+  {
+    "name": "FemaleClamp",
+    "plate": 1,
+    "object_id": 6,
+    "centre_xy": [
+      170,
+      145
+    ],
+    "height": 13.0,
+    "bounds_xy": [
+      [
+        148.0,
+        140.0
+      ],
+      [
+        192.0,
+        150.0
+      ]
+    ],
+    "extruder": 5,
+    "triangles": 3584
+  }
+]

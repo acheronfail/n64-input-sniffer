@@ -1,0 +1,53 @@
+{
+  "revision": "v1",
+  "footprint_mm": [
+    50,
+    90
+  ],
+  "connector_axis_height_mm": 18,
+  "female_terminal_passage_mm": 12.8,
+  "hardware": "Four 2 mm x 8 mm countersunk screws suitable for plastic; no nuts or print pauses",
+  "parts": {
+    "MaleClamp": {
+      "volume_mm3": 2100.1806230607094,
+      "valid": true,
+      "solids": 1
+    },
+    "FemaleClamp": {
+      "volume_mm3": 2532.8919139339396,
+      "valid": true,
+      "solids": 1
+    },
+    "JigBase": {
+      "volume_mm3": 30624.146419446362,
+      "valid": true,
+      "solids": 1
+    }
+  },
+  "checks": {
+    "no_assembled_part_collisions": true,
+    "male_translation_blocked_mm3": {
+      "Vector (0.6, 0.0, 0.0)": 135.67118958996008,
+      "Vector (-0.6, 0.0, 0.0)": 135.67118959001934,
+      "Vector (0.0, 0.6, 0.0)": 46.027669578395475,
+      "Vector (0.0, -0.6, 0.0)": 41.731699573979995,
+      "Vector (0.0, 0.0, 0.6)": 73.77703967724327,
+      "Vector (0.0, 0.0, -0.6)": 221.18237917991095
+    },
+    "female_translation_blocked_mm3": {
+      "Vector (0.6, 0.0, 0.0)": 62.222193226428416,
+      "Vector (-0.6, 0.0, 0.0)": 62.22219322642271,
+      "Vector (0.0, 0.6, 0.0)": 16.06449498698571,
+      "Vector (0.0, -0.6, 0.0)": 6.17288038967686,
+      "Vector (0.0, 0.0, 0.6)": 64.76355511470763,
+      "Vector (0.0, 0.0, -0.6)": 97.44104292539433
+    },
+    "clamps_can_be_lowered_vertically": true,
+    "terminal_approaches_clear": true,
+    "screw_heads_and_housings_clear": true,
+    "male_roll_-5_blocked_mm3": 16.734315420628914,
+    "male_roll_5_blocked_mm3": 16.73431542083585,
+    "female_roll_-5_blocked_mm3": 15.613463451948732,
+    "female_roll_5_blocked_mm3": 15.613463451872553
+  }
+}

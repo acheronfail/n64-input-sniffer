@@ -20,3 +20,7 @@ The unpacked originals already exist in the migrated workspace and are ignored. 
 Save named FreeCAD and 3MF versions, refresh the applicable print exports and assembly notes, review `git status` and the diff, then commit each iteration. v0.16 is the baseline for continued work. Existing versioned models, print packages, previews, validation reports and `revisions/` snapshots preserve the earlier iteration history in this initial import. Historical snapshots are preserved as recorded and may contain old absolute paths; use the current scripts for ongoing work.
 
 Backups, caches, logs and temporary completion/error markers remain local and ignored. STEP/STL geometry, FCStd models, 3MF projects, ZIP print packages, parameters, scripts, macros, documentation and saved validation reports are tracked.
+
+## Soldering jig
+
+The separate [one-pair soldering jig](SolderingJig/README.md) holds a male and female connector with their terminals facing an open central area. Its three-part [print-ready 3MF](SolderingJig/N64-Soldering-Jig-v1.3mf) needs four 2 mm × 8 mm countersunk plastic screws and no supports or pauses.

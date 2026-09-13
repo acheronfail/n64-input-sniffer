@@ -1,0 +1,29 @@
+from pathlib import Path
+import FreeCAD as A,FreeCADGui as G,time,traceback
+from PySide import QtCore,QtWidgets
+from pivy import coin
+r=Path(__file__).resolve().parent
+try:
+ d=A.openDocument(str(r/'N64-Soldering-Jig-v1.FCStd'))
+ for o in d.Objects:
+  if hasattr(o.ViewObject,'ShapeColor'):
+   o.ViewObject.Visibility=True;o.ViewObject.ShapeColor=(.69,.73,.77);o.ViewObject.LineColor=(.15,.19,.22);o.ViewObject.DisplayMode='Flat Lines'
+ for o in d.Connectors.Group:
+  o.ViewObject.ShapeColor=(.16,.18,.20)
+  if 'Screw' in o.Name:o.ViewObject.ShapeColor=(.7,.72,.76)
+ d.MaleClamp.ViewObject.ShapeColor=(.25,.5,.8);d.FemaleClamp.ViewObject.ShapeColor=(.16,.62,.57)
+ view=G.activeDocument().activeView();view.viewAxonometric()
+ def snap(name):
+  G.updateGui();QtWidgets.QApplication.processEvents()
+  view.getCameraNode().orientation.setValue(coin.SbRotation(.3647052,.2798481,.1159169,.8804762))
+  view.fitAll();G.updateGui();QtWidgets.QApplication.processEvents();time.sleep(.2)
+  view.saveImage(str(r/name),1400,1000,'White')
+ snap('assembled.png')
+ for o in [d.MaleClamp,d.FemaleClamp]+[o for o in d.Connectors.Group if 'Screw' in o.Name]:o.Placement.Base.z+=14
+ snap('loading.png')
+ for o in [d.MaleClamp,d.FemaleClamp]+[o for o in d.Connectors.Group if 'Screw' in o.Name]:o.Placement.Base.z-=14
+ view.fitAll();d.recompute();d.save()
+except Exception:(r/'preview.error').write_text(traceback.format_exc())
+finally:
+ if 'd' in locals():A.closeDocument(d.Name)
+ QtCore.QTimer.singleShot(100,QtWidgets.QApplication.quit)

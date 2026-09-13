@@ -1,0 +1,29 @@
+{
+  "JigBase.stl": {
+    "watertight": true,
+    "triangles": 7096,
+    "dimensions_mm": [
+      50.0,
+      90.0,
+      28.0
+    ]
+  },
+  "MaleClamp.stl": {
+    "watertight": true,
+    "triangles": 2952,
+    "dimensions_mm": [
+      44.0,
+      10.0,
+      11.0
+    ]
+  },
+  "FemaleClamp.stl": {
+    "watertight": true,
+    "triangles": 3584,
+    "dimensions_mm": [
+      44.0,
+      10.0,
+      13.0
+    ]
+  }
+}

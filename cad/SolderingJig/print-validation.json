@@ -1,0 +1,61 @@
+{
+  "revision": "v1",
+  "printer": "Bambu Lab P1S 0.4 nozzle",
+  "bed": "Supertack Plate",
+  "plate_counts": [
+    3
+  ],
+  "slices": {
+    "error_string": "Success.",
+    "export_time": 0,
+    "layer_height": 0.1599999964237213,
+    "plate_index": 0,
+    "prepare_time": 0,
+    "return_code": 0,
+    "sliced_plates": [
+      {
+        "id": 1,
+        "sliced_time": 3,
+        "sliced_time_with_cache": 1,
+        "triangle_count": 13632,
+        "warning_message": ""
+      }
+    ],
+    "sparse_infill_density": 15.0,
+    "upward_compatible_machine": [
+      "Bambu Lab P1P 0.4 nozzle",
+      "Bambu Lab X1 0.4 nozzle",
+      "Bambu Lab X1 Carbon 0.4 nozzle",
+      "Bambu Lab X1E 0.4 nozzle",
+      "Bambu Lab A1 0.4 nozzle",
+      "Bambu Lab H2D 0.4 nozzle",
+      "Bambu Lab H2D Pro 0.4 nozzle",
+      "Bambu Lab H2S 0.4 nozzle",
+      "Bambu Lab P2S 0.4 nozzle"
+    ],
+    "wall_loops": 3
+  },
+  "geometry": [
+    {
+      "name": "JigBase.stl",
+      "triangles": 7096,
+      "max_vertex_error_mm": 4.9438483529229416e-08,
+      "source_sha256": "1dd58030aa2e58a5586b6a26803822e6e63903d5d0329604c51dd45edc51d34c"
+    },
+    {
+      "name": "FemaleClamp.stl",
+      "triangles": 3584,
+      "max_vertex_error_mm": 9.403953526998521e-08,
+      "source_sha256": "032559b9b3a3be63131fadc394b514994ecd47bbc864f4474b90d5517f7f61bc"
+    },
+    {
+      "name": "MaleClamp.stl",
+      "triangles": 2952,
+      "max_vertex_error_mm": 9.403953526998521e-08,
+      "source_sha256": "75b787d7178094ca8715e9b3458d83f4de89a6af54bece8bdc475bf3062d2b14"
+    }
+  ],
+  "embedded_gcode_matches_verified_files": true,
+  "pauses": 0,
+  "sha256": "9e67175e79beeddc1eea2076143346831917b55b21ef588ec272abc903e62484"
+}
