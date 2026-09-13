@@ -1,0 +1,190 @@
+:root {
+	color-scheme: dark;
+}
+body {
+	margin: 0;
+	min-height: 100vh;
+	display: grid;
+	place-items: center;
+	background: #14161a;
+	color: #c8ccd4;
+	font:
+		14px/1.4 system-ui,
+		-apple-system,
+		Segoe UI,
+		Roboto,
+		sans-serif;
+}
+.wrap {
+	text-align: center;
+}
+h1 {
+	font-size: 15px;
+	font-weight: 600;
+	letter-spacing: 0.04em;
+	color: #8a909c;
+	margin: 0 0 4px;
+}
+#conn {
+	font-size: 12px;
+	color: #6b7280;
+	margin-bottom: 4px;
+}
+#conn.up {
+	color: #4ade80;
+}
+#conn.down {
+	color: #f87171;
+}
+#pad {
+	font-size: 12px;
+	color: #8a909c;
+	margin-bottom: 14px;
+}
+
+/* Controller layout: three columns (D-pad | center | A/B + C-cluster). */
+.pad {
+	display: grid;
+	grid-template-columns: 150px 170px 150px;
+	gap: 18px;
+	align-items: start;
+	justify-items: center;
+	padding: 28px 30px;
+	border-radius: 22px;
+	background: #1d2026;
+	box-shadow:
+		0 10px 40px rgba(0, 0, 0, 0.45),
+		inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+.col {
+	display: grid;
+	gap: 14px;
+	justify-items: center;
+}
+
+/* Generic button indicator. */
+.btn {
+	display: grid;
+	place-items: center;
+	border-radius: 8px;
+	font-size: 12px;
+	font-weight: 700;
+	letter-spacing: 0.03em;
+	background: #2a2e37;
+	color: #7a8089;
+	border: 1px solid #353a44;
+	transition:
+		background 0.04s,
+		color 0.04s,
+		box-shadow 0.04s;
+	user-select: none;
+}
+.btn.on {
+	color: #0f1115;
+	box-shadow: 0 0 14px currentColor;
+}
+
+.wide {
+	width: 96px;
+	height: 30px;
+}
+.round {
+	width: 46px;
+	height: 46px;
+	border-radius: 50%;
+}
+.small {
+	width: 30px;
+	height: 30px;
+}
+
+/* Color themes per the real controller. */
+.blue.on {
+	background: #4f7bd6;
+	color: #4f7bd6;
+} /* A */
+.green.on {
+	background: #4ade80;
+	color: #4ade80;
+} /* B */
+.grey.on {
+	background: #c8ccd4;
+	color: #c8ccd4;
+} /* Z, L, R, Start, D-pad */
+.yellow.on {
+	background: #f5c542;
+	color: #f5c542;
+} /* C buttons */
+
+/* D-pad cross. */
+.dpad {
+	display: grid;
+	grid-template-columns: repeat(3, 30px);
+	grid-template-rows: repeat(3, 30px);
+	gap: 2px;
+}
+.dpad .up {
+	grid-area: 1 / 2;
+}
+.dpad .left {
+	grid-area: 2 / 1;
+}
+.dpad .right {
+	grid-area: 2 / 3;
+}
+.dpad .down {
+	grid-area: 3 / 2;
+}
+
+/* C-button cluster (same cross shape). */
+.cpad {
+	display: grid;
+	grid-template-columns: repeat(3, 30px);
+	grid-template-rows: repeat(3, 30px);
+	gap: 2px;
+}
+.cpad .cu {
+	grid-area: 1 / 2;
+}
+.cpad .cl {
+	grid-area: 2 / 1;
+}
+.cpad .cr {
+	grid-area: 2 / 3;
+}
+.cpad .cd {
+	grid-area: 3 / 2;
+}
+
+/* Analog stick well + moving dot. */
+.stick {
+	position: relative;
+	width: 110px;
+	height: 110px;
+	border-radius: 50%;
+	background: radial-gradient(circle at 50% 50%, #23272f, #15171c);
+	border: 1px solid #353a44;
+}
+.stick .dot {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	width: 26px;
+	height: 26px;
+	margin: -13px 0 0 -13px;
+	border-radius: 50%;
+	background: #c8ccd4;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+	transition: transform 0.03s linear;
+}
+.axis {
+	font-variant-numeric: tabular-nums;
+	color: #6b7280;
+	font-size: 12px;
+}
+
+.ab {
+	display: flex;
+	gap: 16px;
+	align-items: center;
+}

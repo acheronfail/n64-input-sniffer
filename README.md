@@ -134,7 +134,7 @@ bit-bang sniff. The setup portal runs only during startup, before that server be
 never clash over port 80.
 
 The state wire format (see `packState()` in [src/main.cpp](src/main.cpp) and the bit masks in
-[include/web_ui.h](include/web_ui.h)):
+[web/src/lib/controller.ts](web/src/lib/controller.ts)):
 
 | Byte | Bits (MSB→LSB) |
 |------|----------------|
@@ -145,6 +145,11 @@ The state wire format (see `packState()` in [src/main.cpp](src/main.cpp) and the
 | 4    | stick Y (int8) |
 
 ## Build, upload, monitor
+
+Install Node.js 22.12+ and npm alongside PlatformIO. Every firmware build first
+builds the SvelteKit UI in `web/`, installs locked npm dependencies when needed,
+and embeds its single-file HTML into firmware. No separate filesystem upload is
+required. See [web/README.md](web/README.md) for UI development and checks.
 
 **Before plugging in USB-C, disconnect the adapter from all four console ports—even if the console is switched off.**
 

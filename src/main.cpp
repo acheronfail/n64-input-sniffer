@@ -497,7 +497,7 @@ static void printState(size_t controller, const N64State &s) {
 /**
  * Pack the 32-bit controller response into 4 bytes for the wire. Each button
  * byte is MSB-first (matching readByte); the layout is mirrored by the bit
- * masks in web_ui.h:
+ * masks in web/src/lib/controller.ts:
  *   [0] A B Z START UP DOWN LEFT RIGHT
  *   [1] - - L R C-UP C-DOWN C-LEFT C-RIGHT   (top 2 bits are the unused 8,9)
  *   [2] stick X (int8)   [3] stick Y (int8)
