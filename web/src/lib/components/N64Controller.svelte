@@ -52,8 +52,6 @@
 			/>
 		</radialGradient>
 	</defs>
-	<path d="M220 3v37" stroke="#454545" stroke-width="11" />
-	<path d="M217 3v35" stroke="#727272" stroke-width="2" />
 	<!-- Shoulder buttons follow the upper edge of the two round side housings. -->
 	<g class="neutral-button" class:pressed={controller.buttons.L}>
 		<path d="M43 76Q69 58 132 53L149 65L48 94Z" />
