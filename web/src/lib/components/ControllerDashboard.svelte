@@ -12,7 +12,6 @@
 	import N64Controller from './N64Controller.svelte';
 	let {
 		controllers = Array.from({ length: 4 }, emptyState),
-		received = [false, false, false, false],
 		connection = 'connecting…',
 		connected = false,
 		initialVisible = ALL_CONTROLLERS,
@@ -21,7 +20,6 @@
 		persistSettings = true
 	}: {
 		controllers?: ControllerState[];
-		received?: boolean[];
 		connection?: string;
 		connected?: boolean;
 		initialVisible?: number[];
@@ -203,10 +201,7 @@
 				{@const controller = controllers[index] ?? emptyState()}
 				<article class="controller-card" aria-label={`Controller ${index + 1}`}>
 					<div class="card-heading">
-						<h2><span class="port">{index + 1}</span>Controller {index + 1}</h2>
-						<span class="signal"
-							>{!received[index] ? 'No input yet' : connected ? 'Receiving' : 'Last input'}</span
-						>
+						<h2 aria-label={`Player ${index + 1}`}><span class="port">{index + 1}</span></h2>
 					</div>
 					<N64Controller {controller} number={index + 1} />
 					<footer>
@@ -413,10 +408,6 @@
 		border-radius: 5px;
 		color: #dce5ee;
 		font-size: 11px;
-	}
-	.signal {
-		color: #a1aebe;
-		font-size: 10px;
 	}
 	footer {
 		border-top: 1px solid #303c49;

@@ -27,7 +27,6 @@
 
 <ControllerDashboard
 	{controllers}
-	received={[true, true, true, true]}
 	connected
 	connection="Simulated inputs"
 	persistSettings={false}

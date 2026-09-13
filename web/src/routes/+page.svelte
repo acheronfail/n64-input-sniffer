@@ -4,7 +4,6 @@
 	import ControllerDashboard from '$lib/components/ControllerDashboard.svelte';
 
 	let controllers = $state(Array.from({ length: 4 }, emptyState));
-	let received = $state([false, false, false, false]);
 	let connection = $state('connecting…');
 	let connected = $state(false);
 
@@ -41,7 +40,6 @@
 					animationFrame = undefined;
 					for (const [index, frame] of pending.drain()) {
 						controllers[index] = frame;
-						received[index] = true;
 					}
 				});
 			};
@@ -71,4 +69,4 @@
 	<link rel="icon" href="data:," />
 </svelte:head>
 
-<ControllerDashboard {controllers} {received} {connection} {connected} />
+<ControllerDashboard {controllers} {connection} {connected} />

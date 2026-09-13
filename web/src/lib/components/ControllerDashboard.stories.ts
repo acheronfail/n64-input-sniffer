@@ -15,7 +15,6 @@ const meta = {
 	tags: ['autodocs'],
 	args: {
 		controllers,
-		received: [true, true, true, true],
 		connected: true,
 		connection: 'connected',
 		persistSettings: false
@@ -29,8 +28,7 @@ export const OnlyController3: Story = { args: { initialVisible: [2] } };
 export const Controllers1And4: Story = { args: { initialVisible: [0, 3] } };
 export const WaitingForInput: Story = {
 	args: {
-		controllers: Array.from({ length: 4 }, emptyState),
-		received: [false, false, false, false]
+		controllers: Array.from({ length: 4 }, emptyState)
 	}
 };
 export const Disconnected: Story = {

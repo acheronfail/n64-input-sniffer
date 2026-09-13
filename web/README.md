@@ -43,8 +43,9 @@ is shown in a separate callout beside the center grip.
 Cards automatically stack in a narrow window. For OBS, add the ESP URL as a
 Browser Source and try 280 × 1080 for a four-controller sidebar. Configure its
 selection using OBS's Interact command. OBS stores settings separately from your
-regular browser. Before frames arrive, cards say “No input yet”; after a connection
-loss, they retain the last received state and say “Last input”.
+regular browser. The connection indicator describes the browser’s WebSocket
+connection to the ESP32, not individual controller activity. Controllers retain
+the last received input state after a connection loss.
 
 ## Storybook
 

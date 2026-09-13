@@ -131,7 +131,6 @@
 	<g
 		transform={`translate(${stickOffset(controller.x) * 0.42}, ${-stickOffset(controller.y) * 0.42})`}
 	>
-		<ellipse cx="220" cy="269" rx="19" ry="13" fill="#272727" opacity=".65" />
 		<path d="M208 257l3 16q9 7 18 0l3-16" fill="#aaa" />
 		<circle cx="220" cy="255" r="19" fill={`url(#${uid}-stick)`} stroke="#aaa" />
 		{#each [5, 9, 13, 16] as radius}<circle
