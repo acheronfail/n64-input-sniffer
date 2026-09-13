@@ -47,7 +47,9 @@ The projection is modelled concentric with the housing, flat side down, opposite
 - `mesh-validation.json`: STL closure after welding coincident vertices at 0.0001 mm.
 - `print/full-enclosure-v0.16/manifest.json`: quantities, bed orientation, dimensions and file hashes.
 
-The scan overlay is recentered in X using the existing scan-spacing measurements and shifted +12 mm in Y to account for the formerly omitted mating projection. This preserves the historical intended tip engagement; it is an explicit assembly-registration assumption, not a new measurement of installed socket/contact depth. The original Z registration is retained. Zero surface intersections under this registration do not certify electrical mating depth, printing accuracy or load strength. Physical v0.16 fit remains unverified.
+The scan overlay is recentered in X using the existing scan-spacing measurements and shifted +12 mm in Y to account for the formerly omitted mating projection. This preserves the historical intended tip engagement; it is an explicit assembly-registration assumption, not a new measurement of installed socket/contact depth. The original Z registration is retained. Zero surface intersections under this registration do not certify electrical mating depth, printing accuracy or load strength.
+
+Physical testing: on 2026-09-13, the project owner confirmed that the latest v0.16 model works well after testing. No further geometry changes were needed. Local slicer changes only rearranged which pieces were printed and their order; the committed print projects remain the original saved versions.
 
 ![v0.16 on the corrected scan overlay](v0.16-on-console.png)
 
