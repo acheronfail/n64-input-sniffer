@@ -1,3 +1,6 @@
+export const BACKGROUND_KEY = 'n64-spy.background.v1';
+export const DEFAULT_BACKGROUND = '#101720';
+export const MINIMAL_KEY = 'n64-spy.minimal.v1';
 export const SETTINGS_KEY = 'n64-spy.controllers.v1';
 export const ALL_CONTROLLERS = [0, 1, 2, 3];
 

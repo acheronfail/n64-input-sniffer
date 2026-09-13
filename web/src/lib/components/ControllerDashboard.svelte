@@ -1,7 +1,14 @@
 <script lang="ts">
-	import { onMount, untrack } from 'svelte';
+	import { onMount, untrack, tick } from 'svelte';
 	import { emptyState, type ControllerState } from '../controller';
-	import { ALL_CONTROLLERS, parseVisibility, SETTINGS_KEY } from '../settings';
+	import {
+		ALL_CONTROLLERS,
+		parseVisibility,
+		SETTINGS_KEY,
+		MINIMAL_KEY,
+		BACKGROUND_KEY,
+		DEFAULT_BACKGROUND
+	} from '../settings';
 	import N64Controller from './N64Controller.svelte';
 	let {
 		controllers = Array.from({ length: 4 }, emptyState),
@@ -9,6 +16,8 @@
 		connection = 'connecting…',
 		connected = false,
 		initialVisible = ALL_CONTROLLERS,
+		initialMinimal = false,
+		initialBackground = DEFAULT_BACKGROUND,
 		persistSettings = true
 	}: {
 		controllers?: ControllerState[];
@@ -16,100 +25,236 @@
 		connection?: string;
 		connected?: boolean;
 		initialVisible?: number[];
+		initialMinimal?: boolean;
+		initialBackground?: string;
 		persistSettings?: boolean;
 	} = $props();
 	let visible = $state<number[]>(untrack(() => [...initialVisible]));
 	let storageMessage = $state('');
+	const inputId = $props.id();
+	let background = $state(untrack(() => initialBackground));
+	let backgroundInput = $state(untrack(() => initialBackground));
+	let backgroundError = $state(false);
+	function validColor(value: unknown): value is string {
+		return (
+			typeof value === 'string' &&
+			CSS.supports('color', value) &&
+			!/^(inherit|initial|unset|revert|revert-layer|currentcolor)$/i.test(value.trim()) &&
+			!/\b(var|env)\(/i.test(value)
+		);
+	}
+	function setBackground(value: string) {
+		backgroundInput = value;
+		backgroundError = !validColor(value);
+		if (!backgroundError) {
+			background = value.trim();
+			save(BACKGROUND_KEY, background);
+		}
+	}
+	let minimal = $state(untrack(() => initialMinimal));
+	let exitButton = $state<HTMLButtonElement>();
+	let settingsSummary = $state<HTMLElement>();
 	// Initialize from props without tying a user's selection to incoming frames.
 	onMount(() => {
 		visible = [...initialVisible];
 		if (persistSettings) {
 			try {
 				visible = parseVisibility(localStorage.getItem(SETTINGS_KEY));
+				minimal = localStorage.getItem(MINIMAL_KEY) === 'true';
+				const savedBackground = localStorage.getItem(BACKGROUND_KEY);
+				// A malformed color preference must not prevent restoring other settings.
+				try {
+					const value: unknown = savedBackground === null ? null : JSON.parse(savedBackground);
+					if (validColor(value)) background = backgroundInput = value;
+				} catch {
+					/* Use the default background. */
+				}
 			} catch {
 				storageMessage = 'Browser storage unavailable. Settings apply for this visit.';
 			}
 		}
 	});
-	function select(indices: number[]) {
-		visible = indices;
+	function save(key: string, value: unknown) {
 		if (persistSettings) {
 			try {
-				localStorage.setItem(SETTINGS_KEY, JSON.stringify(visible));
+				localStorage.setItem(key, JSON.stringify(value));
 				storageMessage = '';
 			} catch {
 				storageMessage = 'Could not save settings. Settings apply for this visit.';
 			}
 		}
 	}
+	function select(indices: number[]) {
+		visible = indices;
+		save(SETTINGS_KEY, visible);
+	}
+	async function setMinimal(value: boolean) {
+		minimal = value;
+		save(MINIMAL_KEY, value);
+		await tick();
+		(value ? exitButton : settingsSummary)?.focus({ preventScroll: true });
+	}
 </script>
 
-<main class="dashboard">
-	<header>
-		<div class="brand">
-			<span class="brand-mark" aria-hidden="true">N</span>
-			<div>
-				<h1>N64 SPY</h1>
-				<p>CONTROLLER INPUTS</p>
+<svelte:window
+	onkeydown={(event) => {
+		if (minimal && event.key === 'Escape') {
+			event.preventDefault();
+			void setMinimal(false);
+		}
+	}}
+/>
+
+<div class="surface" style:background-color={background}>
+	<main class="dashboard" class:minimal>
+		{#if minimal}
+			<button
+				class="exit-minimal"
+				bind:this={exitButton}
+				onclick={() => setMinimal(false)}
+				aria-label="Exit minimal mode"
+				title="Exit minimal mode (Esc)"
+			>
+				<svg
+					width="16"
+					height="16"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="1.5"
+					aria-hidden="true"
+				>
+					<path d="M4 4h16v16H4zM4 9h16M9 9v11" />
+				</svg>
+			</button>
+		{/if}
+		<header>
+			<div class="brand">
+				<span class="brand-mark" aria-hidden="true">N</span>
+				<div>
+					<h1>N64 SPY</h1>
+					<p>CONTROLLER INPUTS</p>
+				</div>
 			</div>
-		</div>
-		<details class="settings">
-			<summary>Settings</summary>
-			<div class="settings-panel">
-				<fieldset>
-					<legend>Visible controllers</legend>
-					<div class="choices">
-						{#each ALL_CONTROLLERS as index}
-							<label
-								><input
-									type="checkbox"
-									checked={visible.includes(index)}
-									onchange={(event) =>
-										select(
-											event.currentTarget.checked
-												? [...visible, index].sort()
-												: visible.filter((id) => id !== index)
-										)}
-								/>{index + 1}</label
-							>
-						{/each}
+			<details class="settings">
+				<summary bind:this={settingsSummary}>Settings</summary>
+				<div class="settings-panel">
+					<fieldset>
+						<legend>Visible controllers</legend>
+						<div class="choices">
+							{#each ALL_CONTROLLERS as index}
+								<label
+									><input
+										type="checkbox"
+										checked={visible.includes(index)}
+										onchange={(event) =>
+											select(
+												event.currentTarget.checked
+													? [...visible, index].sort()
+													: visible.filter((id) => id !== index)
+											)}
+									/>{index + 1}</label
+								>
+							{/each}
+						</div>
+					</fieldset>
+					<div class="presets">
+						<button onclick={() => select([...ALL_CONTROLLERS])}>Show all</button><button
+							onclick={() => select([0])}>Only 1</button
+						>
 					</div>
-				</fieldset>
-				<div class="presets">
-					<button onclick={() => select([...ALL_CONTROLLERS])}>Show all</button><button
-						onclick={() => select([0])}>Only 1</button
+					<label class="minimal-option"
+						><input
+							type="checkbox"
+							checked={minimal}
+							onchange={(event) => setMinimal(event.currentTarget.checked)}
+						/> Minimal interface</label
 					>
-				</div>
-				<p>{persistSettings ? 'Saved in this browser.' : 'Demo settings — not saved.'}</p>
-				{#if storageMessage}<p role="status">{storageMessage}</p>{/if}
-			</div>
-		</details>
-	</header>
-	<div class="connection" class:connected><span class="status-dot"></span>{connection}</div>
-	<section class="controllers" aria-label="Controller inputs">
-		{#each ALL_CONTROLLERS.filter((index) => visible.includes(index)) as index (index)}
-			{@const controller = controllers[index] ?? emptyState()}
-			<article class="controller-card" aria-label={`Controller ${index + 1}`}>
-				<div class="card-heading">
-					<h2><span class="port">{index + 1}</span>Controller {index + 1}</h2>
-					<span class="signal"
-						>{!received[index] ? 'No input yet' : connected ? 'Receiving' : 'Last input'}</span
+					<p>Controllers only. Use the corner button or Esc to exit.</p>
+					<label class="background-label" for={`${inputId}-background`}
+						>Background color (CSS)</label
 					>
+					<div class="background-input">
+						<input
+							id={`${inputId}-background`}
+							type="text"
+							value={backgroundInput}
+							oninput={(event) => setBackground(event.currentTarget.value)}
+							spellcheck="false"
+							autocomplete="off"
+							aria-invalid={backgroundError}
+							aria-describedby={`${inputId}-background-help`}
+						/>
+						<button onclick={() => setBackground(DEFAULT_BACKGROUND)}>Reset</button>
+					</div>
+					<p id={`${inputId}-background-help`} class:color-error={backgroundError} role="status">
+						{backgroundError
+							? 'Enter a valid CSS color. The last valid color is still applied.'
+							: 'Use a CSS color, e.g. #00ff00, rgb(0 255 0), or transparent.'}
+					</p>
+					<p>{persistSettings ? 'Saved in this browser.' : 'Demo settings — not saved.'}</p>
+					{#if storageMessage}<p role="status">{storageMessage}</p>{/if}
 				</div>
-				<N64Controller {controller} number={index + 1} />
-				<footer>
-					<span>ANALOG STICK</span>
-					<div><span>X <b>{controller.x}</b></span><span>Y <b>{controller.y}</b></span></div>
-				</footer>
-			</article>
-		{/each}
-	</section>
-	{#if visible.length === 0}<p class="empty">
-			No controllers selected. Open Settings to show a controller.
-		</p>{/if}
-</main>
+			</details>
+		</header>
+		<div class="connection" class:connected><span class="status-dot"></span>{connection}</div>
+		<section class="controllers" aria-label="Controller inputs">
+			{#each ALL_CONTROLLERS.filter((index) => visible.includes(index)) as index (index)}
+				{@const controller = controllers[index] ?? emptyState()}
+				<article class="controller-card" aria-label={`Controller ${index + 1}`}>
+					<div class="card-heading">
+						<h2><span class="port">{index + 1}</span>Controller {index + 1}</h2>
+						<span class="signal"
+							>{!received[index] ? 'No input yet' : connected ? 'Receiving' : 'Last input'}</span
+						>
+					</div>
+					<N64Controller {controller} number={index + 1} />
+					<footer>
+						<span>ANALOG STICK</span>
+						<div><span>X <b>{controller.x}</b></span><span>Y <b>{controller.y}</b></span></div>
+					</footer>
+				</article>
+			{/each}
+		</section>
+		{#if visible.length === 0}<p class="empty">
+				No controllers selected. Open Settings to show a controller.
+			</p>{/if}
+	</main>
+</div>
 
 <style>
+	.surface {
+		min-height: 100vh;
+		min-height: 100dvh;
+		width: 100%;
+	}
+	.background-label {
+		display: block;
+		margin-top: 16px;
+		margin-bottom: 7px;
+	}
+	.background-input {
+		display: flex;
+		gap: 6px;
+	}
+	.background-input input {
+		min-width: 0;
+		width: 100%;
+		height: auto;
+		padding: 7px;
+		border: 1px solid #526171;
+		border-radius: 6px;
+		color: #e4eaf1;
+		background: #101720;
+		font: inherit;
+	}
+	.background-input input[aria-invalid='true'] {
+		border-color: #ffa4a4;
+	}
+	.settings-panel .color-error {
+		color: #ffa4a4;
+	}
+
 	.dashboard {
 		width: 100%;
 		max-width: 1440px;
@@ -323,5 +468,48 @@
 			margin-top: 6px;
 			padding-top: 8px;
 		}
+	}
+	.minimal-option {
+		display: flex;
+		align-items: center;
+		gap: 7px;
+		margin-top: 16px;
+		cursor: pointer;
+	}
+	.minimal header,
+	.minimal .connection,
+	.minimal .card-heading,
+	.minimal footer,
+	.minimal .empty {
+		display: none;
+	}
+	.minimal .controller-card {
+		background: transparent;
+		border: 0;
+		border-radius: 0;
+		padding: 0;
+	}
+	.minimal {
+		padding: 8px;
+	}
+	.exit-minimal {
+		position: fixed;
+		top: 6px;
+		right: 6px;
+		z-index: 3;
+		display: grid;
+		place-items: center;
+		width: 32px;
+		height: 32px;
+		padding: 0;
+		background: transparent;
+		border: 0;
+		color: #9ca6b0;
+		opacity: 0.4;
+	}
+	.exit-minimal:hover,
+	.exit-minimal:focus-visible {
+		opacity: 1;
+		background: #202a35;
 	}
 </style>

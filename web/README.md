@@ -60,3 +60,16 @@ selection. Storybook settings are isolated from the application's saved settings
 The accessibility addon is available for inspecting each example.
 
 Storybook is development-only and is not included in the firmware HTML bundle.
+
+Enable **Minimal interface** in Settings for a controllers-only view, without the
+page header, connection status, card headings, borders, or analog readout footers.
+This preference is saved separately from controller visibility. A subtle button
+in the top-right corner restores the full interface; **Escape** does the same.
+The button is keyboard accessible and remains available even if no controllers
+are selected. Storybook includes minimal, narrow OBS, empty, and toggle demos.
+
+Settings includes a **Background color (CSS)** input with live preview and browser
+persistence. Enter a hex value, named color, `rgb(...)`, `hsl(...)`, or `transparent`.
+Invalid input leaves the last valid background in place; Reset restores the default
+dark background. The color covers the entire viewport. Use minimal mode to remove
+card backgrounds for a uniform OBS chroma-key background.
