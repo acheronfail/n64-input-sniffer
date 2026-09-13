@@ -1,1 +1,35 @@
-.pio
+# PlatformIO and local editor state
+.pio/
+.vscode/
+.DS_Store
+
+# CAD autosaves and Python caches
+/cad/**/__pycache__/
+/cad/**/*.py[cod]
+/cad/**/*.FCBak
+/cad/**/*.FCStd[0-9]*
+/cad/**/*.FCStd~
+/cad/**/*.log
+/cad/**/*.done
+/cad/**/*.error
+/cad/**/*.tmp
+/cad/**/.~lock.*
+
+# Regenerable CAD working files; versioned release models remain tracked.
+/cad/Enclosure/Enclosure.FCStd
+/cad/Enclosure/Enclosure.step
+/cad/Enclosure/ControllerPortMale.step
+/cad/Enclosure/*.stl
+/cad/Enclosure/print/
+/cad/Enclosure/*-Orca-input.3mf
+/cad/Enclosure/*.zip
+/cad/Enclosure/*-layout.json
+/cad/Enclosure/*validation.json
+/cad/Enclosure/slice/
+/cad/SolderingJig/SolderingJig.FCStd
+/cad/SolderingJig/*.step
+/cad/SolderingJig/*.stl
+/cad/SolderingJig/*-input.3mf
+/cad/SolderingJig/*-layout.json
+/cad/SolderingJig/*validation.json
+/cad/SolderingJig/slice/
