@@ -41,7 +41,7 @@ export function stickOffset(value: number): number {
 	return Math.max(-1, Math.min(1, value / 90)) * 38;
 }
 
-// Keep one pending frame per controller; legacy frames belong to controller 1.
+// Keep one pending frame per controller. Legacy frames belong to controller 1.
 export function createFrameBuffer() {
 	const pending = new Map<number, ControllerState>();
 	return {

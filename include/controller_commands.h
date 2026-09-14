@@ -3,7 +3,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-// Button masks use the first two packed N64 response bytes, MSB first.
+// Button masks use the first two packed N64 response bytes, most significant bit (MSB) first.
 class ControllerCommands {
 public:
   enum class Action { None, ResetWiFi, TogglePowerLed };
@@ -32,7 +32,7 @@ public:
     }
     if (controller != owner) return;
     const uint16_t pressed = buttons & ~previous;
-    // Ambiguous simultaneous commands are ignored; release and press one.
+    // Ignore ambiguous simultaneous commands. Release the buttons. Then push one command button.
     const uint16_t command = pressed & (Start | Z);
     if (command == Start || command == Z) {
       pending = command == Start ? Action::ResetWiFi : Action::TogglePowerLed;

@@ -48,7 +48,7 @@ int main() {
   acknowledge(delivery, attempt);
   assert(!delivery.pending());
 
-  // A binary() failure has the same retry semantics as an unwritable socket.
+  // A binary() failure uses the same retry rules as a socket that cannot accept writes.
   delivery.update(0, pressed);
   attempt = prepare(delivery, now);
   for (size_t i = 0; i < attempt.count; ++i)
@@ -62,7 +62,7 @@ int main() {
   assert(memcmp(attempt.packet + 1, released, 4) == 0);
   acknowledge(delivery, attempt);
 
-  // Initial snapshots are retried and include state captured with no clients.
+  // Retry initial snapshots. Include state captured with no clients.
   Delivery snapshot;
   uint32_t snapshotTime = 0;
   snapshot.update(0, pressed);
@@ -81,7 +81,7 @@ int main() {
   acknowledge(snapshot, attempt);
   assert(!snapshot.pending());
 
-  // A newer update or reconnect between prepare/complete must survive the ack.
+  // An acknowledgment must preserve a newer update or reconnect between prepare/complete.
   snapshot.update(0, pressed);
   attempt = prepare(snapshot, snapshotTime);
   snapshot.update(0, released);
@@ -98,7 +98,7 @@ int main() {
   }
   assert(!snapshot.pending());
 
-  // Persistently blocked clients close at the exact limit, not per loop spin.
+  // Close clients that stay blocked at the exact limit, not on each loop iteration.
   Delivery blocked;
   uint32_t blockedTime = 0;
   assert(blocked.connect(1));

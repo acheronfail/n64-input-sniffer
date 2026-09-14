@@ -9,7 +9,7 @@
 #define N64_BITCOUNT 32
 #define N64_FRAMEBITS (N64_PREFIX + N64_BITCOUNT)
 #define N64_POLL_COMMAND 0x01
-// Pulse timings in microseconds; RMT captures at 1us resolution.
+// Pulse timings in microseconds. The remote control peripheral (RMT) captures at 1us resolution.
 #define N64_LOW_ONE_MAX_US 2
 #define N64_LOW_MIN_US 1
 #define N64_LOW_MAX_US 4
@@ -18,7 +18,7 @@
 // Bound temporary capture storage even for long/noisy transactions.
 #define RMT_MAX_CAPTURE_BITS 96
 
-/** Decode one MSB-first byte from the 8 bits of `bits` starting at `offset`. */
+/** Decode one byte from the 8 bits of `bits` at `offset`, most significant bit (MSB) first. */
 static inline uint8_t readByte(const uint8_t *bits, int offset) {
   uint8_t val = 0;
   for (int i = 0; i < 8; ++i) {
@@ -29,8 +29,8 @@ static inline uint8_t readByte(const uint8_t *bits, int offset) {
   return val;
 }
 
-/** True if the 9-bit prefix is the console's poll command (byte 0x01,
- * MSB-first) followed by a stop bit (1). */
+/** Return true if the 9-bit prefix contains the console's poll command
+ * (byte 0x01, MSB-first), then a stop bit (1). */
 static inline bool isPollResponse(const uint8_t *frame) {
   const uint8_t command = readByte(frame, 0); // first 8 prefix bits
   const uint8_t stopBit = frame[8];           // 9th prefix bit
@@ -38,8 +38,8 @@ static inline bool isPollResponse(const uint8_t *frame) {
 }
 
 /**
- * Bits 8 and 9 in the 32-bit controller response are unused and expected to be
- * zero on valid packets. This rejects many random/noisy false decodes.
+ * The controller does not use response bits 8 and 9. Valid packets must set them to zero.
+ * This check rejects many false decodes from random data or noise.
  */
 static inline bool hasValidReservedBits(const uint8_t *frame) {
   const uint8_t *r = frame + N64_PREFIX;
@@ -51,7 +51,7 @@ static inline uint8_t decodeBitFromLowUs(uint32_t lowUs) {
   return (lowUs <= N64_LOW_ONE_MAX_US) ? 1U : 0U;
 }
 
-/** Validate that one low/high pulse pair looks like a real N64 bit cell. */
+/** Check that one low/high pulse pair matches a real N64 bit cell. */
 static inline bool isValidN64CellUs(uint32_t lowUs, uint32_t highUs) {
   if (lowUs < N64_LOW_MIN_US || lowUs > N64_LOW_MAX_US) {
     return false;
@@ -63,7 +63,7 @@ static inline bool isValidN64CellUs(uint32_t lowUs, uint32_t highUs) {
 
 /**
  * Decode an RMT packet into an N64 frame (9-bit poll prefix + 32-bit response).
- * Returns true if a full poll-response frame is found.
+ * Return true if the packet contains a full poll-response frame.
  */
 template <typename Item>
 static bool decodeFrameFromRmtItems(const Item *items, size_t count,
@@ -74,8 +74,8 @@ static bool decodeFrameFromRmtItems(const Item *items, size_t count,
   for (size_t i = 0; i < count && bitCount < RMT_MAX_CAPTURE_BITS; ++i) {
     const Item &item = items[i];
 
-    // Valid N64 traffic is low->high for each bit cell. Decode only those
-    // cells and ignore malformed/noisy segments.
+    // Valid N64 traffic goes low->high for each bit cell.
+    // Decode only those cells. Ignore malformed segments and noise.
     if (item.level0 == 0 && item.level1 == 1 && item.duration0 > 0 &&
         item.duration1 > 0 &&
         isValidN64CellUs(item.duration0, item.duration1)) {
@@ -102,9 +102,9 @@ static bool decodeFrameFromRmtItems(const Item *items, size_t count,
 }
 
 /**
- * Pack the 32-bit controller response into 4 bytes for the wire. Each button
- * byte is MSB-first (matching readByte); the layout is mirrored by the bit
- * masks in web/src/lib/controller.ts:
+ * Pack the 32-bit controller response into 4 bytes for the wire.
+ * Each button byte is MSB-first, as in readByte.
+ * The bit masks in web/src/lib/controller.ts use the same layout:
  *   [0] A B Z START UP DOWN LEFT RIGHT
  *   [1] - - L R C-UP C-DOWN C-LEFT C-RIGHT   (top 2 bits are the unused 8,9)
  *   [2] stick X (int8)   [3] stick Y (int8)

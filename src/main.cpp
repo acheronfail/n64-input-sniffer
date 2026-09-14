@@ -1,20 +1,19 @@
 /**
  * Ported to ESP32 from NintendoSpy N64.
  *
- * This is a passive bus sniffer.  It watches the single data wire that runs
- * between an N64 console and a controller and decodes the controller-state
- * packets the controller sends back in response to the console's poll command
- * (0x01).  Nothing is driven onto the line; the ESP32 only reads.
+ * This passive bus sniffer reads the single data wire between an N64 console
+ * and a controller. It decodes the controller's response to the console's poll
+ * command (0x01). The ESP32 only reads the line. It never drives the line.
  *
- * The N64 controller protocol encodes each bit as a ~4us pulse on an idle-high,
- * open-collector line: '0' bit -> low for ~3us, high for ~1us, and '1' bit ->
- * low for ~1us, high for ~3us. This firmware uses the ESP32's RMT RX peripheral
- * to timestamp pulse widths in hardware, then decodes each bit from the low
- * pulse duration.
+ * Each N64 bit is a ~4us pulse on an open-collector line that stays high when idle.
+ * A '0' is low for ~3us and high for ~1us.
+ * A '1' is low for ~1us and high for ~3us.
+ * The ESP32's remote control peripheral (RMT) timestamps received pulse widths
+ * in hardware. The firmware decodes each bit from the low pulse duration.
  *
- * Each polled frame on the wire is: the console's 9-bit prefix (the 0x01
- * command byte 0000_0001 followed by a stop bit -> 0000_0001 1) immediately
- * followed by the controller's 32-bit response.
+ * Each polled frame starts with the console's 9-bit prefix: the 0x01 command
+ * byte 0000_0001 and a stop bit, giving 0000_0001 1.
+ * The controller's 32-bit response comes immediately after the prefix.
  */
 
 #include <Arduino.h>
@@ -43,36 +42,36 @@ static std::atomic<ControllerCommands::Led> commandLed{ControllerCommands::Led::
 static void processCommandFrame(size_t controller, const uint8_t *frame);
 
 // ---------- WiFi / setup portal ---------------------------------------------
-// No hardcoded credentials. On first boot (or whenever it can't reconnect) the
-// ESP32 brings up an open AP named AP_NAME with a captive portal: join it from
-// a phone/laptop, pick your network, and enter the password. WiFiManager saves
-// it to flash and the ESP32 reconnects automatically on later boots.
+// The firmware contains no fixed credentials. On first boot or after a failed
+// reconnect, the ESP32 starts an open access point (AP) named AP_NAME.
+// Join it from a phone or laptop. Select your network in the captive portal.
+// Enter the password. WiFiManager saves it in flash.
+// The ESP32 reconnects automatically on later boots.
 //
-// Hold the BOOT button (WIFI_RESET_PIN) for WIFI_RESET_HOLD_MS -- at power-up or
-// any time during normal operation -- to forget the saved network and reboot
-// into the setup portal.
+// Hold BOOT (WIFI_RESET_PIN) for WIFI_RESET_HOLD_MS to delete the saved network
+// and reboot into the setup portal. This applies at startup or during normal operation.
 #define AP_NAME "N64Spy-Setup"
 #define MDNS_HOST "n64spy"
 #define WIFI_RESET_PIN 0       // BOOT button on most ESP32 dev boards
-#define WIFI_RESET_HOLD_MS 3000 // hold this long to wipe WiFi + restart
+#define WIFI_RESET_HOLD_MS 3000 // hold duration to delete WiFi credentials and restart
 
 // ---------- Over-the-air updates --------------------------------------------
-// Once connected, the ESP32 listens for firmware uploads over WiFi so you can
-// reflash without the USB cable (PlatformIO: `pio run -e esp32dev_ota -t
-// upload`). The device advertises itself over mDNS as OTA_HOSTNAME.local; set
-// upload_port to that (or its IP) in platformio.ini.
+// After connection, the ESP32 accepts firmware uploads over WiFi without USB.
+// PlatformIO command: `pio run -e esp32dev_ota -t upload`.
+// The device advertises OTA_HOSTNAME.local through multicast DNS (mDNS).
+// Set upload_port to that name or its IP address in platformio.ini.
 //
-// OTA_PASSWORD guards the update endpoint -- leave it empty to disable auth, or
-// set one and pass --auth=<password> via upload_flags in platformio.ini.
+// OTA_PASSWORD controls authentication for over-the-air (OTA) updates.
+// Leave it empty to disable authentication.
+// For a password, set OTA_PASSWORD. Pass --auth=<password> through upload_flags in platformio.ini.
 #define OTA_HOSTNAME MDNS_HOST
 #define OTA_PASSWORD ""
 
 // ---------- Wiring -----------------------------------------------------------
-// Connect this GPIO to the N64 controller DATA line (the middle pin of the
-// 3-pin N64 connector).  The N64 data line is 3.3V logic with a pull-up on the
-// console side, so it can be wired directly to an ESP32 input pin -- no level
-// shifting required.  Be sure to share a common ground with the
-// console/controller.
+// Connect this GPIO to the N64 controller DATA line, the middle pin of the 3-pin N64 connector.
+// The N64 data line uses 3.3V logic with a pull-up on the console side.
+// It connects directly to an ESP32 input pin without level shifting.
+// Share a common ground with the console/controller.
 //
 // Up to 4 controller data lines, one per RMT RX channel.
 #define N64_CONTROLLER_COUNT 4
@@ -83,12 +82,12 @@ static void processCommandFrame(size_t controller, const uint8_t *frame);
 
 #define SERIAL_BAUD 115200
 
-// How long loop() waits (with interrupts ENABLED) for a frame to begin before
-// returning. Bounding this is what keeps the interrupt watchdog fed and the
-// RTOS scheduled when the line is idle / no console attached.
+// Maximum time loop() waits for a frame with interrupts enabled before it returns.
+// This limit lets the interrupt watchdog and real-time operating system (RTOS)
+// run when the line is idle or no console is attached.
 #define FRAME_WAIT_US 5000
 
-// End an RMT receive once the bus has stayed at one level this long.
+// End RMT reception after the bus stays at one level for this duration.
 #define RMT_IDLE_THRESHOLD_US 12
 
 // On ESP32-S3 with the legacy RMT API, channels 4-7 are RX-capable.
@@ -99,8 +98,8 @@ static constexpr rmt_channel_t kN64Channels[N64_CONTROLLER_COUNT] = {
 static RingbufHandle_t n64RmtRingbufs[N64_CONTROLLER_COUNT] = {nullptr, nullptr,
                                  nullptr, nullptr};
 
-// HTTP server (serves the UI) and the WebSocket the UI listens on. Both run in
-// the AsyncTCP task on the other core, so they never block pulse capture.
+// The HTTP server serves the user interface (UI), which listens to the WebSocket.
+// Both run in the AsyncTCP task on the other core and do not block pulse capture.
 static AsyncWebServer server(80);
 static AsyncWebSocket ws("/ws");
 
@@ -116,8 +115,8 @@ static uint32_t wsSlowCloseCount = 0;
 static uint32_t wifiDisconnectCount = 0;
 static uint32_t lastWsDiagAtMs = 0;
 
-// A port is considered "connected" while valid poll-response frames are seen
-// recently. This is activity-based detection (not direct cable detection).
+// A port is "connected" if it recently received valid poll-response frames.
+// This detects activity, not the cable connection itself.
 #define PORT_ACTIVITY_TIMEOUT_MS 1500
 #define PORT_PROBE_INTERVAL_MS 100
 #define PORT_PROBE_WINDOW_MS 30
@@ -142,12 +141,12 @@ static bool startRmtCapture(size_t controller) {
   cfg.channel = kN64Channels[controller];
   cfg.gpio_num = (gpio_num_t)kN64Pins[controller];
   cfg.clk_div = 80; // 80MHz APB / 80 = 1MHz tick => 1us resolution.
-  // ESP32-S3 legacy RMT has tight per-group memory; with 4 RX channels active,
-  // use one block per channel so all channels can be configured.
+  // ESP32-S3 legacy RMT limits memory per group.
+  // With 4 receive (RX) channels active, use one block per channel to configure all channels.
   cfg.mem_block_num = 1;
   cfg.flags = 0;
   cfg.rx_config.idle_threshold = RMT_IDLE_THRESHOLD_US;
-  // Drop sub-microsecond glitches before they hit the RX ring buffer.
+  // Remove glitches shorter than one microsecond before they reach the RX ring buffer.
   cfg.rx_config.filter_en = true;
   cfg.rx_config.filter_ticks_thresh = 1;
 
@@ -231,7 +230,7 @@ static bool readFrameFromRmt(size_t controller, uint8_t frame[N64_FRAMEBITS]) {
       uint8_t latestFrame[N64_FRAMEBITS];
       if (decodeFrameFromRmtItems(items, rxSize / sizeof(rmt_item32_t),
                                   latestFrame)) {
-        // Observe every frame so draining the queue cannot hide button edges.
+        // Process every queued frame so emptying the queue does not hide button edges.
         processCommandFrame(controller, latestFrame);
         memcpy(frame, latestFrame, N64_FRAMEBITS);
         foundFrame = true;
@@ -255,8 +254,8 @@ struct N64State {
 };
 
 /**
- * Bit positions within the 32-bit controller response, matching NintendoSpy's
- * Readers/Nintendo64.cs. (Indices 8 and 9 are unused by the controller.)
+ * Bit positions in the 32-bit controller response match NintendoSpy's
+ * Readers/Nintendo64.cs. The controller does not use indices 8 and 9.
  */
 enum N64ResponseBit {
   RESP_A = 0,
@@ -300,7 +299,7 @@ static N64State decodeState(const uint8_t *frame) {
   return s;
 }
 
-/** Pretty-print one controller's state over serial. */
+/** Print one controller's state over serial in a readable format. */
 static void printState(size_t controller, const N64State &s) {
   char buf[160];
   int n = 0;
@@ -373,7 +372,7 @@ static void flushPendingPayload() {
   }
 }
 
-/** Periodically summarize websocket/Wi-Fi health without spamming serial. */
+/** Summarize WebSocket/WiFi status at intervals to limit serial output. */
 static void logWsDiagnostics() {
   uint32_t nowMs = millis();
   if (nowMs - lastWsDiagAtMs < 1000) {
@@ -421,8 +420,8 @@ static void refreshControllerConnectionState() {
 }
 
 /**
- * Auto-probe disconnected ports: keep RX stopped most of the time, then open
- * short probe windows to discover newly active controller lines.
+ * Probe disconnected ports automatically. Keep RX stopped most of the time.
+ * Use short probe windows to find controller lines with new activity.
  */
 static void serviceControllerProbing() {
   uint32_t nowMs = millis();
@@ -485,7 +484,7 @@ static void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client,
   }
 }
 
-/** Log link-level Wi-Fi transitions so browser drops can be correlated. */
+/** Log WiFi link changes to compare their timing with browser disconnections. */
 static void onWiFiEvent(WiFiEvent_t event, arduino_event_info_t info) {
   if (event == ARDUINO_EVENT_WIFI_STA_GOT_IP) {
     wifiLedConnected.store(true);
@@ -503,10 +502,9 @@ static void onWiFiEvent(WiFiEvent_t event, arduino_event_info_t info) {
 }
 
 /**
- * Start the ArduinoOTA listener so the firmware can be reflashed over WiFi.
- * mDNS is already up by the time this is called, so OTA just adds its service
- * to the existing responder. The handlers below only log progress -- the actual
- * write/reboot is handled by the library.
+ * Start the ArduinoOTA listener for firmware uploads over WiFi.
+ * mDNS already runs when this function starts. OTA adds its service to the existing responder.
+ * The handlers below only log progress. The library writes the firmware and reboots.
  */
 static void startOTA() {
   ArduinoOTA.setHostname(OTA_HOSTNAME);
@@ -534,21 +532,20 @@ static void clearWiFiAndRestart() {
   Serial.println("Erasing saved WiFi and restarting into setup portal...");
   WiFiManager wm;
   wm.resetSettings();
-  delay(200); // let the serial line flush
+  delay(200); // let the serial output finish
   ESP.restart();
 }
 
 static void setStatusLed(uint32_t color);
 
 /**
- * Bring up WiFi via the captive setup portal and start mDNS + the web server.
- * Blocks in setup() until connected (or restarts on portal timeout), before the
- * async server starts -- so WiFiManager's own server never clashes with ours.
+ * Start WiFi through the captive setup portal, then start mDNS and the web server.
+ * Wait in setup() until connected, or restart if the portal times out.
+ * The asynchronous server starts afterward, so it does not compete with WiFiManager's server.
  */
 static void startNetwork() {
   WiFi.mode(WIFI_STA);
-  // Disable modem sleep: lower latency/jitter and fewer websocket transport
-  // interruptions under sustained traffic.
+  // Disable modem sleep to reduce latency, jitter, and WebSocket interruptions during sustained traffic.
   WiFi.setSleep(false);
   WiFi.onEvent(onWiFiEvent);
 
@@ -559,20 +556,19 @@ static void startNetwork() {
     wm.resetSettings();
   }
 
-  // The captive portal runs its own (sync) WebServer on port 80, which doesn't
-  // release the socket in time for our AsyncWebServer to bind on the same boot.
-  // So if the portal had to run, reboot once it has saved creds: the next boot
-  // connects directly without the portal, leaving port 80 free for us.
+  // The captive portal runs its own synchronous WebServer on port 80.
+  // It does not release the socket in time for AsyncWebServer during the same boot.
+  // If the portal runs, reboot after it saves credentials.
+  // The next boot connects directly without the portal, so port 80 stays available.
   bool justConfigured = false;
   wm.setSaveConfigCallback([&]() { justConfigured = true; });
   wm.setAPCallback([](WiFiManager *) { wifiLedPortal.store(true); });
   wm.setPreSaveConfigCallback([]() { wifiLedPortal.store(false); });
 
-  // Try saved creds, else open the captive portal to collect new ones. On
-  // timeout we restart rather than hang forever, so a brief router outage just
-  // retries on the next boot.
+  // Try saved credentials. If they fail, open the captive portal for new credentials.
+  // Restart on timeout so a brief router outage leads to another attempt on the next boot.
   wm.setConfigPortalTimeout(180);
-  // Service the portal ourselves so its waiting state can blink the LED.
+  // Process the portal here so the LED can flash while the portal waits.
   // Stay in setup until connected: controller commands still require WiFi.
   wm.setConfigPortalBlocking(false);
   Serial.printf("Joining WiFi (or open the \"%s\" network to configure)...\n",
@@ -580,8 +576,8 @@ static void startNetwork() {
   bool connected = wm.autoConnect(AP_NAME);
   while (!connected && wm.getConfigPortalActive()) {
     connected = wm.process();
-    // A submitted credential attempt runs inside process(). The pre-save
-    // callback selects blue until it returns; failed attempts return to red.
+    // process() tries the submitted credentials.
+    // The pre-save callback selects blue until process() returns. Failed attempts return to red.
     wifiLedPortal.store(!connected && wm.getConfigPortalActive());
     delay(1);
   }
@@ -611,8 +607,8 @@ static void startNetwork() {
 
   ws.onEvent(onWsEvent);
   server.addHandler(&ws);
-  // Qualify the enum: WiFiManager pulls in the WebServer library, which also
-  // defines an HTTP_GET, so the bare name is ambiguous here.
+  // Qualify the enum because WiFiManager includes the WebServer library.
+  // That library also defines HTTP_GET, so the bare name is ambiguous here.
   server.on("/", WebRequestMethod::HTTP_GET, [](AsyncWebServerRequest *req) {
     req->send(200, "text/html", INDEX_HTML);
   });
@@ -621,13 +617,13 @@ static void startNetwork() {
   startOTA();
 }
 
-/** Latch a WS2812 color, then release the LED's RMT TX resources. */
+/** Latch a WS2812 color. Then release the LED's RMT transmit (TX) resources. */
 static void setStatusLed(uint32_t color) {
 #ifdef POWER_LED_PIN
   static uint32_t lastColor = UINT32_MAX;
   if (lastColor == color) return;
-  // Use the same legacy RMT driver as capture, avoiding Arduino's separate
-  // RMT allocator. Channel 0 is TX-capable on the S3; capture uses RX 4-7.
+  // Use the same legacy RMT driver as capture to avoid Arduino's separate RMT allocator.
+  // S3 channel 0 supports TX. Capture uses RX 4-7.
   rmt_config_t cfg = RMT_DEFAULT_CONFIG_TX((gpio_num_t)POWER_LED_PIN,
                                            RMT_CHANNEL_0);
   cfg.clk_div = 8; // 80 MHz / 8 = 100 ns per tick.
@@ -660,8 +656,9 @@ static void setStatusLed(uint32_t color) {
 #endif
 }
 
-// One writer owns the LED/RMT channel. Wi-Fi callbacks and the main loop
-// publish atomic inputs; neither blocks waiting for a flash sequence.
+// One writer owns the LED/RMT channel.
+// WiFi callbacks and the main loop publish atomic inputs.
+// Neither waits for a flash sequence to finish.
 static void statusLedTask(void *) {
   WiFiStatusLed status;
   for (;;) {
@@ -712,9 +709,9 @@ void setup() {
   }
   setStatusLed(powerLedEnabled ? 0x00FF00 : 0);
 
-  // The N64 line has a pull-up on the console side. Enabling the (weak)
-  // internal pull-up too means disconnected pins read idle-high instead of
-  // floating, so we see clean "no activity" rather than noise.
+  // The N64 line has a pull-up on the console side.
+  // Enable the weak internal pull-up too, so disconnected pins read high instead of floating.
+  // This gives a clear "no activity" state without noise.
   for (size_t i = 0; i < N64_CONTROLLER_COUNT; ++i) {
     pinMode(kN64Pins[i], INPUT_PULLUP);
   }
@@ -739,8 +736,8 @@ void setup() {
   Serial.println(
       "Sniffing up to 4 N64 controller data lines... press buttons to see input.");
 
-  // Start after capture initialization so only this task uses LED RMT from
-  // here onward, including during WiFiManager's blocking connection calls.
+  // Start after capture initialization to give this task sole use of LED RMT.
+  // This includes WiFiManager's blocking connection calls.
   if (xTaskCreate(statusLedTask, "status-led", 3072, nullptr, 1, nullptr) != pdPASS) {
     Serial.println("Status LED task creation failed; restarting.");
     delay(1000);
@@ -750,9 +747,9 @@ void setup() {
 }
 
 /**
- * Wipe WiFi + reboot if the BOOT button is held for WIFI_RESET_HOLD_MS. Polled
- * every loop iteration (even when the console is idle), so the hold is timed
- * across calls with millis() rather than blocking here.
+ * If BOOT stays down for WIFI_RESET_HOLD_MS, delete WiFi credentials and reboot.
+ * Each loop iteration polls the button, even when the console is idle.
+ * millis() measures the hold across calls without a blocking wait.
  */
 static void checkResetButton() {
   static uint32_t pressedAt = 0;
@@ -763,17 +760,17 @@ static void checkResetButton() {
       clearWiFiAndRestart();
     }
   } else {
-    pressedAt = 0; // released before the hold completed -- reset the timer
+    pressedAt = 0; // button released before the hold completed. Reset the timer.
   }
 }
 
-/** Sniff one frame off the wire, decode it, and log the state when it changes.
+/** Read and decode one frame from the wire. Log the state if it changes.
  */
 void loop() {
   checkResetButton();
   serviceCommands();
-  // Service any in-flight OTA upload. Cheap when idle; blocks here for the few
-  // seconds of an actual flash (sniffing pauses, then the device reboots).
+  // Process any active OTA upload. This takes little time when idle.
+  // An actual upload blocks here for a few seconds. Capture pauses, then the device reboots.
   ArduinoOTA.handle();
   flushPendingPayload();
   logWsDiagnostics();
@@ -781,9 +778,9 @@ void loop() {
   serviceControllerProbing();
 
 #ifdef DEBUG_HEARTBEAT
-  // Build with `-D DEBUG_HEARTBEAT` to confirm the loop is alive even when no
-  // console is polling the line (otherwise serial is silent until a button
-  // changes). Throttled so it doesn't drown out real output.
+  // Build with `-D DEBUG_HEARTBEAT` to check that the loop runs without console polls.
+  // Otherwise, serial stays silent until a button changes.
+  // Limit the heartbeat rate to keep other output readable.
   static uint32_t lastBeat = 0;
   if (millis() - lastBeat > 2000) {
     Serial.println("[idle] loop alive, waiting for N64 poll...");
@@ -791,7 +788,7 @@ void loop() {
   }
 #endif
 
-  // Reap any disconnected WebSocket clients (throttled; cheap when idle).
+  // Remove disconnected WebSocket clients at a limited rate. This takes little time when idle.
   static uint32_t lastCleanup = 0;
   if (millis() - lastCleanup > 1000) {
     ws.cleanupClients();

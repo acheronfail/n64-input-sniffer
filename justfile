@@ -12,7 +12,7 @@ setup:
 build:
     pio run
 
-# Build and flash the default USB target; PlatformIO auto-detects the upload port.
+# Build and flash the default USB target. PlatformIO detects the upload port automatically.
 flash:
     pio run --target upload
 

@@ -1,26 +1,31 @@
+# Tests
+
 Run all firmware host tests from the repository root:
 
     sh scripts/test_host.sh
 
-Requires a C++11 compiler (`c++`, or set CXX). Binaries are built in a temporary
-folder and removed on exit. These tests use the same headers as the firmware;
-no board, Arduino SDK, or network is required.
+The tests need a C++11 compiler (`c++`, or set CXX).
+The script builds binaries in a temporary folder and removes them on exit.
+These tests use the same headers as the firmware.
+They need no board, Arduino software development kit (SDK), or network.
 
-- n64_decoder_test.cpp: literal poll/response fixtures converted to RMT pulse
-  items; both level orders, timing limits, each button/axis bit, invalid commands
-  and stop bits, reserved-bit validation, short/long captures, and noise.
-  Fixtures are synthetic, not recordings from a physical controller. The
-  decoder's existing behavior is preserved: malformed cells are skipped, and
-  reserved bits are checked separately before command handling/publication.
-- ws_delivery_test.cpp: independent retries for fast/slow clients, final-state
-  recovery without new input, failed sends, latest-state coalescing, initial
-  snapshots, fairness, rate limits, slow-client eviction/recovery, reconnects,
-  capacity, and microsecond-clock rollover.
-- controller_commands_test.cpp: command ownership, button edges, deadlines,
-  confirmation flashes, one-shot actions, and timer rollover.
-- wifi_status_led_test.cpp: Wi-Fi status patterns and command/power precedence.
+## Test coverage
 
-Web unit tests: `cd web && npm test`.
-Firmware integration build: `pio run -e esp32-s3-devkitc-1`.
-Hardware capture timing and actual network/AsyncTCP behavior still require a
-board test; the host delivery tests exercise the scheduling policy, not sockets.
+- `n64_decoder_test.cpp`: Literal poll/response fixtures converted to remote control peripheral (RMT) pulse items.
+  Tests cover both level orders, timing limits, each button and axis bit, invalid commands and stop bits, and reserved bits.
+  They also cover short and long captures, and noise.
+  The fixtures are synthetic. They are not recordings from a physical controller.
+  The decoder skips malformed cells, as before.
+  The firmware checks reserved bits separately before it handles commands or publishes state.
+- `ws_delivery_test.cpp`: Independent retries for fast and slow clients, and recovery of the final state without new input.
+  Tests also cover failed sends, combined updates that keep the latest state, initial snapshots, fairness, and rate limits.
+  Further tests cover removal and recovery of slow clients, reconnects, capacity, and rollover of the microsecond clock.
+- `controller_commands_test.cpp`: Command ownership, button edges, deadlines, confirmation flashes, actions that occur once, and timer rollover.
+- `wifi_status_led_test.cpp`: WiFi status patterns and priority between commands, WiFi status, and the power LED.
+
+## Other checks
+
+Run web unit tests with `cd web && npm test`.
+Build the firmware for integration checks with `pio run -e esp32-s3-devkitc-1`.
+Hardware capture timing and actual network/AsyncTCP behavior still need a board test.
+The host delivery tests check the scheduling policy. They do not test sockets.

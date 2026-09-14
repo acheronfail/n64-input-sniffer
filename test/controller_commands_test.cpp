@@ -17,7 +17,7 @@ static void checkCommand(uint16_t button, Action expected, uint32_t start) {
     const uint32_t now = start + 1 + phase * 125;
     assert(commands.tick(now) == Action::None);
     assert(commands.led(now) == (phase % 2 ? Led::Off : Led::Magenta));
-    // More presses while confirming must not replace or restart the command.
+    // More button presses during confirmation must not replace or restart the command.
     commands.input(0, Commands::Chord | Commands::Start | Commands::Z, now);
     assert(commands.tick(now + 124) == Action::None);
     assert(commands.led(now + 124) == (phase % 2 ? Led::Off : Led::Magenta));
@@ -44,7 +44,7 @@ int main() {
   commands.input(0, Commands::Chord | Commands::Start, 2);
   assert(commands.led(2) == Led::Green); // START was held at entry.
   commands.input(1, Commands::Z, 3);
-  assert(commands.led(3) == Led::Green); // Other controller cannot command.
+  assert(commands.led(3) == Led::Green); // The other controller cannot send a command.
   commands.input(0, 0x4000, 4); // B no longer triggers WiFi reset.
   assert(commands.led(4) == Led::Green);
   commands.input(0, Commands::Start | Commands::Z, 5);

@@ -4,8 +4,8 @@
 #include <stdint.h>
 #include <string.h>
 
-// Latest-state delivery, with independent acknowledgements for each browser.
-// Callers serialize access; no network operations occur inside this class.
+// Delivery of the latest state, with separate acknowledgments for each browser.
+// Callers serialize access. This class does no network operations.
 class WsDelivery {
 public:
   static constexpr size_t Controllers = 4;
@@ -67,7 +67,7 @@ public:
       attempt.packet[0] = uint8_t(controller);
       memcpy(attempt.packet + 1, latest[controller], 4);
       attempt.revision = revisions[controller];
-      // Rate-limit failures too, and advance even if every client is blocked.
+      // Limit the retry rate after failures too. Advance even if every client is blocked.
       lastAttemptUs = nowUs;
       nextController = (controller + 1) % Controllers;
       return true;
@@ -75,7 +75,7 @@ public:
     return false;
   }
 
-  // Returns true when the caller should close a persistently blocked client.
+  // Return true when the caller must close a client that stays blocked.
   bool complete(const Attempt &attempt, size_t recipient, bool sent) {
     if (recipient >= attempt.count) return false;
     auto *client = find(attempt.clients[recipient]);

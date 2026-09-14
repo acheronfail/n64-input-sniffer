@@ -49,18 +49,18 @@ int main() {
   // Credential submission switches portal red to connecting blue.
   assert(led.color(1700, false, false, 0, false, Command::Normal) == Led::Blue);
   assert(led.color(1800, false, false, 1, false, Command::Normal) == Led::Red);
-  // Returning to the portal or repeated failures must not restart the burst.
+  // A return to the portal or repeated failures must not restart the flashes.
   assert(led.color(1925, false, true, 2, false, Command::Normal) == 0);
   assert(led.color(2549, false, true, 2, false, Command::Normal) == 0);
   assert(led.color(2550, false, true, 2, false, Command::Normal) == Led::Red);
   assert(led.color(3050, false, true, 2, false, Command::Normal) == 0);
-  // Controller feedback overrides every network state, including dark phases.
+  // Controller feedback, including its off phases, takes priority over every network state.
   for (bool connected : {false, true}) {
     assert(led.color(3100, connected, true, 2, true, Command::Green) == Led::Green);
     assert(led.color(3100, connected, true, 2, true, Command::Magenta) == 0x00FFFF);
     assert(led.color(3100, connected, true, 2, true, Command::Off) == 0);
   }
-  // A successful reconnect supersedes an in-progress failure signal.
+  // A successful reconnect takes priority over an active failure signal.
   assert(led.color(3200, false, false, 3, false, Command::Normal) == Led::Red);
   assert(led.color(3250, true, false, 3, false, Command::Normal) == Led::Green);
   assert(led.color(4250, true, false, 3, false, Command::Normal) == 0);

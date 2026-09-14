@@ -4,7 +4,7 @@
 #include <vector>
 #include <algorithm>
 
-// Same fields as an RMT item, without depending on the ESP32 SDK.
+// Same fields as an RMT item, without the ESP32 SDK dependency.
 struct Pulse { unsigned level0, duration0, level1, duration1; };
 using Capture = std::vector<Pulse>;
 
@@ -48,10 +48,10 @@ int main() {
     expectPacket(pulses(neutral, reversed), neutralPacket);
     expectPacket(pulses(mixed, reversed), mixedPacket);
     expectPacket(pulses(all, reversed), allPacket);
-    // Threshold: 2us is one, 3us is zero; longest accepted cell/low.
+    // Threshold: 2us is one, 3us is zero. Longest accepted cell and low pulse.
     expectPacket(pulses(mixed, reversed, 2, 4, 6), mixedPacket);
   }
-  // Every button and every axis bit independently checks byte/bit ordering.
+  // Each button and axis bit independently checks the byte and bit order.
   for (size_t bit = 0; bit < 32; ++bit) {
     if (bit == 8 || bit == 9) continue;
     auto capture = pulses(neutral);
@@ -86,7 +86,7 @@ int main() {
   auto capture = pulses(mixed);
   capture[8] = Pulse{0, 3, 1, 1};
   reject(capture);
-  // Malformed segments are ignored; replacing a real bit makes a short frame.
+  // Ignore malformed segments. A replacement for a real bit makes the frame too short.
   for (const Pulse noise : {Pulse{0, 0, 1, 4}, Pulse{0, 3, 1, 0},
                            Pulse{0, 1, 1, 1}, Pulse{0, 4, 1, 3},
                            Pulse{0, 5, 1, 1}, Pulse{0, 1, 0, 3},
@@ -98,7 +98,7 @@ int main() {
     capture.insert(capture.begin() + 20, noise);
     expectPacket(capture, mixedPacket);
   }
-  // Reserved bits are validated separately before publishing/command handling.
+  // Check reserved bits separately before state publication or command processing.
   for (size_t bit : {size_t(8), size_t(9)}) {
     capture = pulses(neutral);
     capture[9 + bit] = Pulse{0, 1, 1, 3};

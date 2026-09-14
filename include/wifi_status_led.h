@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include "controller_commands.h"
 
-// Timing only; the LED task owns this state. Colors use WS2812 GRB order.
+// Timing only. The LED task owns this state. WS2812 colors use green, red, blue (GRB) order.
 class WiFiStatusLed {
 public:
   static constexpr uint32_t Red = 0x00FF00;
@@ -41,7 +41,7 @@ public:
       baseStartedAt = now;
     }
 
-    // Command feedback includes its dark phases and overrides Wi-Fi/power.
+    // Command feedback, including its off phases, takes priority over WiFi status and the power LED.
     switch (command) {
     case ControllerCommands::Led::Green: return Green;
     case ControllerCommands::Led::Magenta: return 0x00FFFF;

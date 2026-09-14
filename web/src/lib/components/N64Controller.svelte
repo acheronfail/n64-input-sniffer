@@ -138,7 +138,7 @@
 				class="stick-ring"
 			/>{/each}
 	</g>
-	<!-- Z is on the back; a separate callout avoids inventing a front-face button. -->
+	<!-- Z is on the back. A separate callout shows it without an incorrect button on the front. -->
 	<path d="M251 320l34 32h19" class="rear-line" />
 	<g class="neutral-button rear" class:pressed={controller.buttons.Z}>
 		<rect x="307" y="340" width="32" height="23" rx="7" />

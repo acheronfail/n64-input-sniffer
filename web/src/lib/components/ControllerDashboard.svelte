@@ -52,7 +52,7 @@
 	let minimal = $state(untrack(() => initialMinimal));
 	let exitButton = $state<HTMLButtonElement>();
 	let settingsSummary = $state<HTMLElement>();
-	// Initialize from props without tying a user's selection to incoming frames.
+	// Initialize from props. Keep the user's selection independent of incoming frames.
 	onMount(() => {
 		visible = [...initialVisible];
 		if (persistSettings) {
@@ -60,7 +60,7 @@
 				visible = parseVisibility(localStorage.getItem(SETTINGS_KEY));
 				minimal = localStorage.getItem(MINIMAL_KEY) === 'true';
 				const savedBackground = localStorage.getItem(BACKGROUND_KEY);
-				// A malformed color preference must not prevent restoring other settings.
+				// A malformed color preference must not prevent the other settings from loading.
 				try {
 					const value: unknown = savedBackground === null ? null : JSON.parse(savedBackground);
 					if (validColor(value)) background = backgroundInput = value;

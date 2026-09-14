@@ -1,4 +1,4 @@
 #pragma once
 
-// Generated from web/ by scripts/build_web.py before firmware compilation.
+// scripts/build_web.py generates this header from web/ before firmware compilation.
 #include "web_ui_generated.h"

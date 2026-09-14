@@ -13,7 +13,7 @@ if not env.IsCleanTarget():
     if npm is None:
         raise RuntimeError("Building the UI requires Node.js 22.12+ and npm on PATH")
 
-    # Install reproducibly on first build and whenever the dependency manifests change.
+    # Install locked dependencies on the first build and after changes to the dependency manifests.
     digest = sha256((web / "package.json").read_bytes() + (web / "package-lock.json").read_bytes()).hexdigest()
     stamp = web / "node_modules" / ".platformio-dependencies"
     if not stamp.exists() or stamp.read_text() != digest:
@@ -33,7 +33,7 @@ if not env.IsCleanTarget():
     generated = Path(env.subst("$BUILD_DIR")) / "generated"
     generated.mkdir(parents=True, exist_ok=True)
     target = generated / "web_ui_generated.h"
-    # Preserve mtime when unchanged so incremental C++ builds remain incremental.
+    # Keep mtime unchanged if the content matches, so incremental C++ builds do not repeat work.
     if not target.exists() or target.read_text(encoding="utf-8") != header:
         target.write_text(header, encoding="utf-8")
     env.Append(CPPPATH=[str(generated)])
