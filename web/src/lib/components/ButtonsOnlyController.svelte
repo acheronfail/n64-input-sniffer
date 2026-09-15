@@ -1,7 +1,18 @@
 <script lang="ts">
 	import { stickOffset, type ControllerState } from '../controller';
 	import DirectionArrow from './DirectionArrow.svelte';
-	let { controller, number }: { controller: ControllerState; number: number } = $props();
+	import PlayerLabel from './PlayerLabel.svelte';
+	let {
+		controller,
+		number,
+		name = `Pad ${number}`,
+		onrename
+	}: {
+		controller: ControllerState;
+		number: number;
+		name?: string;
+		onrename?: (name: string) => void;
+	} = $props();
 	const uid = $props.id();
 	const buttons = [
 		{ id: 'L', label: 'L', color: '#a78bfa' },
@@ -45,11 +56,12 @@
 </script>
 
 <svg
-	viewBox="0 0 440 200"
-	role="img"
+	viewBox="0 -32 440 232"
+	role="group"
 	aria-label={`Controller ${number}: pressed ${pressed}; stick X ${controller.x}, Y ${controller.y}`}
 >
-	<title>Player {number} — buttons only</title>
+	<title>Pad {number} — buttons only</title>
+	<PlayerLabel {name} {number} {onrename} y={-30} />
 	<defs>
 		<linearGradient id={`${uid}-dpad`} x1="0" y1="0" x2="0.3" y2="1">
 			<stop stop-color="#888" /><stop offset="0.45" stop-color="#555" /><stop

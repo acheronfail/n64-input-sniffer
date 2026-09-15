@@ -61,7 +61,7 @@ export const MinimalToggle: Story = {
 	play: async ({ canvasElement }) => {
 		const canvas = within(canvasElement);
 		await userEvent.click(canvas.getByText('Settings'));
-		await userEvent.click(canvas.getByRole('button', { name: 'Enter minimal interface' }));
+		await userEvent.click(canvas.getByRole('button', { name: 'Enter minimal mode' }));
 		await expect(canvasElement.querySelector('.surface')).toHaveStyle({
 			backgroundColor: 'rgba(0, 0, 0, 0)'
 		});
@@ -71,7 +71,8 @@ export const MinimalToggle: Story = {
 		await expect(exit).toHaveFocus();
 		await userEvent.click(exit);
 		await expect(canvas.getByRole('heading', { name: 'N64 SPY' })).toBeVisible();
-		await userEvent.click(canvas.getByRole('button', { name: 'Enter minimal interface' }));
+		await userEvent.click(canvas.getByText('Settings'));
+		await userEvent.click(canvas.getByRole('button', { name: 'Enter minimal mode' }));
 		await userEvent.keyboard('{Escape}');
 		await expect(canvas.getByRole('heading', { name: 'N64 SPY' })).toBeVisible();
 	}

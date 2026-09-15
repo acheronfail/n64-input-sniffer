@@ -3,11 +3,22 @@
 	import type { ControllerTheme } from '../settings';
 	import ButtonsOnlyController from './ButtonsOnlyController.svelte';
 	import DirectionArrow from './DirectionArrow.svelte';
+	import PlayerLabel from './PlayerLabel.svelte';
 	let {
 		controller = emptyState(),
 		number = 1,
-		theme = 'classic'
-	}: { controller?: ControllerState; number?: number; theme?: ControllerTheme } = $props();
+		theme = 'classic',
+		minimal = false,
+		name = `Pad ${number}`,
+		onrename
+	}: {
+		controller?: ControllerState;
+		number?: number;
+		theme?: ControllerTheme;
+		minimal?: boolean;
+		name?: string;
+		onrename?: (name: string) => void;
+	} = $props();
 	const uid = $props.id();
 	let large = $derived(theme !== 'classic');
 	const enlargedPositions = {
@@ -43,12 +54,12 @@
 </script>
 
 {#if theme === 'buttons-only'}
-	<ButtonsOnlyController {controller} {number} />
+	<ButtonsOnlyController {controller} {number} {name} {onrename} />
 {:else}
 	<svg
 		viewBox="0 0 440 410"
 		class:large
-		role="img"
+		role="group"
 		aria-label={`Controller ${number}: pressed ${pressed}; stick X ${controller.x}, Y ${controller.y}`}
 	>
 		<title>N64 controller {number}</title>
@@ -111,9 +122,15 @@
 			/>
 			<path class="tower-edge" d="M133 68Q139 116 150 148M307 68Q301 116 290 148" />
 			<path class="tower-light" d="M139 58Q220 28 301 58" />
-			<rect class="logo-border" x="172" y="78" width="96" height="23" rx="11" />
-			<text class="logo" x="220" y="90">Player {number}</text>
 		</g>
+		<PlayerLabel
+			{name}
+			{number}
+			{onrename}
+			y={minimal && large ? 4 : 76}
+			width={minimal && large ? 240 : 150}
+			subdued={theme === 'classic'}
+		/>
 		{#if large}
 			{#each [{ id: 'L', x: 48 }, { id: 'R', x: 302 }] as shoulder}
 				<g class="neutral-button" class:pressed={controller.buttons[shoulder.id as 'L' | 'R']}>
@@ -303,20 +320,6 @@
 		stroke: #e0e0e0;
 		stroke-width: 2;
 		opacity: 0.65;
-	}
-	.logo-border {
-		fill: #b3b3b3;
-		stroke: #939393;
-		stroke-width: 1.5;
-	}
-	.logo {
-		fill: #7a7a7a;
-		font-size: 16px;
-		font-weight: 800;
-		letter-spacing: -0.5px;
-		paint-order: stroke;
-		stroke: #d1d1d1;
-		stroke-width: 0.5;
 	}
 	.neutral-button path,
 	.neutral-button rect {

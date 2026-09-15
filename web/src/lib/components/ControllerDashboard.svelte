@@ -3,6 +3,12 @@
 	import { emptyState, type ControllerState } from '../controller';
 	import {
 		ALL_CONTROLLERS,
+		PLAYER_NAMES_KEY,
+		parsePlayerNames,
+		STACKING_KEY,
+		STACKING_OPTIONS,
+		parseStacking,
+		type ControllerStacking,
 		THEMES,
 		THEME_KEY,
 		parseTheme,
@@ -12,6 +18,11 @@
 		MINIMAL_KEY,
 		MINIMAL_CONNECTION_KEY,
 		MINIMAL_LATENCY_KEY,
+		MINIMAL_STATUS_SIZE_KEY,
+		DEFAULT_MINIMAL_STATUS_SIZE,
+		MIN_MINIMAL_STATUS_SIZE,
+		MAX_MINIMAL_STATUS_SIZE,
+		parseMinimalStatusSize,
 		BACKGROUND_KEY,
 		DEFAULT_BACKGROUND,
 		DEFAULT_BACKGROUND_COLOR
@@ -39,6 +50,8 @@
 	} = $props();
 	let visible = $state<number[]>(untrack(() => [...initialVisible]));
 	let theme = $state<ControllerTheme>('classic');
+	let playerNames = $state(parsePlayerNames(null));
+	let stacking = $state<ControllerStacking>('normal');
 	let storageMessage = $state('');
 	const inputId = $props.id();
 	let background = $state(untrack(() => initialBackground));
@@ -74,8 +87,11 @@
 	let minimal = $state(untrack(() => initialMinimal));
 	let showMinimalConnection = $state(true);
 	let showMinimalLatency = $state(false);
+	let statusSize = $state(DEFAULT_MINIMAL_STATUS_SIZE);
 	let exitButton = $state<HTMLButtonElement>();
 	let settingsSummary = $state<HTMLElement>();
+	let settingsElement = $state<HTMLDetailsElement>();
+	let settingsOpen = $state(false);
 	// Initialize from props. Keep the user's selection independent of incoming frames.
 	onMount(() => {
 		visible = [...initialVisible];
@@ -83,9 +99,12 @@
 			try {
 				visible = parseVisibility(localStorage.getItem(SETTINGS_KEY));
 				theme = parseTheme(localStorage.getItem(THEME_KEY));
+				playerNames = parsePlayerNames(localStorage.getItem(PLAYER_NAMES_KEY));
+				stacking = parseStacking(localStorage.getItem(STACKING_KEY));
 				minimal = localStorage.getItem(MINIMAL_KEY) === 'true';
 				showMinimalConnection = localStorage.getItem(MINIMAL_CONNECTION_KEY) !== 'false';
 				showMinimalLatency = localStorage.getItem(MINIMAL_LATENCY_KEY) === 'true';
+				statusSize = parseMinimalStatusSize(localStorage.getItem(MINIMAL_STATUS_SIZE_KEY));
 				const savedBackground = localStorage.getItem(BACKGROUND_KEY);
 				// A malformed color preference must not prevent the other settings from loading.
 				try {
@@ -118,6 +137,7 @@
 	}
 	async function setMinimal(value: boolean) {
 		minimal = value;
+		if (value) settingsOpen = false;
 		save(MINIMAL_KEY, value);
 		await tick();
 		(value ? exitButton : settingsSummary)?.focus({ preventScroll: true });
@@ -125,8 +145,17 @@
 </script>
 
 <svelte:window
+	onclick={(event) => {
+		if (event.target instanceof Node && !settingsElement?.contains(event.target)) {
+			settingsOpen = false;
+		}
+	}}
 	onkeydown={(event) => {
-		if (minimal && event.key === 'Escape') {
+		if (event.key === 'Escape' && settingsOpen) {
+			event.preventDefault();
+			settingsOpen = false;
+			settingsSummary?.focus({ preventScroll: true });
+		} else if (minimal && event.key === 'Escape') {
 			event.preventDefault();
 			void setMinimal(false);
 		}
@@ -134,7 +163,7 @@
 />
 
 <div class="surface" style:background-color={background}>
-	<main class="dashboard" class:minimal>
+	<main class="dashboard" class:minimal style:--status-size={`${statusSize}px`}>
 		{#if minimal}
 			<button
 				class="exit-minimal"
@@ -164,9 +193,54 @@
 					<p>CONTROLLER INPUTS</p>
 				</div>
 			</div>
-			<details class="settings">
-				<summary bind:this={settingsSummary}>Settings</summary>
+			<details class="settings" bind:this={settingsElement} bind:open={settingsOpen}>
+				<summary bind:this={settingsSummary} aria-label="Settings" title="Settings">
+					{#if minimal}
+						<svg
+							width="16"
+							height="16"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="1.5"
+							aria-hidden="true"
+						>
+							<path d="M4 7h16M4 17h16" />
+							<circle cx="9" cy="7" r="3" fill="currentColor" />
+							<circle cx="15" cy="17" r="3" fill="currentColor" />
+						</svg>
+					{:else}Settings{/if}
+				</summary>
 				<div class="settings-panel">
+					<fieldset class="minimal-options">
+						<legend>Minimal mode</legend>
+						<button class="minimal-option" onclick={() => setMinimal(!minimal)}
+							>{minimal ? 'Exit minimal mode' : 'Enter minimal mode'}</button
+						>
+						<p class="minimal-help">Controllers only. Use the corner button or Esc to exit.</p>
+						<label class="indicator-option">
+							<input
+								type="checkbox"
+								checked={showMinimalConnection}
+								onchange={(event) => {
+									showMinimalConnection = event.currentTarget.checked;
+									save(MINIMAL_CONNECTION_KEY, showMinimalConnection);
+								}}
+							/>
+							Show connection dot in minimal mode
+						</label>
+						<label class="indicator-option">
+							<input
+								type="checkbox"
+								checked={showMinimalLatency}
+								onchange={(event) => {
+									showMinimalLatency = event.currentTarget.checked;
+									save(MINIMAL_LATENCY_KEY, showMinimalLatency);
+								}}
+							/>
+							Show latency in minimal mode
+						</label>
+					</fieldset>
 					<fieldset class="theme-options">
 						<legend>Theme</legend>
 						{#each THEMES as option}
@@ -181,6 +255,23 @@
 								{option.label}
 							</label>
 						{/each}
+						<label class="status-size-option">
+							<span>Status size: {statusSize}px</span>
+							<input
+								type="range"
+								min={MIN_MINIMAL_STATUS_SIZE}
+								max={MAX_MINIMAL_STATUS_SIZE}
+								step="1"
+								value={statusSize}
+								aria-label="Status size"
+								aria-valuetext={`${statusSize} pixels`}
+								oninput={(event) => {
+									statusSize = event.currentTarget.valueAsNumber;
+									save(MINIMAL_STATUS_SIZE_KEY, statusSize);
+								}}
+							/>
+						</label>
+						<p>Scales the latency text and connection status in all modes.</p>
 					</fieldset>
 					<fieldset>
 						<legend>Visible controllers</legend>
@@ -206,32 +297,22 @@
 							onclick={() => select([0])}>Only 1</button
 						>
 					</div>
-					<button class="minimal-option" onclick={() => setMinimal(true)}
-						>Enter minimal interface</button
-					>
-					<p>Controllers only. Use the corner button or Esc to exit.</p>
-					<label class="indicator-option">
-						<input
-							type="checkbox"
-							checked={showMinimalConnection}
-							onchange={(event) => {
-								showMinimalConnection = event.currentTarget.checked;
-								save(MINIMAL_CONNECTION_KEY, showMinimalConnection);
-							}}
-						/>
-						Show connection dot in minimal mode
-					</label>
-					<label class="indicator-option">
-						<input
-							type="checkbox"
-							checked={showMinimalLatency}
-							onchange={(event) => {
-								showMinimalLatency = event.currentTarget.checked;
-								save(MINIMAL_LATENCY_KEY, showMinimalLatency);
-							}}
-						/>
-						Show latency in minimal mode
-					</label>
+					<fieldset class="theme-options stacking-options">
+						<legend>Controller stacking</legend>
+						{#each STACKING_OPTIONS as option}
+							<label class:selected={stacking === option.value}>
+								<input
+									type="radio"
+									name={`${inputId}-stacking`}
+									value={option.value}
+									bind:group={stacking}
+									onchange={() => save(STACKING_KEY, option.value)}
+								/>
+								{option.label}
+							</label>
+						{/each}
+						<p>Normal wraps to fit. Vertical uses one column. Horizontal uses one row.</p>
+					</fieldset>
 					<fieldset class="background-options">
 						<legend>Background</legend>
 						<div class="choices">
@@ -285,7 +366,7 @@
 				{#if !minimal || showMinimalConnection}
 					<span class="status-dot" role="img" aria-label={connection} title={connection}></span>
 				{/if}
-				{#if !minimal}{connection}{/if}
+				{#if !minimal}<span class="connection-label">{connection}</span>{/if}
 				{#if (minimal && showMinimalLatency) || (!minimal && connected)}
 					<span
 						class="latency"
@@ -303,14 +384,29 @@
 				{/if}
 			</div>
 		{/if}
-		<section class="controllers" aria-label="Controller inputs">
+		<section
+			class="controllers"
+			class:vertical={stacking === 'vertical'}
+			class:horizontal={stacking === 'horizontal'}
+			aria-label="Controller inputs"
+		>
 			{#each ALL_CONTROLLERS.filter((index) => visible.includes(index)) as index (index)}
 				{@const controller = controllers[index] ?? emptyState()}
 				<article class="controller-card" aria-label={`Controller ${index + 1}`}>
 					<div class="card-heading">
-						<h2 aria-label={`Player ${index + 1}`}><span class="port">{index + 1}</span></h2>
+						<h2 aria-label={`Pad ${index + 1}`}><span class="port">{index + 1}</span></h2>
 					</div>
-					<N64Controller {controller} {theme} number={index + 1} />
+					<N64Controller
+						{controller}
+						{theme}
+						{minimal}
+						number={index + 1}
+						name={playerNames[index]}
+						onrename={(name) => {
+							playerNames[index] = name;
+							save(PLAYER_NAMES_KEY, playerNames);
+						}}
+					/>
 					<footer>
 						<span>ANALOG STICK</span>
 						<div><span>X <b>{controller.x}</b></span><span>Y <b>{controller.y}</b></span></div>
@@ -328,7 +424,10 @@
 	.theme-options {
 		margin-bottom: 16px;
 	}
-	.theme-options label {
+	.stacking-options {
+		margin-top: 16px;
+	}
+	.theme-options label:not(.status-size-option) {
 		display: flex;
 		align-items: center;
 		gap: 8px;
@@ -493,24 +592,27 @@
 		margin: 12px 0 0;
 	}
 	.connection {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		gap: 7px;
-		font-size: 11px;
+		font-family: ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', monospace;
+		font-size: var(--status-size);
+		line-height: 1.3;
 		color: #b1bac6;
 		margin: 16px 0;
 		overflow-wrap: anywhere;
 	}
 	.latency {
-		font-size: 1.2em;
-		white-space: nowrap;
-		flex-shrink: 0;
+		font-size: inherit;
+		white-space: normal;
 		font-variant-numeric: tabular-nums;
 	}
+	.connection-label {
+		margin-right: 0.4em;
+	}
 	.status-dot {
-		flex: 0 0 6px;
-		height: 6px;
+		display: inline-block;
+		width: 0.5em;
+		height: 0.5em;
+		vertical-align: middle;
+		margin-right: 0.4em;
 		border-radius: 50%;
 		background: #b2a385;
 	}
@@ -522,6 +624,14 @@
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
 		gap: clamp(10px, 1.8vw, 22px);
+	}
+	.controllers.vertical {
+		grid-template-columns: minmax(0, 1fr);
+	}
+	.controllers.horizontal {
+		grid-template-columns: none;
+		grid-auto-flow: column;
+		grid-auto-columns: minmax(0, 1fr);
 	}
 	.controller-card {
 		min-width: 0;
@@ -607,9 +717,11 @@
 			padding-top: 8px;
 		}
 	}
+	.minimal-options {
+		margin-bottom: 16px;
+	}
 	.minimal-option {
 		display: block;
-		margin-top: 16px;
 	}
 	.indicator-option {
 		display: flex;
@@ -621,7 +733,16 @@
 	.indicator-option input {
 		flex-shrink: 0;
 	}
-	.minimal header,
+	.status-size-option {
+		display: grid;
+		gap: 8px;
+		margin-top: 16px;
+	}
+	.status-size-option input {
+		width: 100%;
+	}
+	.minimal .brand,
+	.minimal .minimal-help,
 	.minimal .card-heading,
 	.minimal footer,
 	.minimal .empty {
@@ -636,19 +757,30 @@
 	.minimal {
 		padding: 8px;
 	}
+	.minimal header {
+		display: contents;
+	}
+	.minimal .settings {
+		position: fixed;
+		top: 6px;
+		right: 42px;
+		z-index: 4;
+	}
+	.minimal .settings-panel {
+		top: 38px;
+		right: -36px;
+		max-height: calc(100dvh - 54px);
+	}
+	.minimal summary::-webkit-details-marker {
+		display: none;
+	}
 	.minimal .connection {
 		min-height: 24px;
 		margin: 0 0 8px;
-		padding: 4px 38px 0 4px;
-		gap: 7px;
-		flex-wrap: wrap;
+		padding: 4px 74px 0 4px;
 	}
-	.minimal .latency {
-		min-width: 0;
-		flex-shrink: 1;
-		white-space: normal;
-	}
-	.exit-minimal {
+	.exit-minimal,
+	.minimal summary {
 		position: fixed;
 		top: 6px;
 		right: 6px;
@@ -663,8 +795,15 @@
 		color: #9ca6b0;
 		opacity: 0.4;
 	}
+	.minimal summary {
+		position: static;
+		list-style: none;
+	}
 	.exit-minimal:hover,
-	.exit-minimal:focus-visible {
+	.exit-minimal:focus-visible,
+	.minimal summary:hover,
+	.minimal summary:focus-visible,
+	.minimal .settings[open] summary {
 		opacity: 1;
 		background: #202a35;
 	}

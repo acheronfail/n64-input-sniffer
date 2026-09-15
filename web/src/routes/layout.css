@@ -13,8 +13,11 @@
 * {
 	box-sizing: border-box;
 }
-body {
+/* OBS custom CSS must override the fallback even when Vite injects styles later. */
+:where(body) {
 	background-color: #101720;
+}
+body {
 	color-scheme: dark;
 	margin: 0;
 	min-width: 180px;

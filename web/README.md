@@ -72,6 +72,11 @@ Settings also offers three themes using an in-page radio group compatible with O
 **Classic** keeps the original controller, **Enlarged** uses larger controls over a 75% transparent
 shell, and **Buttons only** hides the shell and lights up dim greyscale controls when pressed.
 The theme is saved per browser and applies to every visible controller.
+Click a player label to rename that controller (up to 24 characters).
+Press Enter or click away to save; Escape cancels. An empty name restores “Pad 1”, etc.
+Names are saved per controller in this browser. Labels scale with the controller artwork,
+remain opaque in the Enlarged theme, and sit above the buttons in minimal mode
+for Enlarged and Buttons only. Classic labels stay on the controller shell in both modes.
 Hidden controllers still receive updates.
 The UI assigns legacy four-byte frames to controller 1.
 
@@ -82,6 +87,9 @@ The analog stick follows both axes.
 A separate callout beside the center grip shows the rear Z trigger.
 
 Cards stack automatically in a narrow window.
+Use **Controller stacking** in Settings to choose **Normal** (automatic wrapping),
+**Vertical** (one column), or **Horizontal** (one row, sharing the available width).
+The browser saves this choice, and changes apply immediately in full and minimal modes.
 For Open Broadcaster Software (OBS), add the ESP URL as a Browser Source.
 Try 280 × 1080 for a sidebar with four controllers.
 Configure the selection with OBS's Interact command.
@@ -112,6 +120,9 @@ Use **Show latency in minimal mode** in Settings to show or hide the latency.
 The browser saves this setting. It is off by default.
 The latency follows the connection dot in a row at the top left.
 If you hide the dot, the latency stays at the top left.
+Use **Status size** in the Theme section to adjust the
+text from 12 to 64 pixels. It defaults to 24 pixels, with a connection dot half that size.
+The browser saves the size and applies it in all modes and themes.
 
 It uses the shortest round trip from the last 30 seconds to estimate the clock offset.
 Clock checks expire after 30 seconds. Reconnection clears the estimate and the last reading.
@@ -161,7 +172,7 @@ Storybook is for development only. The firmware HTML bundle does not include it.
 
 ## Minimal interface
 
-Select **Enter minimal interface** in Settings for a view that shows only controllers.
+Select **Enter minimal mode** in Settings for a view that shows only controllers.
 This view hides the page header, connection text, card headings, borders, and analog readout footers.
 A small dot at the top left shows the connection state: green when connected, tan when connecting or disconnected.
 Use **Show connection dot in minimal mode** in Settings to show or hide the dot.
@@ -170,15 +181,19 @@ The browser saves this preference separately from controller visibility.
 
 A small button in the top-right corner restores the full interface.
 **Escape** does the same.
+The faint settings icon to its left opens Settings while minimal mode stays active.
+Changes apply immediately and are saved as usual. Click outside the popover to close it.
+With Settings open, **Escape** closes the popover first.
 The button supports keyboard access and stays available even when you select no controllers.
 Storybook includes minimal, narrow OBS, empty, and toggle demos.
 
 ## Background
 
-The background defaults to **Transparent**, including when you select **Enter minimal interface**.
+The background defaults to **Transparent**, including when you select **Enter minimal mode**.
 Use this option for an OBS overlay.
 The page body has a dark background for regular browsers.
 The default OBS custom CSS overrides this background with transparency.
+The fallback uses zero CSS specificity so the override also wins when `just dev` loads styles later.
 Select **Color** to use a chroma key background instead.
 These options are mutually exclusive.
 
