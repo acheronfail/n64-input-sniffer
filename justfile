@@ -12,9 +12,10 @@ setup:
 build:
     pio run
 
-# Build and flash the default USB target. PlatformIO detects the upload port automatically.
-flash:
-    pio run --target upload
+# Build and flash the firmware. Pass extra arguments to PlatformIO.
+[positional-arguments]
+flash *args:
+    pio run --target upload "$@"
 
 # Start the Storybook development server.
 storybook:
