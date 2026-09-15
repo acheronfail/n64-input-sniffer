@@ -566,6 +566,7 @@ static void startNetwork() {
   WiFi.onEvent(onWiFiEvent);
 
   WiFiManager wm;
+  wm.setHostname(MDNS_HOST);
   pinMode(WIFI_RESET_PIN, INPUT_PULLUP);
   if (digitalRead(WIFI_RESET_PIN) == LOW) {
     Serial.println("BOOT held -- forgetting saved WiFi, opening setup portal.");
