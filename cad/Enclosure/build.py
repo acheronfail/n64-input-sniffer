@@ -335,7 +335,7 @@ for o in [bo,lo,wi,ko,go,gt,bc,fc]:
 for prefix in ['FemalePortKeeper']:
  Mesh.Mesh(D.getObject(prefix+'1').Shape.tessellate(.08)).write(str(ROOT/(prefix+'.stl')))
 for obj in retainer_parts:Mesh.Mesh(obj.Shape.tessellate(.08)).write(str(ROOT/(obj.Name+'.stl')))
-Part.export([bo,lo,wi,ko]+retainer_parts,str(ROOT/'Enclosure-v1.1.step'))
+Part.export([bo,lo,wi,ko]+retainer_parts,str(ROOT/'Enclosure-v1.2.step'))
 Mesh.Mesh(union([hardware[2*i].Shape.fuse(mating_hardware[i].Shape) for i in range(4)]).tessellate(.05)).write(str(ROOT/'MaleConnectorAssembly.stl'))
 # Reuse the embedded display overlay from the tested release. This overlay is optional.
 # It does not certify clearance after changes to geometry or connector spacing.
@@ -359,6 +359,6 @@ full.translate(V(-120-P.get('male_port_x',P['port_x'])[0],-(P['nose_y']+bow(P['p
 assert full.isValid() and len(full.Solids)==1
 full.exportStep(str(ROOT/'ControllerPortMale.step'))
 
-D.recompute();D.saveAs(str(ROOT/'Enclosure-v1.1.FCStd'))
+D.recompute();D.saveAs(str(ROOT/'Enclosure-v1.2.FCStd'))
 
 print(json.dumps(report,indent=2))

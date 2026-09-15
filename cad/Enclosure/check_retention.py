@@ -1,9 +1,9 @@
-"""Check the geometry of independent connector retention in v1.1 for regressions."""
+"""Check the geometry of independent connector retention in v1.2 for regressions."""
 from pathlib import Path
 import sys,json,itertools
 import FreeCAD as A,Part
 r=Path(__file__).resolve().parent
-new=A.openDocument(str(r/'Enclosure-v1.1.FCStd'))
+new=A.openDocument(str(r/'Enclosure-v1.2.FCStd'))
 p=json.loads((r/'parameters.json').read_text());v=A.Vector
 checks={};retention={}
 def vol(s):return 0. if s.isNull() or not s.Solids else s.Volume
@@ -47,6 +47,6 @@ face=new.USBCEnvelope.Shape.BoundBox.YMax
 path=Part.makeBox(8.4,25,2.4,v(-4.2,face,9))
 checks['USB_access_mm3']=sum(vol(path.common(o.Shape)) for o in new.PrintParts.Group)
 assert all(x<.005 for x in checks.values()),checks
-result={'revision':'v1.1','checks':checks,'retention_checks':retention,'physical_fit_verified':False,'console_scan_axial_clearance':'Not checked by this script; embedded scans are display references only.'}
+result={'revision':'v1.2','checks':checks,'retention_checks':retention,'physical_fit_verified':False,'console_scan_axial_clearance':'Not checked by this script; embedded scans are display references only.'}
 (r/'independent-retention-validation.json').write_text(json.dumps(result,indent=2)+'\n')
 print(json.dumps(result,indent=2))

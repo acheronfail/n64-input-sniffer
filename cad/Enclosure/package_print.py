@@ -1,10 +1,10 @@
 from pathlib import Path
 import numpy as np,json,hashlib,zipfile,re
 root=Path(__file__).resolve().parent
-out=root/'print/full-enclosure-v1.1';out.mkdir(parents=True,exist_ok=True)
+out=root/'print/full-enclosure-v1.2';out.mkdir(parents=True,exist_ok=True)
 dtype=np.dtype([('n','<f4',3),('v','<f4',(3,3)),('a','<u2')])
 specs=[('LowerShell',1,'Rigid material matching the proven enclosure print',False),('UpperShell',1,'Same as lower shell',True),('BoardKeeper',1,'Reuse existing keeper if available',False)]+[(f'MalePortKeeper{i}',1,'Rigid material; numbered left to right by increasing CAD X',True) for i in range(1,5)]+[('FemalePortKeeper',4,'Rigid material; all four identical',True),('LightWindow',1,'Optional translucent material; reuse existing window',False)]
-manifest={'revision':'v1.1','status':'Generated iteration; physical testing of the retained v1.0 release does not certify subsequent edits','files':[]}
+manifest={'revision':'v1.2','status':'Generated iteration; physical testing of the retained v1.0 release does not certify subsequent edits','files':[]}
 for name,qty,material,invert in specs:
  src=root/(name+'.stl');data=np.fromfile(src,dtype=dtype,offset=84).copy()
  rot=np.array([1,-1,-1] if invert else [1,1,1])
@@ -14,7 +14,7 @@ for name,qty,material,invert in specs:
  data['v']+=translation
  target=out/(name+'.stl')
  with target.open('wb') as f:
-  f.write(('Enclosure v1.1 | '+name+' | bed-oriented mm').encode().ljust(80,b' '));f.write(np.uint32(len(data)).tobytes());data.tofile(f)
+  f.write(('Enclosure v1.2 | '+name+' | bed-oriented mm').encode().ljust(80,b' '));f.write(np.uint32(len(data)).tobytes());data.tofile(f)
  actual=data['v'].reshape(-1,3)
  assert abs(float(actual[:,2].min()))<.0001
  # Rigid transform must preserve all triangle edge lengths and topology.
@@ -29,6 +29,6 @@ instructions=(root/'README.md').read_text().split('## Design changes')[0]
 # Keep the standalone ZIP instructions independent of repository-relative links.
 instructions=re.sub(r'\[([^]]+)\]\([^)]+\)', r'\1', instructions)
 (out/'PRINT-AND-ASSEMBLE.md').write_text(instructions)
-with zipfile.ZipFile(root/"Enclosure-full-enclosure-v1.1.zip","w",zipfile.ZIP_DEFLATED) as z:
+with zipfile.ZipFile(root/"Enclosure-full-enclosure-v1.2.zip","w",zipfile.ZIP_DEFLATED) as z:
  for filename in [e["file"] for e in manifest["files"]]+["manifest.json","PRINT-AND-ASSEMBLE.md"]:
-  z.write(out/filename,"Enclosure-full-enclosure-v1.1/"+filename)
+  z.write(out/filename,"Enclosure-full-enclosure-v1.2/"+filename)

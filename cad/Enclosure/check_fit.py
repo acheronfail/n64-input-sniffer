@@ -3,7 +3,7 @@ from pathlib import Path
 import sys,json
 import FreeCAD as A,Part
 r=Path(__file__).resolve().parent;p=json.loads((r/'parameters.json').read_text());V=A.Vector
-new=A.openDocument(str(r/'Enclosure-v1.1.FCStd'))
+new=A.openDocument(str(r/'Enclosure-v1.2.FCStd'))
 def volume(s):return 0 if s.isNull() or not s.Solids else s.Volume
 def diff(a,b):return volume(a.cut(b))+volume(b.cut(a))
 checks={};male=[]
@@ -36,5 +36,5 @@ assert min(tower_gaps)>=p['minimum_keeper_tower_gap']-.001,tower_gaps
 window_centre=new.LightWindow.Shape.BoundBox.Center
 assert abs(window_centre.x)<.001
 assert abs(window_centre.y-(p['rear_y']-14-p['led_window_inward_shift']-p['pcb_console_inset']))<.001
-report={'revision':'v1.1','checks':checks,'female_terminal_passage_width_mm':12.8,'male_lip_relief':male,'window_shift_toward_centre_mm':p['led_window_inward_shift'],'physical_fit_verified':False,'connector_gaps_mm':gaps,'keeper_tower_gaps_mm':tower_gaps,'window_centre_y_mm':window_centre.y}
-(r/'fit-v1.1-validation.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2))
+report={'revision':'v1.2','checks':checks,'female_terminal_passage_width_mm':12.8,'male_lip_relief':male,'window_shift_toward_centre_mm':p['led_window_inward_shift'],'physical_fit_verified':False,'connector_gaps_mm':gaps,'keeper_tower_gaps_mm':tower_gaps,'window_centre_y_mm':window_centre.y}
+(r/'fit-v1.2-validation.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2))

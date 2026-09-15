@@ -2,11 +2,11 @@
 from pathlib import Path
 import argparse
 parser=argparse.ArgumentParser(description=__doc__)
-parser.add_argument("--slice-dir", type=Path, default=Path(__file__).resolve().parent/"slice"/"v1.1")
+parser.add_argument("--slice-dir", type=Path, default=Path(__file__).resolve().parent/"slice"/"v1.2")
 args=parser.parse_args()
 import json,re,math,zipfile,hashlib,numpy as np
 r=Path(__file__).resolve().parent;folder=args.slice_dir.resolve()
-project=folder/'Enclosure-full-enclosure-v1.1-Orca-complete.3mf'
+project=folder/'Enclosure-full-enclosure-v1.2-Orca-complete.3mf'
 with zipfile.ZipFile(project) as archive:settings=json.loads(archive.read('Metadata/project_settings.config'))
 dt=np.dtype([('n','<f4',3),('v','<f4',(3,3)),('a','<u2')])
 vertices=np.fromfile(r/'UpperShell.stl',dtype=dt,offset=84)['v'].reshape(-1,3)
@@ -36,5 +36,5 @@ for name,events in hits.items():
  assert events,(name,'missing cap extrusion')
  assert all(e['height']==14.12 and e['line']>pauses[0]['line'] for e in events),(name,events)
 for i in [2,3]:assert not any(l.strip()=='M400 U1' for l in (folder/f'plate_{i}.gcode').read_text().splitlines())
-result={'revision':'v1.1','project_sha256':hashlib.sha256(project.read_bytes()).hexdigest(),'pauses':pauses,'all_six_caps_begin_after_pause':True,'other_plates_have_no_pause':True,'pockets':{name:{'centre_xy_mm':centres[name],'first_cap_extrusion':events[0],'cap_segments':len(events)} for name,events in hits.items()}}
-(r/'pause-v1.1-toolpath-validation.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result,indent=2))
+result={'revision':'v1.2','project_sha256':hashlib.sha256(project.read_bytes()).hexdigest(),'pauses':pauses,'all_six_caps_begin_after_pause':True,'other_plates_have_no_pause':True,'pockets':{name:{'centre_xy_mm':centres[name],'first_cap_extrusion':events[0],'cap_segments':len(events)} for name,events in hits.items()}}
+(r/'pause-v1.2-toolpath-validation.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result,indent=2))

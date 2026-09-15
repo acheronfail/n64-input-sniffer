@@ -1,6 +1,13 @@
 # CAD release
 
-The current **v1.1** enclosure leaves at least 2 mm between opposing keeper towers.
+The v1.2 enclosure moves the ESP and its supports 2 mm toward the USB-C wall.
+**Status: verified.** The owner printed v1.2 and marked it verified on 2026-09-15.
+The v1.1 release stays available.
+
+- [v1.2 FreeCAD model](Enclosure/Enclosure-v1.2.FCStd)
+- [v1.2 print project](Enclosure/Enclosure-full-enclosure-v1.2-Orca-complete.3mf)
+
+The tested **v1.1** enclosure leaves at least 2 mm between opposing keeper towers.
 It moves the ESP window 4 mm toward the N64 edge and moves four closure bolts toward that edge.
 The matching jig has an 18.1 mm connector gap.
 **Status: verified.** The owner confirmed that both printed v1.1 parts work on 2026-09-15.

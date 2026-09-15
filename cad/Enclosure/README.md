@@ -1,8 +1,14 @@
-# Enclosure v1.1
+# Enclosure v1.2
 
-**Status: verified.** The owner printed v1.1 and confirmed that it works on 2026-09-15.
+**Status: verified.** The owner printed v1.2 and marked it verified on 2026-09-15.
+The owner tested the retained v1.1 print on 2026-09-15.
 
-[FreeCAD model](Enclosure-v1.1.FCStd) · [Print-ready OrcaSlicer 3MF](Enclosure-full-enclosure-v1.1-Orca-complete.3mf)
+[FreeCAD model](Enclosure-v1.2.FCStd) · [Print-ready OrcaSlicer 3MF](Enclosure-full-enclosure-v1.2-Orca-complete.3mf)
+
+v1.2 moves the ESP board, supports, and keeper 2 mm toward the USB-C wall.
+The USB-C socket face moves from Y = 6.2 mm to Y = 8.2 mm.
+The USB slot and lid window stay in place.
+The existing board keeper fits the moved supports.
 
 v1.1 gives wires at least 2 mm of space between the opposing keeper screw towers.
 Connector tails are 18.094 mm apart at the center ports and 19.998 mm at the outer ports.
@@ -11,7 +17,7 @@ Female terminal passages remain 12.8 mm wide.
 
 The ESP window, recess, and support ledge move 4 mm toward the N64-facing edge.
 They stay centered from left to right.
-The board and USB remain in place.
+v1.2 adds the board move described above.
 
 Four of the six closure bolts now sit near the N64-facing edge: CAD (X, Y) = (±18, 3) and (±79.5, 2) mm.
 The remaining pair stays near the female side at (±18, −48.2) mm.
@@ -108,6 +114,7 @@ Thus, approximately 10 mm of the measured 12 mm projection remains beyond the lo
 Check full insertion on the real console before final wiring and assembly.
 The v1.1 geometry and toolpaths passed digital checks.
 The owner confirmed that the printed v1.1 enclosure works on 2026-09-15.
+The owner also printed v1.2 and marked it verified on 2026-09-15.
 
 ## Close the case
 
@@ -126,7 +133,7 @@ Fully disconnect the adapter from all four console ports before connecting USB-C
 
 1. Edit `parameters.json` for exposed dimensions.
 2. Edit `build.py` for geometry changes.
-3. Run `build.FCMacro` in FreeCAD to produce `Enclosure-v1.1.FCStd` and print meshes.
+3. Run `build.FCMacro` in FreeCAD to produce `Enclosure-v1.2.FCStd` and print meshes.
 
 See the [development instructions](../DEVELOPMENT.md) for checks, packaging, and slicing.
 The saved model parameter snapshot does not recompute the design on its own.

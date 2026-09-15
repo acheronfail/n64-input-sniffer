@@ -3,7 +3,7 @@ from pathlib import Path
 import sys,json,math
 import FreeCAD as A,Part
 r=Path(__file__).resolve().parent;p=json.loads((r/'parameters.json').read_text())
-d=A.openDocument(str(r/'Enclosure-v1.1.FCStd'));V=A.Vector
+d=A.openDocument(str(r/'Enclosure-v1.2.FCStd'));V=A.Vector
 checks={};nuts=[]
 outer=d.OuterContourLoft.Shape
 for shell in [d.LowerShell,d.UpperShell]:
@@ -30,5 +30,5 @@ for x,y in p['closure_screw_xy']:
  entry['screw_path_obstruction_mm3']=sum(screw.common(o.Shape).Volume for o in d.PrintParts.Group+d.Hardware.Group if hasattr(o,'Shape'))
  assert all(value<.005 for key,value in entry.items() if key.endswith('_mm3')),entry
  nuts.append(entry)
-report={'revision':'v1.1','nuts':nuts,'nut_proxy':{'across_flats_mm':4,'height_mm':1.6},'all_six_have_complete_walls_seats_and_caps':True}
-(r/'nut-seats-v1.1-validation.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2))
+report={'revision':'v1.2','nuts':nuts,'nut_proxy':{'across_flats_mm':4,'height_mm':1.6},'all_six_have_complete_walls_seats_and_caps':True}
+(r/'nut-seats-v1.2-validation.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2))

@@ -1,7 +1,8 @@
 # CAD development
 
 The versioned FreeCAD models and print-ready 3MF files are the retained releases.
-Builds write v1.1 models, working meshes, and reports. They leave v1.0 files intact.
+Enclosure builds write v1.2 models, working meshes, and reports. They preserve the v1.0 and v1.1 releases.
+Soldering jig builds still write v1.1.
 The enclosure's generated male connector STEP also stays in its own folder.
 If the connector design changes, explicitly promote that STEP file to the parent reference.
 
@@ -67,7 +68,7 @@ Other checks cover these features:
 The checks use the current geometry without loading discarded revisions.
 Each generated revision needs its own physical fit tests.
 
-`package_print.py` produces STL files in their print orientation, a manifest, and an assembly README in `Enclosure/print/full-enclosure-v1.1/`.
+`package_print.py` produces STL files in their print orientation, a manifest, and an assembly README in `Enclosure/print/full-enclosure-v1.2/`.
 It also produces a ZIP.
 `create_3mf.py` reads profiles from the retained v1.0 3MF and builds a new unsliced project from the new meshes.
 It does not reuse old toolpaths.
@@ -75,13 +76,13 @@ It does not reuse old toolpaths.
 Run the slicer and slice checks:
 
 ```sh
-mkdir -p cad/Enclosure/slice/v1.1
-orca-slicer --slice 0 --outputdir cad/Enclosure/slice/v1.1 --export-3mf Enclosure-full-enclosure-v1.1-Orca-complete.3mf cad/Enclosure/Enclosure-v1.1-Orca-input.3mf
+mkdir -p cad/Enclosure/slice/v1.2
+orca-slicer --slice 0 --outputdir cad/Enclosure/slice/v1.2 --export-3mf Enclosure-full-enclosure-v1.2-Orca-complete.3mf cad/Enclosure/Enclosure-v1.2-Orca-input.3mf
 python cad/Enclosure/check_nut_pause.py
 python cad/Enclosure/verify_print.py
 ```
 
-The two slice checks default to `Enclosure/slice/v1.1/`.
+The two slice checks default to `Enclosure/slice/v1.2/`.
 To check another Orca command-line output directory, pass `--slice-dir PATH`.
 That directory must contain the exported 3MF and plate G-code files, plus `result.json` when Orca writes it.
 The checks support Orca 2.4.0 through embedded slice metadata.
