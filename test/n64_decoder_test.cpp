@@ -20,9 +20,10 @@ static Capture pulses(const char *bits, bool reversed = false,
   return result;
 }
 
-static void expectPacket(const Capture &capture, const uint8_t expected[4]) {
+static void expectPacket(const Capture &capture, const uint8_t expected[4],
+                         unsigned ticksPerUs = 1) {
   uint8_t frame[N64_FRAMEBITS] = {};
-  assert(decodeFrameFromRmtItems(capture.data(), capture.size(), frame));
+  assert(decodeFrameFromRmtItems(capture.data(), capture.size(), frame, ticksPerUs));
   assert(hasValidReservedBits(frame));
   uint8_t payload[4];
   packState(frame, payload);
@@ -44,7 +45,25 @@ int main() {
   const uint8_t neutralPacket[] = {0, 0, 0, 0};
   const uint8_t mixedPacket[] = {0xa5, 0x29, 0x80, 0x7f};
   const uint8_t allPacket[] = {0xff, 0x3f, 0xff, 1};
+  // A near-3us zero must stay zero when the capture retains fractional timing.
   for (bool reversed : {false, true}) {
+    auto capture = pulses(neutral, reversed, 8, 24, 32);
+    capture[9] = reversed ? Pulse{1, 8, 0, 23} : Pulse{0, 23, 1, 8};
+    uint8_t frame[N64_FRAMEBITS], payload[4];
+    assert(decodeFrameFromRmtItems(capture.data(), capture.size(), frame, 8));
+    packState(frame, payload);
+    assert(memcmp(payload, neutralPacket, 4) == 0);
+    // Integer microseconds lose the distinction and produce a false A press.
+    for (auto &p : capture) { p.duration0 /= 8; p.duration1 /= 8; }
+    assert(decodeFrameFromRmtItems(capture.data(), capture.size(), frame));
+    packState(frame, payload);
+    assert(payload[0] == 0x80);
+    assert(!decodeFrameFromRmtItems(capture.data(), capture.size(), frame, 0));
+  }
+  for (bool reversed : {false, true}) {
+    expectPacket(pulses(neutral, reversed, 8, 24, 32), neutralPacket, 8);
+    expectPacket(pulses(mixed, reversed, 8, 24, 32), mixedPacket, 8);
+    expectPacket(pulses(all, reversed, 8, 24, 32), allPacket, 8);
     expectPacket(pulses(neutral, reversed), neutralPacket);
     expectPacket(pulses(mixed, reversed), mixedPacket);
     expectPacket(pulses(all, reversed), allPacket);

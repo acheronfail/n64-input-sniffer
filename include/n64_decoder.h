@@ -9,7 +9,7 @@
 #define N64_BITCOUNT 32
 #define N64_FRAMEBITS (N64_PREFIX + N64_BITCOUNT)
 #define N64_POLL_COMMAND 0x01
-// Pulse timings in microseconds. The remote control peripheral (RMT) captures at 1us resolution.
+// Pulse limits in microseconds. Capture ticks can be shorter than one microsecond.
 #define N64_LOW_ONE_MAX_US 2
 #define N64_LOW_MIN_US 1
 #define N64_LOW_MAX_US 4
@@ -67,9 +67,18 @@ static inline bool isValidN64CellUs(uint32_t lowUs, uint32_t highUs) {
  */
 template <typename Item>
 static bool decodeFrameFromRmtItems(const Item *items, size_t count,
-                                    uint8_t frame[N64_FRAMEBITS]) {
+                                    uint8_t frame[N64_FRAMEBITS],
+                                    uint32_t ticksPerUs = 1) {
+  if (ticksPerUs == 0 || ticksPerUs > 80) return false;
   uint8_t bits[RMT_MAX_CAPTURE_BITS];
   size_t bitCount = 0;
+  const auto validCell = [ticksPerUs](uint32_t low, uint32_t high) {
+    return low >= N64_LOW_MIN_US * ticksPerUs &&
+           low <= N64_LOW_MAX_US * ticksPerUs &&
+           high <= N64_CELL_MAX_US * ticksPerUs &&
+           low + high >= N64_CELL_MIN_US * ticksPerUs &&
+           low + high <= N64_CELL_MAX_US * ticksPerUs;
+  };
 
   for (size_t i = 0; i < count && bitCount < RMT_MAX_CAPTURE_BITS; ++i) {
     const Item &item = items[i];
@@ -78,14 +87,14 @@ static bool decodeFrameFromRmtItems(const Item *items, size_t count,
     // Decode only those cells. Ignore malformed segments and noise.
     if (item.level0 == 0 && item.level1 == 1 && item.duration0 > 0 &&
         item.duration1 > 0 &&
-        isValidN64CellUs(item.duration0, item.duration1)) {
-      bits[bitCount++] = decodeBitFromLowUs(item.duration0);
+        validCell(item.duration0, item.duration1)) {
+      bits[bitCount++] = item.duration0 <= N64_LOW_ONE_MAX_US * ticksPerUs;
     }
 
     if (item.level0 == 1 && item.level1 == 0 && item.duration0 > 0 &&
         item.duration1 > 0 && bitCount < RMT_MAX_CAPTURE_BITS &&
-        isValidN64CellUs(item.duration1, item.duration0)) {
-      bits[bitCount++] = decodeBitFromLowUs(item.duration1);
+        validCell(item.duration1, item.duration0)) {
+      bits[bitCount++] = item.duration1 <= N64_LOW_ONE_MAX_US * ticksPerUs;
     }
   }
 
@@ -116,4 +125,3 @@ static void packState(const uint8_t *frame, uint8_t out[4]) {
   out[2] = readByte(r, 16);
   out[3] = readByte(r, 24);
 }
-

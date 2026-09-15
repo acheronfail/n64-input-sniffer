@@ -89,6 +89,7 @@ static void processCommandFrame(size_t controller, const uint8_t *frame);
 
 // End RMT reception after the bus stays at one level for this duration.
 #define RMT_IDLE_THRESHOLD_US 12
+static constexpr uint32_t kN64RmtTicksPerUs = 8;
 
 // On ESP32-S3 with the legacy RMT API, channels 4-7 are RX-capable.
 static constexpr int kN64Pins[N64_CONTROLLER_COUNT] = {
@@ -130,7 +131,7 @@ static bool controllerProbing[N64_CONTROLLER_COUNT] = {false, false, false,
 static uint32_t controllerProbeStartedMs[N64_CONTROLLER_COUNT] = {0, 0, 0, 0};
 static uint32_t controllerLastProbeAtMs[N64_CONTROLLER_COUNT] = {0, 0, 0, 0};
 
-/** Configure one controller's RMT RX channel for 1us pulse capture. */
+/** Configure one controller's RMT RX channel for 0.125us pulse capture. */
 static bool startRmtCapture(size_t controller) {
   if (controller >= N64_CONTROLLER_COUNT) {
     return false;
@@ -140,13 +141,13 @@ static bool startRmtCapture(size_t controller) {
   cfg.rmt_mode = RMT_MODE_RX;
   cfg.channel = kN64Channels[controller];
   cfg.gpio_num = (gpio_num_t)kN64Pins[controller];
-  cfg.clk_div = 80; // 80MHz APB / 80 = 1MHz tick => 1us resolution.
+  cfg.clk_div = 80 / kN64RmtTicksPerUs;
   // ESP32-S3 legacy RMT limits memory per group.
   // With 4 receive (RX) channels active, use one block per channel to configure all channels.
   cfg.mem_block_num = 1;
   cfg.flags = 0;
-  cfg.rx_config.idle_threshold = RMT_IDLE_THRESHOLD_US;
-  // Remove glitches shorter than one microsecond before they reach the RX ring buffer.
+  cfg.rx_config.idle_threshold = RMT_IDLE_THRESHOLD_US * kN64RmtTicksPerUs;
+  // The filter uses APB clock periods, separate from the capture tick duration.
   cfg.rx_config.filter_en = true;
   cfg.rx_config.filter_ticks_thresh = 1;
 
@@ -229,7 +230,7 @@ static bool readFrameFromRmt(size_t controller, uint8_t frame[N64_FRAMEBITS]) {
     if (rxSize >= sizeof(rmt_item32_t)) {
       uint8_t latestFrame[N64_FRAMEBITS];
       if (decodeFrameFromRmtItems(items, rxSize / sizeof(rmt_item32_t),
-                                  latestFrame)) {
+                                  latestFrame, kN64RmtTicksPerUs)) {
         // Process every queued frame so emptying the queue does not hide button edges.
         processCommandFrame(controller, latestFrame);
         memcpy(frame, latestFrame, N64_FRAMEBITS);
@@ -538,11 +539,7 @@ static void clearWiFiAndRestart() {
 
 static void setStatusLed(uint32_t color);
 
-/**
- * Start WiFi through the captive setup portal, then start mDNS and the web server.
- * Wait in setup() until connected, or restart if the portal times out.
- * The asynchronous server starts afterward, so it does not compete with WiFiManager's server.
- */
+/** Connect to saved WiFi or start a captive portal before the web server. */
 static void startNetwork() {
   WiFi.mode(WIFI_STA);
   // Disable modem sleep to reduce latency, jitter, and WebSocket interruptions during sustained traffic.

@@ -17,13 +17,14 @@ The N64 controller uses one open-collector wire that stays high when idle. Each 
 | `0` | ~3µs | ~1µs |
 | `1` | ~1µs | ~3µs |
 
-The ESP32 samples the line ~2µs after each falling edge.
-At that point, a `1` is high and a `0` is still low.
+The ESP32 RMT peripheral measures each low and high pulse in hardware, with 0.125 µs resolution.
+The decoder reads a `1` when the low pulse lasts at most 2 µs, and a `0` when it lasts longer.
+It checks pulse lengths and the poll prefix before it accepts a frame.
 Each polled frame starts with the console's 9-bit prefix: the `0x01` poll command (`0000_0001`) and a `1` stop bit.
 The controller's 32-bit response comes next.
 
-The ESP32 port replaces AVR `PIND` reads with direct `GPIO.in` register reads.
-It replaces manually counted NOP delays with the Xtensa cycle counter (`xthal_get_ccount`), scaled by `F_CPU`.
+Fractional timing matters. At 1 µs resolution, a low pulse near 3 µs can measure as 2 µs and produce a false input.
+The finer resolution preserves that distinction. The decoder uses capture ticks directly, without first rounding them to whole microseconds.
 
 ## Wiring
 
@@ -148,7 +149,7 @@ The ESP32 is a passive sniffer, so these button presses also reach the game.
 ### Web server and state format
 
 The asynchronous server runs in its own task on the other core.
-It does not disturb the timing of the software that reads individual bits.
+The RMT peripheral captures pulse timing independently of the web server.
 The setup portal runs only during startup, before the server starts, so they do not compete for port 80.
 
 The state format uses the following bytes.
