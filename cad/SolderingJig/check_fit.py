@@ -1,7 +1,7 @@
 from pathlib import Path
 import sys,json
 import FreeCAD as A
-r=Path(__file__).resolve().parent;d=A.openDocument(str(r/'SolderingJig.FCStd'));v=A.Vector
+r=Path(__file__).resolve().parent;d=A.openDocument(str(r/'N64-Soldering-Jig-v1.1.FCStd'));v=A.Vector
 report=json.loads((r/'validation.json').read_text())
 for label,shape,cap in [('male',d.MaleHousing.Shape,d.MaleClamp.Shape),('female',d.FemaleHousing.Shape,d.FemaleClamp.Shape)]:
  for angle in [-5,5]:

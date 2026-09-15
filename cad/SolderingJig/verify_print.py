@@ -1,11 +1,11 @@
-"""Validate the delivered Orca project against soldering jig STLs and toolpaths."""
+"""Check the delivered Orca project against soldering jig STLs and toolpaths."""
 from pathlib import Path
 import argparse
 parser=argparse.ArgumentParser(description=__doc__)
-parser.add_argument("--slice-dir", type=Path, default=Path(__file__).resolve().parent/"slice")
+parser.add_argument("--slice-dir", type=Path, default=Path(__file__).resolve().parent/"slice"/"v1.1")
 args=parser.parse_args()
 import json,zipfile,hashlib,xml.etree.ElementTree as E,numpy as np,shutil
-r=Path(__file__).resolve().parent;folder=args.slice_dir.resolve();p=folder/'N64-Soldering-Jig-v1.3mf'
+r=Path(__file__).resolve().parent;folder=args.slice_dir.resolve();p=folder/'N64-Soldering-Jig-v1.1.3mf'
 ns={'m':'http://schemas.microsoft.com/3dmanufacturing/core/2015/02'};pn='{http://schemas.microsoft.com/3dmanufacturing/production/2015/06}path'
 dt=np.dtype([('n','<f4',3),('v','<f4',(3,3)),('a','<u2')])
 result_path=folder/'result.json'
@@ -13,7 +13,7 @@ result=json.loads(result_path.read_text()) if result_path.exists() else None
 if result is not None:
  assert result['return_code']==0 and len(result['sliced_plates'])==1
  assert all(not a['warning_message'] for a in result['sliced_plates'])
-# Orca 2.4.0 does not emit result.json; verify its embedded slice metadata too.
+# Orca 2.4.0 does not write result.json. Check its embedded slice metadata too.
 def slice_warnings(archive):
  return [dict(n.attrib) for n in E.fromstring(archive.read('Metadata/slice_info.config')).iter('warning')]
 with zipfile.ZipFile(r/'N64-Soldering-Jig-v1.3mf') as baseline:
@@ -56,8 +56,8 @@ with zipfile.ZipFile(p) as z:
   ox,oy=[(0,0),(307.2,0),(0,-307.2)][e['plate']-1]
   t-=np.array([e['centre_xy'][0]+ox,e['centre_xy'][1]+oy,0])
   original=np.fromfile(r/name,dtype=dt,offset=84)['v'].astype(float)
-  # Orca preserves triangle order in this project. Compare all vertex coordinates,
-  # allowing only serialization precision, not changed dimensions or orientation.
+  # Orca preserves triangle order in this project. Compare all vertex coordinates.
+  # Allow only differences from serialization precision. Do not allow changes to dimensions or orientation.
   assert t.shape==original.shape,(name,t.shape,original.shape)
   vertex_error=float(np.max(np.abs(t-original)))
   assert vertex_error<.00005,(name,vertex_error)
@@ -75,9 +75,9 @@ with zipfile.ZipFile(p) as z:
  assert len(layers)==0
  assert not any(line.strip()=='M400 U1' for line in z.read('Metadata/plate_1.gcode').decode().splitlines())
  assert settings['enable_support']=='0'
-report={'revision':'v1','printer':settings['printer_settings_id'],'bed':settings['curr_bed_type'],'plate_counts':[3],'slices':result,'inherited_profile_warnings':warnings,'geometry':checks,'embedded_gcode_matches_verified_files':True,'pauses':0,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()}
+report={'revision':'v1.1','printer':settings['printer_settings_id'],'bed':settings['curr_bed_type'],'plate_counts':[3],'slices':result,'inherited_profile_warnings':warnings,'geometry':checks,'embedded_gcode_matches_verified_files':True,'pauses':0,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()}
 (r/'print-validation.json').write_text(json.dumps(report,indent=2)+'\n')
-# The verified slice remains in slice-dir; promote it explicitly after review.
+# The checked slice stays in slice-dir. Promote it explicitly after review.
 print('Verified',p)
 if warnings:print('Inherited profile warnings (also present in retained release):',warnings)
 

@@ -1,11 +1,11 @@
-"""Create a one-plate soldering jig project; no supports or pauses."""
+"""Create a one-plate soldering jig project with no supports or pauses."""
 from pathlib import Path
 import zipfile,json,uuid,xml.etree.ElementTree as E,numpy as np
 r=Path(__file__).resolve().parent;src=r
 with zipfile.ZipFile(r.parent/'Enclosure/Enclosure-full-enclosure-v1.0-Orca-complete.3mf') as z:
  settings=json.loads(z.read('Metadata/project_settings.config'))
  content_types=z.read('[Content_Types].xml')
-settings['project_name']='N64 soldering jig v1'
+settings['project_name']='N64 soldering jig v1.1'
 settings['wall_loops']='3'
 settings['sparse_infill_density']='15%'
 settings['enable_support']='0'
@@ -57,7 +57,7 @@ config[:]=config.findall('object')+plates+[assembly]
 custom=E.Element('custom_gcodes_per_layer');pl=E.SubElement(custom,'plate');E.SubElement(pl,'plate_info',id='1')
 E.SubElement(pl,'mode',value='SingleExtruder')
 entries.update({'[Content_Types].xml':content_types,'3D/3dmodel.model':E.tostring(model,encoding='utf-8',xml_declaration=True),'3D/_rels/3dmodel.model.rels':E.tostring(rels,encoding='utf-8',xml_declaration=True),'Metadata/model_settings.config':E.tostring(config,encoding='utf-8',xml_declaration=True),'Metadata/project_settings.config':json.dumps(settings,indent=2).encode(),'Metadata/custom_gcode_per_layer.xml':E.tostring(custom,encoding='utf-8',xml_declaration=True),'_rels/.rels':b'<?xml version="1.0"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Target="/3D/3dmodel.model" Id="rel-1" Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"/></Relationships>'})
-with zipfile.ZipFile(r/'N64-Soldering-Jig-v1-input.3mf','w',zipfile.ZIP_DEFLATED) as z:
+with zipfile.ZipFile(r/'N64-Soldering-Jig-v1.1-input.3mf','w',zipfile.ZIP_DEFLATED) as z:
  for n,data in entries.items():z.writestr(n,data)
 (r/'print-layout.json').write_text(json.dumps(manifest,indent=2)+'\n')
 print('Created three parts on one plate, no pauses.')
