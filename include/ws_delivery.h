@@ -13,7 +13,7 @@ public:
   static constexpr uint32_t IntervalUs = 20000;
   static constexpr uint16_t BlockedLimit = 60;
   struct Attempt {
-    uint8_t packet[5] = {};
+    uint8_t packet[13] = {};
     uint32_t revision = 0;
     uint32_t clients[MaxClients] = {};
     uint32_t sessions[MaxClients] = {};
@@ -38,9 +38,10 @@ public:
     if (auto *client = find(id)) *client = Client{};
   }
 
-  void update(size_t controller, const uint8_t payload[4]) {
+  void update(size_t controller, const uint8_t payload[4], uint64_t decodedUs = 0) {
     if (controller >= Controllers) return;
     memcpy(latest[controller], payload, 4);
+    timestamps[controller] = decodedUs;
     ++revisions[controller];
     for (auto &client : clients) {
       if (client.active) client.pending |= uint8_t(1U << controller);
@@ -66,6 +67,8 @@ public:
       if (!attempt.count) continue;
       attempt.packet[0] = uint8_t(controller);
       memcpy(attempt.packet + 1, latest[controller], 4);
+      for (size_t i = 0; i < 8; ++i)
+        attempt.packet[5 + i] = uint8_t(timestamps[controller] >> (8 * i));
       attempt.revision = revisions[controller];
       // Limit the retry rate after failures too. Advance even if every client is blocked.
       lastAttemptUs = nowUs;
@@ -103,6 +106,7 @@ private:
   Client clients[MaxClients] = {};
   uint8_t latest[Controllers][4] = {};
   uint32_t revisions[Controllers] = {};
+  uint64_t timestamps[Controllers] = {};
   uint32_t lastAttemptUs = 0;
   uint32_t session = 0;
   size_t nextController = 0;

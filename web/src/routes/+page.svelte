@@ -1,12 +1,14 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { startHeartbeat } from '$lib/heartbeat';
+	import { createLatencyTracker, type LatencyReading } from '$lib/latency';
 	import { decodeFrame, emptyState, createFrameBuffer } from '$lib/controller';
 	import ControllerDashboard from '$lib/components/ControllerDashboard.svelte';
 
 	let controllers = $state(Array.from({ length: 4 }, emptyState));
 	let connection = $state('connecting…');
 	let connected = $state(false);
+	let latency = $state<LatencyReading>({ ms: null, stale: true });
 
 	onMount(() => {
 		let ws: WebSocket | null = null;
@@ -15,11 +17,15 @@
 		let heartbeat: ReturnType<typeof startHeartbeat> | undefined;
 		let connectTimer: ReturnType<typeof setTimeout> | undefined;
 		const pending = createFrameBuffer();
+		let tracker = createLatencyTracker();
+		let latencyTimer: ReturnType<typeof setInterval> | undefined;
 		let disposed = false;
 
 		function disconnect(status: string) {
 			if (disposed) return;
 			heartbeat?.stop();
+			clearInterval(latencyTimer);
+			latency = { ms: null, stale: true };
 			clearTimeout(connectTimer);
 			connection = status;
 			connected = false;
@@ -40,6 +46,13 @@
 				clearTimeout(connectTimer);
 				connection = 'connected';
 				connected = true;
+				tracker = createLatencyTracker();
+				const probe = () => {
+					ws?.send(tracker.probe(performance.now()));
+					latency = tracker.reading(performance.now());
+				};
+				probe();
+				latencyTimer = setInterval(probe, 1000);
 				heartbeat = startHeartbeat(
 					() => ws?.send('ping'),
 					() => disconnect('connection lost — retrying…')
@@ -50,6 +63,11 @@
 			};
 			ws.onerror = (event) => console.log('[ws] error', event);
 			ws.onmessage = (event) => {
+				const receivedAt = performance.now();
+				if (typeof event.data === 'string' && tracker.receive(event.data, receivedAt)) {
+					heartbeat?.received();
+					return;
+				}
 				if (event.data === 'pong') {
 					heartbeat?.received();
 					return;
@@ -58,6 +76,7 @@
 				const frame = decodeFrame(new Uint8Array(event.data));
 				if (!frame) return;
 				heartbeat?.received();
+				tracker.input(frame.decodedMs, receivedAt);
 				pending.push(frame);
 				if (animationFrame !== undefined) return;
 				animationFrame = requestAnimationFrame(() => {
@@ -72,6 +91,8 @@
 		function dispose() {
 			disposed = true;
 			heartbeat?.stop();
+			clearInterval(latencyTimer);
+			latency = { ms: null, stale: true };
 			clearTimeout(connectTimer);
 			clearTimeout(reconnectTimer);
 			if (animationFrame !== undefined) cancelAnimationFrame(animationFrame);
@@ -95,4 +116,4 @@
 	<link rel="icon" href="data:," />
 </svelte:head>
 
-<ControllerDashboard {controllers} {connection} {connected} />
+<ControllerDashboard {controllers} {connection} {connected} {latency} />

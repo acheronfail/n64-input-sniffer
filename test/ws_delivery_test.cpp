@@ -33,9 +33,12 @@ int main() {
   assert(delivery.connect(20));
   initialSnapshots(delivery, now);
   const uint8_t pressed[] = {0x80, 0, 0x80, 0x7f};
-  delivery.update(2, pressed);
+  delivery.update(2, pressed, UINT64_C(5000000000));
   auto attempt = prepare(delivery, now);
   assert(attempt.count == 2 && attempt.packet[0] == 2);
+  const uint8_t timestamp[] = {0x00, 0xf2, 0x05, 0x2a, 0x01, 0, 0, 0};
+  assert(sizeof(attempt.packet) == 13);
+  assert(memcmp(attempt.packet + 5, timestamp, 8) == 0);
   assert(memcmp(attempt.packet + 1, pressed, 4) == 0);
   assert(!delivery.complete(attempt, 0, true));
   assert(!delivery.complete(attempt, 1, false));
@@ -44,6 +47,7 @@ int main() {
   // No new controller input arrives between the original send and this retry.
   attempt = prepare(delivery, now);
   assert(attempt.count == 1 && attempt.clients[0] == 20);
+  assert(memcmp(attempt.packet + 5, timestamp, 8) == 0);
   assert(memcmp(attempt.packet + 1, pressed, 4) == 0);
   acknowledge(delivery, attempt);
   assert(!delivery.pending());

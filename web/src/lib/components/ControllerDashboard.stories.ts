@@ -133,3 +133,13 @@ export const BackgroundSettings: Story = {
 		});
 	}
 };
+
+export const InputLatency: Story = {
+	args: { latency: { ms: 24, stale: false } },
+	play: async ({ canvasElement }) => {
+		await expect(within(canvasElement).getByText('Input latency: ≈24 ms')).toBeVisible();
+	}
+};
+export const StaleLatency: Story = {
+	args: { latency: { ms: 24, stale: true } }
+};

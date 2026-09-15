@@ -25,6 +25,7 @@
 #include <WiFi.h>
 #include <WiFiManager.h>
 #include <driver/rmt.h>
+#include <esp_timer.h>
 #include <freertos/ringbuf.h>
 
 #include "web_ui.h"
@@ -475,10 +476,22 @@ static void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client,
     Serial.printf("[ws] connect id=%lu from=%s\n", (unsigned long)client->id(),
                   client->remoteIP().toString().c_str());
   } else if (type == WS_EVT_DATA) {
+    const uint64_t receivedUs = esp_timer_get_time();
     const auto *info = static_cast<AwsFrameInfo *>(arg);
     if (info->final && info->index == 0 && info->len == 4 &&
         info->opcode == WS_TEXT && len == 4 && memcmp(data, "ping", 4) == 0) {
       client->text("pong");
+    } else if (info->final && info->index == 0 && info->len == len &&
+               info->opcode == WS_TEXT && len > 5 && len <= 15 &&
+               memcmp(data, "sync:", 5) == 0) {
+      for (size_t i = 5; i < len; ++i)
+        if (data[i] < '0' || data[i] > '9') return;
+      char reply[80];
+      snprintf(reply, sizeof(reply), "sync:%.*s:%llu:%llu", int(len - 5),
+               reinterpret_cast<const char *>(data + 5),
+               (unsigned long long)receivedUs,
+               (unsigned long long)esp_timer_get_time());
+      client->text(reply);
     }
   } else if (type == WS_EVT_DISCONNECT) {
     portENTER_CRITICAL(&wsDeliveryMux);
@@ -809,6 +822,7 @@ void loop() {
       continue;
     }
 
+    const uint64_t decodedUs = esp_timer_get_time();
     uint8_t payload[4];
     packState(frame, payload);
 
@@ -816,7 +830,7 @@ void loop() {
     if (memcmp(lastPayload[controller], payload, sizeof(payload)) != 0) {
       memcpy(lastPayload[controller], payload, sizeof(payload));
       portENTER_CRITICAL(&wsDeliveryMux);
-      wsDelivery.update(controller, payload);
+      wsDelivery.update(controller, payload, decodedUs);
       portEXIT_CRITICAL(&wsDeliveryMux);
       printState(controller, decodeState(frame));
     }

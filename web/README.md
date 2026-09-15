@@ -3,7 +3,7 @@
 The SvelteKit user interface (UI) reads the ESP32's binary WebSocket messages at `/ws`.
 It shows the latest controller frame and combines updates for each animation frame.
 It reconnects after one second.
-Five-byte frames include a controller index. The UI also supports legacy four-byte frames.
+Thirteen-byte frames include a controller index and a decode timestamp. The UI also supports legacy four-byte and five-byte frames.
 
 ## Development
 
@@ -76,13 +76,56 @@ OBS stores settings separately from your regular browser.
 
 The connection indicator shows the browser's WebSocket connection to the ESP32.
 It does not show individual controller activity.
-The browser checks the connection each second. It sends `ping` only after at least one second without a valid controller frame or `pong`.
+The browser checks the connection each second. It sends `ping` only after at least one second without a valid controller frame, clock reply, or `pong`.
 The firmware replies with `pong`, so idle controllers do not cause a connection timeout.
-After three seconds without a valid controller frame or `pong`, the browser marks the connection lost at the next check.
+After three seconds without a valid controller frame, clock reply, or `pong`, the browser marks the connection lost at the next check.
 Detection normally takes three to four seconds. Background tabs can take longer if the browser delays timers.
 Connection attempts also time out after three seconds. The browser retries after one second.
 Flash the updated firmware and reload the page to use the heartbeat.
 After a connection loss, controllers keep the last input state they received.
+
+## Input latency
+
+The connection row shows `Link latency: ≈5 ms` after the first clock reply, even without controller input.
+Clock replies serve as timestamped heartbeats. The browser sends one clock probe per second, including during input activity.
+Link latency estimates the time from ESP reply to browser receipt. It excludes the input queue delay.
+For three seconds after a measured input change, the row shows `Input latency` instead.
+The browser smooths input and link readings separately. If clock replies stop, the link reading becomes stale after three seconds.
+Input latency estimates the time from ESP decode to browser receipt, including the firmware queue and network delay.
+It excludes console polling, capture delay before decoding, and screen display delay.
+The browser smooths readings and updates the label once per second.
+A dash means that no measurement is available. Minimal mode hides the label by default.
+Use **Show latency in minimal mode** in Settings to show or hide the latency.
+The browser saves this setting. It is off by default.
+The latency follows the connection dot in a row at the top left.
+If you hide the dot, the latency stays at the top left.
+
+It uses the shortest round trip from the last 30 seconds to estimate the clock offset.
+Clock checks expire after 30 seconds. Reconnection clears the estimate and the last reading.
+Unequal network delays affect accuracy, so the value retains the approximation symbol.
+
+Controller packets contain 13 bytes:
+
+- Byte 0: controller index, from 0 to 3.
+- Bytes 1–4: button and stick state, in the existing format.
+- Bytes 5–12: unsigned 64-bit ESP decode timestamp in microseconds, least significant byte first.
+
+A zero timestamp marks a state without a measured decode time.
+Retries preserve the timestamp. The browser excludes cached states from before its first clock check.
+The browser still accepts legacy four-byte and five-byte packets, which have no latency measurement.
+Reload the page after flashing the firmware. Older pages cannot decode the new packets.
+
+Clock requests use `sync:<id>`. Replies use `sync:<id>:<receivedUs>:<repliedUs>`.
+The ESP records both times with its monotonic timer. The browser records send and receive times with `performance.now()`.
+All calculations use milliseconds. The clock offset equals ESP time minus browser time:
+
+```text
+offset = ((espReceived - browserSent) + (espReplied - browserReceived)) / 2
+roundTrip = (browserReceived - browserSent) - (espReplied - espReceived)
+latency = browserReceived - espDecoded + offset
+```
+
+Valid clock replies also count as connection activity. The existing idle ping/pong check remains active.
 
 ## Storybook
 

@@ -7,15 +7,18 @@
 		SETTINGS_KEY,
 		MINIMAL_KEY,
 		MINIMAL_CONNECTION_KEY,
+		MINIMAL_LATENCY_KEY,
 		BACKGROUND_KEY,
 		DEFAULT_BACKGROUND,
 		DEFAULT_BACKGROUND_COLOR
 	} from '../settings';
 	import N64Controller from './N64Controller.svelte';
+	import type { LatencyReading } from '../latency';
 	let {
 		controllers = Array.from({ length: 4 }, emptyState),
 		connection = 'connecting…',
 		connected = false,
+		latency = { ms: null, stale: true },
 		initialVisible = ALL_CONTROLLERS,
 		initialMinimal = false,
 		initialBackground = DEFAULT_BACKGROUND,
@@ -24,6 +27,7 @@
 		controllers?: ControllerState[];
 		connection?: string;
 		connected?: boolean;
+		latency?: LatencyReading;
 		initialVisible?: number[];
 		initialMinimal?: boolean;
 		initialBackground?: string;
@@ -64,6 +68,7 @@
 	}
 	let minimal = $state(untrack(() => initialMinimal));
 	let showMinimalConnection = $state(true);
+	let showMinimalLatency = $state(false);
 	let exitButton = $state<HTMLButtonElement>();
 	let settingsSummary = $state<HTMLElement>();
 	// Initialize from props. Keep the user's selection independent of incoming frames.
@@ -74,6 +79,7 @@
 				visible = parseVisibility(localStorage.getItem(SETTINGS_KEY));
 				minimal = localStorage.getItem(MINIMAL_KEY) === 'true';
 				showMinimalConnection = localStorage.getItem(MINIMAL_CONNECTION_KEY) !== 'false';
+				showMinimalLatency = localStorage.getItem(MINIMAL_LATENCY_KEY) === 'true';
 				const savedBackground = localStorage.getItem(BACKGROUND_KEY);
 				// A malformed color preference must not prevent the other settings from loading.
 				try {
@@ -194,6 +200,17 @@
 						/>
 						Show connection dot in minimal mode
 					</label>
+					<label class="indicator-option">
+						<input
+							type="checkbox"
+							checked={showMinimalLatency}
+							onchange={(event) => {
+								showMinimalLatency = event.currentTarget.checked;
+								save(MINIMAL_LATENCY_KEY, showMinimalLatency);
+							}}
+						/>
+						Show latency in minimal mode
+					</label>
 					<fieldset class="background-options">
 						<legend>Background</legend>
 						<div class="choices">
@@ -242,16 +259,27 @@
 				</div>
 			</details>
 		</header>
-		{#if !minimal || showMinimalConnection}
-			<div
-				class="connection"
-				class:connected
-				role="status"
-				aria-label={connection}
-				title={connection}
-			>
-				<span class="status-dot" aria-hidden="true"></span>
+		{#if !minimal || showMinimalConnection || showMinimalLatency}
+			<div class="connection" class:connected role="status">
+				{#if !minimal || showMinimalConnection}
+					<span class="status-dot" role="img" aria-label={connection} title={connection}></span>
+				{/if}
 				{#if !minimal}{connection}{/if}
+				{#if (minimal && showMinimalLatency) || (!minimal && connected)}
+					<span
+						class="latency"
+						title={latency.source === 'link'
+							? 'Estimated time from ESP clock reply to browser receipt. Excludes input queue and screen display delay. Unequal network delays affect accuracy.'
+							: 'Estimated time from ESP decode to browser receipt. Excludes screen display delay. Unequal network delays affect accuracy.'}
+					>
+						{latency.source === 'link' ? 'Link latency' : 'Input latency'}: {!connected ||
+						latency.ms === null
+							? '—'
+							: `≈${Math.round(latency.ms)} ms`}{connected && latency.ms !== null && latency.stale
+							? ' (stale)'
+							: ''}
+					</span>
+				{/if}
 			</div>
 		{/if}
 		<section class="controllers" aria-label="Controller inputs">
@@ -421,12 +449,19 @@
 	}
 	.connection {
 		display: flex;
+		flex-wrap: wrap;
 		align-items: center;
 		gap: 7px;
 		font-size: 11px;
 		color: #b1bac6;
 		margin: 16px 0;
 		overflow-wrap: anywhere;
+	}
+	.latency {
+		font-size: 1.2em;
+		white-space: nowrap;
+		flex-shrink: 0;
+		font-variant-numeric: tabular-nums;
 	}
 	.status-dot {
 		flex: 0 0 6px;
@@ -562,7 +597,8 @@
 		left: 12px;
 		z-index: 3;
 		margin: 0;
-		gap: 0;
+		gap: 7px;
+		flex-wrap: nowrap;
 	}
 	.exit-minimal {
 		position: fixed;
