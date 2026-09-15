@@ -1,41 +1,122 @@
-# Enclosure v1.0
+# Enclosure v1.1
 
-[FreeCAD model](Enclosure-v1.0.FCStd) · [Print-ready OrcaSlicer 3MF](Enclosure-full-enclosure-v1.0-Orca-complete.3mf)
+**Status: verified.** The owner printed v1.1 and confirmed that it works on 2026-09-15.
 
-This is the tested v0.16 enclosure, renamed to v1.0 with identical file contents. Physical testing was confirmed by the owner on 2026-09-13. Local slicer changes only rearranged which pieces were printed and their order; this release retains the original saved print project.
+[FreeCAD model](Enclosure-v1.1.FCStd) · [Print-ready OrcaSlicer 3MF](Enclosure-full-enclosure-v1.1-Orca-complete.3mf)
+
+v1.1 gives wires at least 2 mm of space between the opposing keeper screw towers.
+Connector tails are 18.094 mm apart at the center ports and 19.998 mm at the outer ports.
+The matching soldering jig uses an 18.1 mm gap.
+Female terminal passages remain 12.8 mm wide.
+
+The ESP window, recess, and support ledge move 4 mm toward the N64-facing edge.
+They stay centered from left to right.
+The board and USB remain in place.
+
+Four of the six closure bolts now sit near the N64-facing edge: CAD (X, Y) = (±18, 3) and (±79.5, 2) mm.
+The remaining pair stays near the female side at (±18, −48.2) mm.
+This puts more fasteners along the edge that lifted.
+
+Hardware quantities are unchanged.
+The closure bosses stay inside the original 168 mm case outline.
+Local reliefs let the two outer male keepers lift past the internal side bosses.
+
+The original [v1.0 model](Enclosure-v1.0.FCStd) and [v1.0 print project](Enclosure-full-enclosure-v1.0-Orca-complete.3mf) remain unchanged.
+Physical tests of v1.0 took place on 2026-09-13.
 
 ## Printing
 
-The 3MF includes all 12 parts and sliced toolpaths across three plates using a Bambu Lab P1S 0.4 mm profile, Supertack bed, 0.16 mm layers and a 0.20 mm first layer:
+The 3MF includes all 12 parts and sliced toolpaths across three plates.
+It uses a Bambu Lab P1S 0.4 mm profile, Supertack bed, 0.16 mm layers, and a 0.20 mm first layer.
 
-1. Lower and upper shells, PLA. One nut-insertion pause.
-2. Four distinct male keepers, four identical female keepers and one board keeper, PLA. No pauses.
-3. One optional light window, PETG. No pauses.
+| Plate | Parts and material | Pauses |
+| --- | --- | --- |
+| 1 | Lower and upper shells, PLA | One pause to insert nuts |
+| 2 | Four distinct male keepers, four identical female keepers, and one board keeper, PLA | None |
+| 3 | One optional light window, PETG | None |
 
-Parts are bed-oriented in millimetres at 100% scale. Select the actual printer, bed and filament before printing; recheck the nut pause if reslicing. The four male keepers have one through four identification dimples and are port-specific.
+Parts have their print orientation in millimeters at 100% scale.
+The four male keepers have one through four identification dimples and each fits a specific port.
+
+1. Select the actual printer, bed, and filament before you print.
+2. If you slice the project again, check the nut pause again.
 
 ## Hardware
 
 - Six **M2 × 20 mm countersunk machine screws** and six M2 nuts for case closure.
-- Sixteen **2 mm nominal × 8 mm countersunk screws suitable for plastic** for the eight port keepers, two each. Keeper clearance holes are 2.2 mm, with 90-degree countersinks sized to 4.2 mm heads. Lower posts have 1.6 mm nominal printed pilot holes, 8 mm deep. Select the screw/pilot combination for the actual printed material; these are not modelled M2 metal threads. Ordinary machine screws require suitably tapped posts or another threaded fastening solution.
+- Sixteen **2 mm nominal × 8 mm countersunk screws suitable for plastic** for the eight port keepers, two each.
 - Two normal M2 × 8 mm plastic screws for the board keeper.
 
-The port-keeper screw heads must finish flush or below their keeper surfaces. Nominal countersunk screw length is measured including the head. An 8 mm keeper screw has approximately 6 mm of engagement below the 2 mm keeper bridge. Tighten until the keeper seats on its posts; extra torque is not needed to squeeze the connector.
+Keeper clearance holes are 2.2 mm, with 90-degree countersinks sized to 4.2 mm heads.
+Lower posts have 1.6 mm nominal printed pilot holes, 8 mm deep.
+Select the screw/pilot combination for the actual printed material.
+These holes are not modeled M2 metal threads.
+Ordinary machine screws need suitably tapped posts or another threaded fastener arrangement.
+
+The port-keeper screw heads must finish flush or below their keeper surfaces.
+Nominal countersunk screw length is measured including the head.
+An 8 mm keeper screw has approximately 6 mm of engagement below the 2 mm keeper bridge.
+Tighten until the keeper seats on its posts.
+Extra torque is not needed to squeeze the connector.
 
 ## Embedded closure nuts
 
-Only the **six M2 closure nuts** remain embedded in the upper shell. The supplied 3MF contains one native `M400 U1` pause on plate 1, before layer 88 at Z=14.12 mm. Toolpath checks confirm all six pocket caps start after the pause; plates 2 and 3 have none. Verify it against the new slice before printing: the nut-pocket cap must not begin until the nuts are installed.
+Only the **six M2 closure nuts** remain embedded in the upper shell.
+The supplied 3MF contains one native `M400 U1` pause on plate 1, before layer 88 at Z=14.12 mm.
+Toolpath checks show that all six pocket caps start after the pause.
+Plates 2 and 3 have no pauses.
 
-## Assembly
+Check the pause against the new slice before you print.
+The nut-pocket cap must not start until the nuts are installed.
 
-1. Check that the real male mating portion agrees with the extended CAD reference: 16 mm circular diameter, flattened to 12 mm high, projecting 12 mm from the housing. The model assumes it is concentric with the housing and has its flat side down, opposite the housing's flat side (up). The 0.35 mm mating-opening clearance is per axis. Contacts are not modelled.
-2. With the lower shell open, seat one male connector at a time, flat housing side up. Fit its matching keeper and two keeper screws before proceeding to the next port. Keepers 1–4 correspond to increasing CAD X: −64.04, −36.00, +36.00, +64.04 mm. The identification dimples are on the rear screw bridge, toward the wiring cavity. Viewed from the controller/female side with the case upright, this is left to right; viewed directly into the male tips, it is reversed.
-3. Seat each female connector in its existing groove, fit an identical female keeper, and secure its two screws. No port should depend on the lid for retention.
-4. Route wires through the spaces between the keeper posts. Fit the board and its keeper, USB toward the male connectors. Keep wiring below the moving lid and clear of screw tips.
-5. With the lid still off, gently check each port for lift and movement in both axial directions. Small clearance movement is expected; no housing should escape its keeper. Confirm even console engagement and full insertion without force.
-6. Install the light window if desired, lower the lid vertically, and install the six closure screws. Reopening uses only these closure screws; leave the port keepers attached.
+## Check the male connector
 
-The retaining lip surrounds the mating portion near its root, so approximately 10 mm of the measured 12 mm projection remains beyond the local case face. Verify full insertion on the real console before final wiring/assembly. The owner confirmed successful physical testing on 2026-09-13; no instrumented load-strength measurements were recorded.
+Check the real male mating portion against the extended CAD reference:
+
+- 16 mm circular diameter, flattened to 12 mm high
+- 12 mm projection from the housing
+- Concentric with the housing
+- Flat side down, opposite the housing's flat side (up)
+
+The 0.35 mm mating-opening clearance is per axis.
+The model does not include contacts.
+
+## Install the connectors
+
+1. With the lower shell open, seat one male connector, flat housing side up.
+2. Fit its matching keeper and two keeper screws before the next port.
+   Keepers 1–4 correspond to increasing CAD X: −64.04, −36.00, +36.00, +64.04 mm.
+   The identification dimples sit on the rear screw bridge, toward the wiring cavity.
+   From the controller/female side with the case upright, the order is left to right.
+   From directly in front of the male tips, the order is reversed.
+3. Repeat steps 1 and 2 for each remaining male port.
+4. Seat each female connector in its existing groove.
+5. Fit an identical female keeper and two screws to each female connector.
+   No port must depend on the lid for retention.
+
+## Install the board and check fit
+
+1. Route wires through the spaces between the keeper posts.
+2. Fit the board and its keeper, with USB toward the male connectors.
+3. Keep wiring below the moving lid and clear of screw tips.
+4. With the lid still off, gently check each port for lift and movement in both axial directions.
+   Small clearance movement is expected. No housing must escape its keeper.
+5. Make sure the console engagement is even and permits full insertion without force.
+
+The retaining lip surrounds the mating portion near its root.
+Thus, approximately 10 mm of the measured 12 mm projection remains beyond the local case face.
+Check full insertion on the real console before final wiring and assembly.
+The v1.1 geometry and toolpaths passed digital checks.
+The owner confirmed that the printed v1.1 enclosure works on 2026-09-15.
+
+## Close the case
+
+1. If desired, install the light window.
+2. Lower the lid vertically.
+3. Install the six closure screws.
+
+To open the case again, remove only these closure screws.
+Leave the port keepers attached.
 
 ## Existing electrical precaution
 
@@ -43,4 +124,9 @@ Fully disconnect the adapter from all four console ports before connecting USB-C
 
 ## Design changes
 
-Edit `parameters.json` for exposed dimensions and `build.py` for geometry changes. Run `build.FCMacro` in FreeCAD to produce `Enclosure.FCStd` and print meshes. See [development instructions](../DEVELOPMENT.md) for checks, packaging and slicing. The saved model parameter snapshot does not recompute the design on its own.
+1. Edit `parameters.json` for exposed dimensions.
+2. Edit `build.py` for geometry changes.
+3. Run `build.FCMacro` in FreeCAD to produce `Enclosure-v1.1.FCStd` and print meshes.
+
+See the [development instructions](../DEVELOPMENT.md) for checks, packaging, and slicing.
+The saved model parameter snapshot does not recompute the design on its own.

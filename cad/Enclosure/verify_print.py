@@ -1,11 +1,11 @@
-"""Validate the delivered Orca project against final v1.0 STLs and toolpaths."""
+"""Check the delivered Orca project against final v1.1 STLs and toolpaths."""
 from pathlib import Path
 import argparse
 parser=argparse.ArgumentParser(description=__doc__)
-parser.add_argument("--slice-dir", type=Path, default=Path(__file__).resolve().parent/"slice")
+parser.add_argument("--slice-dir", type=Path, default=Path(__file__).resolve().parent/"slice"/"v1.1")
 args=parser.parse_args()
 import json,zipfile,hashlib,xml.etree.ElementTree as E,numpy as np,shutil
-r=Path(__file__).resolve().parent;folder=args.slice_dir.resolve();p=folder/'Enclosure-full-enclosure-v1.0-Orca-complete.3mf'
+r=Path(__file__).resolve().parent;folder=args.slice_dir.resolve();p=folder/'Enclosure-full-enclosure-v1.1-Orca-complete.3mf'
 ns={'m':'http://schemas.microsoft.com/3dmanufacturing/core/2015/02'};pn='{http://schemas.microsoft.com/3dmanufacturing/production/2015/06}path'
 dt=np.dtype([('n','<f4',3),('v','<f4',(3,3)),('a','<u2')])
 result_path=folder/'result.json'
@@ -13,7 +13,7 @@ result=json.loads(result_path.read_text()) if result_path.exists() else None
 if result is not None:
  assert result['return_code']==0 and len(result['sliced_plates'])==3
  assert all(not a['warning_message'] for a in result['sliced_plates'])
-# Orca 2.4.0 does not emit result.json; verify its embedded slice metadata too.
+# Orca 2.4.0 does not write result.json. Check its embedded slice metadata too.
 def slice_warnings(archive):
  return [dict(n.attrib) for n in E.fromstring(archive.read('Metadata/slice_info.config')).iter('warning')]
 with zipfile.ZipFile(r/'Enclosure-full-enclosure-v1.0-Orca-complete.3mf') as baseline:
@@ -46,7 +46,7 @@ with zipfile.ZipFile(p) as z:
    t=tris(c.get(pn,path).lstrip('/'),c.get('objectid'));chunks.append(transform(t,c.get('transform')))
   return np.concatenate(chunks)
  items={i.get('objectid'):i for i in roots['3D/3dmodel.model'].findall('m:build/m:item',ns)}
- layout=json.loads((r/'orca-v1.0-layout.json').read_text());expected={}
+ layout=json.loads((r/'orca-v1.1-layout.json').read_text());expected={}
  for e in layout:expected[str(e['object_id'])]=e
  checks=[];bounds={}
  for obj in config.findall('object'):
@@ -55,15 +55,15 @@ with zipfile.ZipFile(p) as z:
   t=transform(tris('3D/3dmodel.model',oid),item.get('transform'))
   ox,oy=[(0,0),(307.2,0),(0,-307.2)][e['plate']-1]
   t-=np.array([e['centre_xy'][0]+ox,e['centre_xy'][1]+oy,0])
-  original=np.fromfile(r/'print/full-enclosure-v1.0'/name,dtype=dt,offset=84)['v'].astype(float)
-  # Orca preserves triangle order in this project. Compare all vertex coordinates,
-  # allowing only serialization precision, not changed dimensions or orientation.
+  original=np.fromfile(r/'print/full-enclosure-v1.1'/name,dtype=dt,offset=84)['v'].astype(float)
+  # Orca preserves triangle order in this project. Compare all vertex coordinates.
+  # Allow only differences from serialization precision. Do not allow changes to dimensions or orientation.
   assert t.shape==original.shape,(name,t.shape,original.shape)
   vertex_error=float(np.max(np.abs(t-original)))
   assert vertex_error<.00005,(name,vertex_error)
   assert md(obj,'extruder')==str(e['extruder'])
   bounds[oid]=[t.reshape(-1,3).min(0)+[*e['centre_xy'],0],t.reshape(-1,3).max(0)+[*e['centre_xy'],0]]
-  checks.append({'name':name,'triangles':len(t),'max_vertex_error_mm':vertex_error,'source_sha256':hashlib.sha256((r/'print/full-enclosure-v1.0'/name).read_bytes()).hexdigest()})
+  checks.append({'name':name,'triangles':len(t),'max_vertex_error_mm':vertex_error,'source_sha256':hashlib.sha256((r/'print/full-enclosure-v1.1'/name).read_bytes()).hexdigest()})
  assert not expected
  plates=config.findall('plate');assert [len(a.findall('model_instance')) for a in plates]==[2,9,1]
  for plate in plates:
@@ -73,10 +73,10 @@ with zipfile.ZipFile(p) as z:
    for lo2,hi2 in bs[i+1:]:assert any(hi[:2]+5<lo2[:2]) or any(hi2[:2]+5<lo[:2])
  custom=E.fromstring(z.read('Metadata/custom_gcode_per_layer.xml'));layers=custom.findall('plate/layer')
  assert len(layers)==1 and float(layers[0].get('top_z'))==14.12
-pause_report=json.loads((r/'pause-v1.0-toolpath-validation.json').read_text())
+pause_report=json.loads((r/'pause-v1.1-toolpath-validation.json').read_text())
 assert pause_report['project_sha256']==hashlib.sha256(p.read_bytes()).hexdigest(), 'Run check_nut_pause.py on this slice first'
-report={'revision':'v1.0','printer':settings['printer_settings_id'],'bed':settings['curr_bed_type'],'plate_counts':[2,9,1],'slices':result,'inherited_profile_warnings':warnings,'geometry':checks,'embedded_gcode_matches_verified_files':True,'pause_validation':pause_report,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()}
-(r/'orca-v1.0-validation.json').write_text(json.dumps(report,indent=2)+'\n')
-# The verified slice remains in slice-dir; promote it explicitly after review.
+report={'revision':'v1.1','printer':settings['printer_settings_id'],'bed':settings['curr_bed_type'],'plate_counts':[2,9,1],'slices':result,'inherited_profile_warnings':warnings,'geometry':checks,'embedded_gcode_matches_verified_files':True,'pause_validation':pause_report,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()}
+(r/'orca-v1.1-validation.json').write_text(json.dumps(report,indent=2)+'\n')
+# The checked slice stays in slice-dir. Promote it explicitly after review.
 print('Verified',p)
 if warnings:print('Inherited profile warnings (also present in retained release):',warnings)

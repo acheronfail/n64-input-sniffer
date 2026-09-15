@@ -1,4 +1,4 @@
-"""Run in FreeCAD Python, or execute build.FCMacro. Units: mm."""
+"""Run in FreeCAD Python, or run build.FCMacro. Units: mm."""
 import sys,os,json,math,traceback
 from pathlib import Path
 import FreeCAD as A, Part, Mesh
@@ -26,7 +26,7 @@ def union(shapes):return shapes[0].multiFuse(shapes[1:]).removeSplitter() if len
 def clearance(s,c=None):
  c=P['connector_clearance'] if c is None else c;return union([s.translated(V(*v)) for v in [(0,0,0),(c,0,0),(-c,0,0),(0,c,0),(0,-c,0),(0,0,c),(0,0,-c)]])
 def bow(x):return x*x/P['curve_radius']
-# Smooth closed outline: two curved faces and rounded shoulders, identical topology for loft.
+# Smooth closed outline: two curved faces and rounded shoulders. The loft uses identical topology.
 def outline(w,front,rear,z):
  def v(x,y):return V(x,y,z)
  a=v(-w+8,front+3); b=v(w-8,front+3);c=v(w,front+11);e=v(w,rear-1);f=v(w-4,rear+bow(w-4));g=v(-w+4,rear+bow(w-4));h=v(-w,rear-1);i=v(-w,front+11)
@@ -34,8 +34,8 @@ def outline(w,front,rear,z):
  return Part.Wire(edges)
 w=P['half_width'];fr=P['front_y'];re=P['rear_y'];bz=P['bottom_z'];tz=P['top_z'];wall=P['wall']
 front_shift=fr+62.0
-# Board geometry stays in its proven local frame; rotate/relocate the whole
-# mount together so USB faces the console (+Y), between the centre ports.
+# Keep the board geometry in its tested local frame.
+# Rotate and move the whole mount so USB faces the console (+Y), between the center ports.
 def board_transform(shape):
  s=shape.copy()
  if P.get('pcb_console_side',0):
@@ -47,21 +47,22 @@ inner=Part.makeLoft([outline(w-wall,fr+wall,re-wall,bz+wall),outline(w-wall,fr+w
 feature('OuterContourLoft',outer);feature('InteriorLoft',inner)
 shell=outer.cut(inner)
 
-# Solid local collars capture each housing; enclosing halves retain their axial shoulders.
+# Solid local collars hold each housing. The enclosing halves retain their axial shoulders.
 male0=Part.Shape();male0.read(str(ROOT.parent/'n64-input-ControllerPortMale-housing.step'));male0.translate(V(120,0,0))
 female0=Part.Shape();female0.read(str(ROOT.parent/'n64-input-ControllerPortFemale.step'));female0.translate(V(-110,0,0))
 hardware=[];mating_hardware=[];cutters=[];collars=[]
-# Male spacing is independent of the proven female seats. Keep original Y depths.
+# Male spacing is independent of the tested female seats. Keep the original Y depths.
 for i,fx in enumerate(P['port_x']):
  x=P.get('male_port_x',P['port_x'])[i]
  y=P['nose_y']+bow(fx)
  m=male0.copy();m.translate(V(x,y,0));hardware.append(feature('MalePort'+str(i+1),m,refs,(.17,.18,.20)))
- # Measured external mating envelope: coaxial 16 mm circle clipped to 12 mm
- # height, flat side DOWN, opposite the housing flat. Contacts/internal cavities are intentionally omitted.
+ # Measured external mating envelope: coaxial 16 mm circle clipped to 12 mm height.
+ # The flat side faces DOWN, opposite the housing flat.
+ # The model excludes contacts and internal cavities.
  rad=P['male_mating_diameter']/2;length=P['male_mating_length']
  projection=Part.makeCylinder(rad,length,V(x,y,0),V(0,1,0))
- # Clip with the cylinder seam outside the kept arc, then rotate the valid
- # profile. Clipping through the seam can create an invalid trimmed face in OCC.
+ # Clip with the cylinder seam outside the kept arc. Then rotate the valid profile.
+ # A cut through the seam can create an invalid trimmed face in OCC.
  projection=projection.common(box(x-rad-1,y,-rad,2*rad+2,length,P['male_mating_height']))
  projection.rotate(V(x,y,0),V(0,1,0),180)
  assert projection.isValid() and len(projection.Solids)==1
@@ -70,7 +71,7 @@ for i,fx in enumerate(P['port_x']):
  f=female0.copy();f.translate(V(fx,P['front_y']+13,0));hardware.append(feature('FemalePort'+str(i+1),f,refs,(.29,.30,.32)))
  # 0.22 mm radial clearance on the supplied housing, including keyed profiles and flange.
  mc=clearance(m);cutters.extend([mc,clearance(f)])
- # Deepen only the inward tail saddle, leaving the console-facing mating seat fixed.
+ # Deepen only the inward tail saddle. Keep the console-facing mating seat fixed.
  tail_access=box(x-7,y-38,-5,14,5,10)
  tail_region=box(x-20,y-39,-30,40,9.5,30)
  tail_relief=mc.fuse(tail_access).translated(V(0,0,-P['male_tail_extra_depth'])).common(tail_region)
@@ -93,14 +94,21 @@ feature('CapturedConnectorSeats',shell)
 # Six M2 through screws with print-in captive nuts, accessible underneath.
 # Keep all six nut bosses outside the keepers' vertical service pockets.
 screws=P['closure_screw_xy']
-bosses=[];holes=[]
+bosses=[];holes=[];side_bosses=[]
 for x,y in screws:
- bosses.append(Part.makeCylinder(P['closure_boss_radius'],29.6,V(x,y,-13.6)))
+ side=abs(x)>P['half_width']/2
+ radius=P['side_closure_boss_radius'] if side else P['closure_boss_radius']
+ boss=Part.makeCylinder(radius,tz-bz,V(x,y,bz)).common(outer)
+ bosses.append(boss)
+ if side:side_bosses.append(boss)
  holes.append(Part.makeCylinder(1.1,27,V(x,y,-13.7)))
 for n,b in enumerate(bosses):
- b=b.common(outer)
+ # Keep every boss inside the existing curved and beveled exterior.
  shell=shell.fuse(b)
 for h in holes:shell=shell.cut(h)
+side_boss_envelope=union(side_bosses)
+# Full-height clearance leaves the outer keepers free to lift past the bosses.
+side_keeper_relief=clearance(side_boss_envelope)
 
 
 # Console-light passage removed: the top window exposes the ESP32 LED.
@@ -111,14 +119,14 @@ assert 0<ur<min(uw,uh)/2
 usb=union([box(-uw/2+ur,fr-6,uz-uh/2,uw-2*ur,12,uh),box(-uw/2,fr-6,uz-uh/2+ur,uw,12,uh-2*ur)]+[Part.makeCylinder(ur,12,V(x,fr-6,z),V(0,1,0)) for x in [-uw/2+ur,uw/2-ur] for z in [uz-uh/2+ur,uz+uh/2-ur]])
 usb=board_transform(usb)
 shell=shell.cut(usb)
-# v0.14: contour keepers attach to the lower shell; no housing screws or pads.
+# v0.14: contour keepers attach to the lower shell. No housing screws or pads.
 retainer_parts=[]
-# Broad replaceable translucent window accommodates LED placement variations.
+# A broad replaceable translucent window allows for different LED positions.
 window_shift=P['led_window_inward_shift']
 window=box(-7.5,fr+6.5+window_shift,12.8,15,15,10)
 ledge=box(-9,fr+5+window_shift,13.8,18,18,10)
 shell=shell.cut(board_transform(window.fuse(ledge)))
-# A 45-degree underside supports the LED recess, retaining a 0.6 mm flat land.
+# A 45-degree underside supports the LED recess and keeps a 0.6 mm flat land.
 def window_wire(size,z):
  h=size/2;cy=fr+14+window_shift
  pts=[V(-h,cy-h,z),V(h,cy-h,z),V(h,cy+h,z),V(-h,cy+h,z)]
@@ -130,7 +138,7 @@ shell=shell.fuse(window_ring).cut(window_taper).removeSplitter()
 feature('LEDWindowSupportTaper',window_ring)
 base=shell.common(box(-150,-100,-30,300,150,30))
 lid=shell.common(box(-150,-100,P['seam_gap'],300,150,40))
-# Route the local seam through the USB centre for either board height.
+# Route the local seam through the USB center for either board height.
 tab_w=P['usb_seam_tab_width'];tab_y=P['usb_seam_inner_y'];gap=P['seam_gap']
 tab_start=fr-8
 if uz < 0:
@@ -144,25 +152,27 @@ else:
 feature('USBSeamTongue',tongue)
 
 print('Building independent port keepers',flush=True)
-# Male housings are positively captured between their rear shoulder and the
-# front lip surrounding the smaller mating projection. Each upper keeper is
-# independent of the lid; only its two screws go into the printed lower posts.
+# Each male housing stays between its rear shoulder and the front lip around the smaller mating projection.
+# Each upper keeper is independent of the lid.
+# Only its two screws enter the printed lower posts.
 for i,x in enumerate(P.get('male_port_x',P['port_x'])):
  print('Male keeper',i+1,flush=True)
  y=P['nose_y']+bow(P['port_x'][i]);sy=y-37.5
  kt=P['male_keeper_top'];kz=kt-P['male_keeper_thickness']
  retainer=shell.common(box(x-13.3,y-31.5,P['connector_clearance'],26.6,34.5,kt-P['connector_clearance']))
- back=box(x-9.6,sy-2.6,kz,19.2,9.6,kt-kz)
+ # Wider posts leave the female terminal corridor clear in the shortened case.
+ screw_offset=P['male_keeper_screw_offset']
+ back=box(x-screw_offset-2.6,sy-2.6,kz,2*(screw_offset+2.6),9.6,kt-kz)
  retainer=retainer.fuse(back)
- # Extra clearance only around the curved front housing lip. The lower
- # seat stays snug; retain the axial capture band and at least 1.1 mm roof.
+ # Add clearance only around the curved front housing lip. Keep the lower seat snug.
+ # Retain the axial capture band and at least 1.1 mm of roof.
  lip_region=box(x-15,y-12,-1,30,13,16)
  lip_relief=clearance(hardware[2*i].Shape,P['male_keeper_lip_clearance']).common(lip_region)
  retainer=retainer.cut(lip_relief)
  # Open the flat upper housing area while keeping front/rear capture bands.
  retainer=retainer.cut(box(x-8,y-27.2,6.8,16,15.2,10))
  posts=[]
- for sx in [x-7,x+7]:
+ for sx in [x-screw_offset,x+screw_offset]:
   post=box(sx-2.6,sy-3.5,bz+wall,5.2,7.5,kz-(bz+wall))
   post=post.cut(Part.makeCylinder(P['male_keeper_pilot']/2,8,V(sx,sy,kz-8)))
   posts.append(post)
@@ -170,6 +180,7 @@ for i,x in enumerate(P.get('male_port_x',P['port_x'])):
   retainer=retainer.cut(countersink(sx,sy,kt,4.2,2.2,-1))
   screw=Part.makeCylinder(1,7,V(sx,sy,kt-8)).fuse(Part.makeCone(1,2,1,V(sx,sy,kt-1)))
   feature('MaleKeeperScrew'+str(i+1)+('L' if sx<x else 'R'),screw,refs,(.7,.72,.75))
+ retainer=retainer.cut(side_keeper_relief)
  supports=union(posts)
  feature('MaleKeeperPosts'+str(i+1),supports)
  base=base.fuse(supports)
@@ -180,21 +191,22 @@ for i,x in enumerate(P.get('male_port_x',P['port_x'])):
  obj=feature('MalePortKeeper'+str(i+1),retainer.removeSplitter(),parts,(.32,.53,.78))
  retainer_parts.append(obj)
 
-# Independent female keepers capture the existing flange from above, with two
-# top-accessible countersunk screws into lower-shell posts behind each connector.
+# Independent female keepers hold the existing flange from above.
+# Two countersunk screws enter lower-shell posts behind each connector from the top.
 # Print these upside down on their broad, flat top faces.
 female_supports=[]
 for i,x in enumerate(P['port_x']):
  print('Female keeper',i+1,flush=True)
  f=hardware[2*i+1].Shape
  kz=P['female_keeper_top']-P['female_keeper_thickness'];kt=P['female_keeper_top']
- sy=fr+22
+ # Shorten the bridge toward its connector to clear the opposing male keeper.
+ sy=fr+P['female_keeper_screw_y_offset']
  ring=box(x-12.8,fr+12,P['connector_clearance'],25.6,4.5,kt-P['connector_clearance'])
- back=box(x-12.8,fr+15.5,kz,25.6,9.1,kt-kz)
+ back=box(x-12.8,fr+15.5,kz,25.6,P['female_keeper_screw_y_offset']+2.6-15.5,kt-kz)
  retainer=ring.fuse(back).cut(clearance(f))
  posts=[]
  for sx in [x-P['female_keeper_screw_offset'],x+P['female_keeper_screw_offset']]:
-  post=box(sx-2.6,fr+18.5,bz+wall,5.2,7.5,kz-(bz+wall))
+  post=box(sx-2.6,sy-3.5,bz+wall,5.2,7.5,kz-(bz+wall))
   pilot=Part.makeCylinder(P['female_keeper_pilot']/2,8,V(sx,sy,kz-8))
   posts.append(post.cut(pilot))
   retainer=retainer.cut(Part.makeCylinder(1.1,4,V(sx,sy,kz-.5)))
@@ -206,27 +218,27 @@ for i,x in enumerate(P['port_x']):
  supports=union(posts)
  female_supports.append(feature('FemaleKeeperPosts'+str(i+1),supports))
  base=base.fuse(supports)
- # Remove the keeper's complete removal path from the lid, without cutting the
- # exterior roof: nominal roof underside is 13.6, keeper top is 12.8 mm.
+ # Remove lid material along the keeper's full removal path. Keep the exterior roof intact.
+ # The nominal roof underside is 13.6 mm. The keeper top is 12.8 mm.
  lid=lid.cut(clearance(retainer)).cut(clearance(supports))
  retainer=retainer.removeSplitter()
  obj=feature('FemalePortKeeper'+str(i+1),retainer,parts,(.2,.6,.62))
  retainer_parts.append(obj)
 
-# Raised rigid pedestal: continuous perimeter walls and screw pillars support the proven keeper.
+# Raised rigid pedestal: continuous perimeter walls and screw pillars support the tested keeper.
 floorz=bz+wall;rail_top=pcbz-1.8
 support=[]
-# Low perimeter foundation connects the four seats while leaving the underside open.
+# A low perimeter foundation connects the four seats and leaves the underside open.
 for x in [-11.5,9.1]:support.append(box(x,usby-.8,floorz,2.4,L+1.6,rail_top-floorz))
 support.append(box(-11.5,usby-.8,floorz,23,2.4,rail_top-floorz))
 # Extend the low foundation to stay joined to the moved rear stop.
 support.append(box(-11.5,usby+L-1.6,floorz,23,2.4+P['pcb_rear_stop_setback'],rail_top-floorz))
 for x in [-8.8,6.4]:
  for y in [usby+.3,usby+L-2.7]:support.append(box(x,y,floorz,2.4,2.4,pcbz-floorz))
-# Guides touch only the end corners, leaving the long solder-pad rows accessible.
+# Guides touch only the end corners. The long solder-pad rows stay accessible.
 for x in [-11.5,W/2+P['pcb_clearance']]:
  for y in [usby+.3,usby+L-2.7]:support.append(box(x,y,floorz,2.3,2.4,pcbz+.8-floorz))
-# End stops flank USB and resist cable insertion/removal.
+# End stops sit beside USB and resist cable insertion and removal.
 for x in [-8.8,6.4]:support.append(box(x,usby-1.6,floorz,2.4,1.6,pcbz+1-floorz))
 support.append(box(-8.8,usby+L+P['pcb_clearance']+P['pcb_rear_stop_setback'],floorz,17.6,P['pcb_rear_stop_thickness'],pcbz+1-floorz))
 keeperz=pcbz+P['pcb_thickness']+P['keeper_gap'];kh=P['keeper_thickness'];cy=usby+L/2
@@ -236,7 +248,7 @@ for x in [-13,13]:cradle=cradle.cut(Part.makeCylinder(.8,keeperz-floorz,V(x,cy,f
 cradle=board_transform(cradle)
 feature("BoardCradle",cradle)
 base=base.fuse(cradle).removeSplitter()
-# Open keeper frame: corner fingers retain the PCB; the centre and USB remain clear.
+# Open keeper frame: corner fingers retain the printed circuit board (PCB). The center and USB remain clear.
 keep=[]
 for x in [-11.5,9.3]:keep.append(box(x,usby+.2,keeperz,2.2,L+1.2,kh))
 for y in [usby+L-.1]:keep.append(box(-11.5,y,keeperz,23,1.5,kh))
@@ -264,33 +276,34 @@ for x,y in [(-79,fr+13),(79,fr+13)]:
  base=base.fuse(Part.makeCylinder(1.1,2.8,V(x,y,-.1)))
  lid=lid.fuse(pad.common(box(-150,-100,P['seam_gap'],300,150,30)))
  lid=lid.cut(Part.makeCylinder(1.3,3,V(x,y,0)))
-# M2 closure clearance holes and flat-head seats; fully enclosed M2 pockets in lid.
+# M2 closure clearance holes and flat-head seats. Fully enclosed M2 pockets in the lid.
 for x,y in screws:
  base=base.cut(Part.makeCylinder(1.1,19,V(x,y,-17)))
  base=base.cut(countersink(x,y,bz,P['closure_head_diameter'],2.2,1))
- # Enclosed nut pockets: pause before their roof is printed in the roof-down lid.
+ # Enclosed nut pockets: pause before the printer adds their roof in the roof-down lid.
  af=P['closure_nut_af'];nz=P['closure_nut_pocket_z'];nh=P['closure_nut_pocket_height'];nr=af/math.sqrt(3)
  along_y=abs(x)==79
  angle=math.pi/2 if along_y else 0
  pts=[V(x+nr*math.cos(angle+k*math.pi/3),y+nr*math.sin(angle+k*math.pi/3),nz) for k in range(6)]
  pocket=Part.Face(Part.makePolygon(pts+[pts[0]])).extrude(V(0,0,nh))
  lid=lid.cut(pocket)
-# Alignment pads are added after the keepers; relieve those too.
+# The build adds alignment pads after the keepers. Relieve those too.
 for obj in retainer_parts:
  b=obj.Shape.BoundBox;c=P['connector_clearance']
- # Full vertical pocket prevents lid material catching under keeper bridges.
+ # A full vertical pocket prevents lid material from catching under keeper bridges.
  pocket=box(b.XMin-c,b.YMin-c,P['seam_gap'],b.XLength+2*c,b.YLength+2*c,b.ZMax+c-P['seam_gap'])
- lid=lid.cut(pocket)
+ # The notched keepers lift around the side bosses. Retain those nut walls.
+ lid=lid.cut(pocket.cut(side_boss_envelope))
 base=base.removeSplitter();lid=lid.removeSplitter()
 bo=feature('LowerShell',base,parts);bo.Label='Lower shell · extended housing seats · independent keeper posts'
 lo=feature('UpperShell',lid,parts);lo.Label='Upper shell · independent connector retention · no clamp hardware'
-# Separate translucent insert, pressed into upper recess with a little adhesive if required.
+# Separate translucent insert. Push it into the upper recess with a little adhesive if required.
 wi=feature('LightWindow',board_transform(box(-8.8,fr+5.2+window_shift,13.95,17.6,17.6,1.7)),parts,(.65,.9,.83));wi.Label='Optional translucent LED window'
 if A.GuiUp:wi.ViewObject.Transparency=65
 pcb=feature('ESP32BoardEnvelope',board_transform(box(-W/2,usby,pcbz,W,L,P['pcb_thickness'])),refs,(.12,.40,.32))
 feature('ESP32ComponentKeepout',board_transform(box(-6.5,usby+7,pcbz+1.6,13,12,3)),refs,(.55,.56,.59))
 usb_ref=feature('USBCEnvelope',board_transform(box(-4.6,usby-1.7,pcbz+1.6,9.2,7.4,3.2)),refs,(.72,.73,.76))
-# Fit coupons isolate uncertain purchased-part dimensions before printing a full case.
+# Fit coupons check uncertain dimensions of purchased parts before a full case print.
 gauge=base.common(box(-90,-26,-17,180,24,20))
 gauge=gauge.fuse(box(-80,-22,-16,160,4,2.4)).removeSplitter()
 go=feature('RearAlignmentGauge',gauge,hist);go.Label='PRINT FIRST · Four-plug lower alignment gauge'
@@ -322,10 +335,10 @@ for o in [bo,lo,wi,ko,go,gt,bc,fc]:
 for prefix in ['FemalePortKeeper']:
  Mesh.Mesh(D.getObject(prefix+'1').Shape.tessellate(.08)).write(str(ROOT/(prefix+'.stl')))
 for obj in retainer_parts:Mesh.Mesh(obj.Shape.tessellate(.08)).write(str(ROOT/(obj.Name+'.stl')))
-Part.export([bo,lo,wi,ko]+retainer_parts,str(ROOT/'Enclosure.step'))
+Part.export([bo,lo,wi,ko]+retainer_parts,str(ROOT/'Enclosure-v1.1.step'))
 Mesh.Mesh(union([hardware[2*i].Shape.fuse(mating_hardware[i].Shape) for i in range(4)]).tessellate(.05)).write(str(ROOT/'MaleConnectorAssembly.stl'))
-# Reuse the embedded display overlay from the tested release. It is optional
-# and is not a collision certificate for changed geometry or connector spacing.
+# Reuse the embedded display overlay from the tested release. This overlay is optional.
+# It does not certify clearance after changes to geometry or connector spacing.
 reference=A.openDocument(str(ROOT/'Enclosure-v1.0.FCStd'))
 for name in ['ConsoleTop','ConsoleBottom']:
  source=reference.getObject(name)
@@ -339,13 +352,13 @@ D.recompute()
 if A.GuiUp:
  import FreeCADGui as G
  G.activeDocument().activeView().viewAxonometric();G.activeDocument().activeView().fitAll()
-# Update the source connector STEP with the measured mating projection. Preserve
-# the original housing-only STEP separately so the model origin never drifts.
+# Update the source connector STEP with the measured mating projection.
+# Keep the original housing-only STEP separately so the model origin does not move.
 full=hardware[0].Shape.fuse(mating_hardware[0].Shape).removeSplitter()
 full.translate(V(-120-P.get('male_port_x',P['port_x'])[0],-(P['nose_y']+bow(P['port_x'][0])),0))
 assert full.isValid() and len(full.Solids)==1
 full.exportStep(str(ROOT/'ControllerPortMale.step'))
 
-D.recompute();D.saveAs(str(ROOT/'Enclosure.FCStd'))
+D.recompute();D.saveAs(str(ROOT/'Enclosure-v1.1.FCStd'))
 
 print(json.dumps(report,indent=2))

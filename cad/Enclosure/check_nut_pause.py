@@ -1,17 +1,17 @@
-"""Verify the exact pause order and cap extrusion at all six M2 pockets."""
+"""Check the exact pause order and cap extrusion at all six M2 pockets."""
 from pathlib import Path
 import argparse
 parser=argparse.ArgumentParser(description=__doc__)
-parser.add_argument("--slice-dir", type=Path, default=Path(__file__).resolve().parent/"slice")
+parser.add_argument("--slice-dir", type=Path, default=Path(__file__).resolve().parent/"slice"/"v1.1")
 args=parser.parse_args()
 import json,re,math,zipfile,hashlib,numpy as np
 r=Path(__file__).resolve().parent;folder=args.slice_dir.resolve()
-project=folder/'Enclosure-full-enclosure-v1.0-Orca-complete.3mf'
+project=folder/'Enclosure-full-enclosure-v1.1-Orca-complete.3mf'
 with zipfile.ZipFile(project) as archive:settings=json.loads(archive.read('Metadata/project_settings.config'))
 dt=np.dtype([('n','<f4',3),('v','<f4',(3,3)),('a','<u2')])
 vertices=np.fromfile(r/'UpperShell.stl',dtype=dt,offset=84)['v'].reshape(-1,3)
 ox,oy=map(float,settings['extruder_offset'][0].split('x'))
-# Upper shell is roof-down, bed-centred in XY and placed at (128,165).
+# The upper shell is roof-down, centered on the bed in XY and placed at (128,165).
 yoff=165+(float(vertices[:,1].min())+float(vertices[:,1].max()))/2-oy
 centres={f'M2_{i+1}':(128+x-ox,yoff-y) for i,(x,y) in enumerate(json.loads((r/'parameters.json').read_text())['closure_screw_xy'])}
 hits={name:[] for name in centres};pauses=[];x=y=0.;height=None;layer=None
@@ -36,5 +36,5 @@ for name,events in hits.items():
  assert events,(name,'missing cap extrusion')
  assert all(e['height']==14.12 and e['line']>pauses[0]['line'] for e in events),(name,events)
 for i in [2,3]:assert not any(l.strip()=='M400 U1' for l in (folder/f'plate_{i}.gcode').read_text().splitlines())
-result={'revision':'v1.0','project_sha256':hashlib.sha256(project.read_bytes()).hexdigest(),'pauses':pauses,'all_six_caps_begin_after_pause':True,'other_plates_have_no_pause':True,'pockets':{name:{'centre_xy_mm':centres[name],'first_cap_extrusion':events[0],'cap_segments':len(events)} for name,events in hits.items()}}
-(r/'pause-v1.0-toolpath-validation.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result,indent=2))
+result={'revision':'v1.1','project_sha256':hashlib.sha256(project.read_bytes()).hexdigest(),'pauses':pauses,'all_six_caps_begin_after_pause':True,'other_plates_have_no_pause':True,'pockets':{name:{'centre_xy_mm':centres[name],'first_cap_extrusion':events[0],'cap_segments':len(events)} for name,events in hits.items()}}
+(r/'pause-v1.1-toolpath-validation.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result,indent=2))

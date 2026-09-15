@@ -6,7 +6,7 @@
     63.7
   ],
   "rear_y": 9.0,
-  "front_y": -72.0,
+  "front_y": -60.2,
   "half_width": 84.0,
   "bottom_z": -16.0,
   "top_z": 16.0,
@@ -18,7 +18,7 @@
   "pcb_length": 22.52,
   "pcb_thickness": 1.6,
   "pcb_z": 7.0,
-  "pcb_front_y": -69.0,
+  "pcb_front_y": -57.2,
   "pcb_clearance": 0.2,
   "keeper_gap": 0.15,
   "keeper_thickness": 1.8,
@@ -27,7 +27,7 @@
   "usb_opening_height": 4.0,
   "usb_corner_radius": 0.7,
   "usb_seam_tab_width": 28.0,
-  "usb_seam_inner_y": -68.9,
+  "usb_seam_inner_y": -57.1,
   "keeper_head_diameter": 4.2,
   "closure_head_diameter": 4.2,
   "countersink_angle_deg": 90.0,
@@ -59,31 +59,36 @@
   "closure_screw_xy": [
     [
       -18,
-      -60
+      -48.2
     ],
     [
       18,
-      -60
+      -48.2
     ],
     [
       -18,
-      -19
+      3
     ],
     [
       18,
-      -19
+      3
     ],
     [
-      -78,
-      -38.5
+      -79.5,
+      2
     ],
     [
-      78,
-      -38.5
+      79.5,
+      2
     ]
   ],
   "closure_boss_radius": 4.3,
   "female_keeper_screw_offset": 9.0,
   "male_keeper_lip_clearance": 0.7,
-  "led_window_inward_shift": 6.0
+  "led_window_inward_shift": 2.0,
+  "minimum_wire_gap": 18.1,
+  "male_keeper_screw_offset": 9.35,
+  "female_keeper_screw_y_offset": 21.0,
+  "minimum_keeper_tower_gap": 2.0,
+  "side_closure_boss_radius": 4.2
 }

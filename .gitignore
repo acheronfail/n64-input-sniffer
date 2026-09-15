@@ -18,6 +18,7 @@
 # Regenerable CAD working files; versioned release models remain tracked.
 /cad/Enclosure/Enclosure.FCStd
 /cad/Enclosure/Enclosure.step
+/cad/Enclosure/Enclosure-v*.step
 /cad/Enclosure/ControllerPortMale.step
 /cad/Enclosure/*.stl
 /cad/Enclosure/print/
