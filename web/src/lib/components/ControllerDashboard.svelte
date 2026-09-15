@@ -6,8 +6,10 @@
 		parseVisibility,
 		SETTINGS_KEY,
 		MINIMAL_KEY,
+		MINIMAL_CONNECTION_KEY,
 		BACKGROUND_KEY,
-		DEFAULT_BACKGROUND
+		DEFAULT_BACKGROUND,
+		DEFAULT_BACKGROUND_COLOR
 	} from '../settings';
 	import N64Controller from './N64Controller.svelte';
 	let {
@@ -31,7 +33,12 @@
 	let storageMessage = $state('');
 	const inputId = $props.id();
 	let background = $state(untrack(() => initialBackground));
-	let backgroundInput = $state(untrack(() => initialBackground));
+	let backgroundColor = $state(
+		untrack(() =>
+			initialBackground === 'transparent' ? DEFAULT_BACKGROUND_COLOR : initialBackground
+		)
+	);
+	let backgroundInput = $state(untrack(() => backgroundColor));
 	let backgroundError = $state(false);
 	function validColor(value: unknown): value is string {
 		return (
@@ -43,13 +50,20 @@
 	}
 	function setBackground(value: string) {
 		backgroundInput = value;
-		backgroundError = !validColor(value);
+		backgroundError = !validColor(value) || value.trim().toLowerCase() === 'transparent';
 		if (!backgroundError) {
-			background = value.trim();
+			backgroundColor = background = value.trim();
 			save(BACKGROUND_KEY, background);
 		}
 	}
+	function setTransparent(value: boolean) {
+		background = value ? 'transparent' : backgroundColor;
+		backgroundInput = backgroundColor;
+		backgroundError = false;
+		save(BACKGROUND_KEY, background);
+	}
 	let minimal = $state(untrack(() => initialMinimal));
+	let showMinimalConnection = $state(true);
 	let exitButton = $state<HTMLButtonElement>();
 	let settingsSummary = $state<HTMLElement>();
 	// Initialize from props. Keep the user's selection independent of incoming frames.
@@ -59,11 +73,15 @@
 			try {
 				visible = parseVisibility(localStorage.getItem(SETTINGS_KEY));
 				minimal = localStorage.getItem(MINIMAL_KEY) === 'true';
+				showMinimalConnection = localStorage.getItem(MINIMAL_CONNECTION_KEY) !== 'false';
 				const savedBackground = localStorage.getItem(BACKGROUND_KEY);
 				// A malformed color preference must not prevent the other settings from loading.
 				try {
 					const value: unknown = savedBackground === null ? null : JSON.parse(savedBackground);
-					if (validColor(value)) background = backgroundInput = value;
+					if (validColor(value)) {
+						background = value.trim().toLowerCase() === 'transparent' ? 'transparent' : value;
+						if (background !== 'transparent') backgroundColor = backgroundInput = background;
+					}
 				} catch {
 					/* Use the default background. */
 				}
@@ -161,14 +179,42 @@
 							onclick={() => select([0])}>Only 1</button
 						>
 					</div>
-					<label class="minimal-option"
-						><input
-							type="checkbox"
-							checked={minimal}
-							onchange={(event) => setMinimal(event.currentTarget.checked)}
-						/> Minimal interface</label
+					<button class="minimal-option" onclick={() => setMinimal(true)}
+						>Enter minimal interface</button
 					>
 					<p>Controllers only. Use the corner button or Esc to exit.</p>
+					<label class="indicator-option">
+						<input
+							type="checkbox"
+							checked={showMinimalConnection}
+							onchange={(event) => {
+								showMinimalConnection = event.currentTarget.checked;
+								save(MINIMAL_CONNECTION_KEY, showMinimalConnection);
+							}}
+						/>
+						Show connection dot in minimal mode
+					</label>
+					<fieldset class="background-options">
+						<legend>Background</legend>
+						<div class="choices">
+							<label
+								><input
+									type="radio"
+									name={`${inputId}-background-mode`}
+									checked={background === 'transparent'}
+									onchange={() => setTransparent(true)}
+								/> Transparent</label
+							>
+							<label
+								><input
+									type="radio"
+									name={`${inputId}-background-mode`}
+									checked={background !== 'transparent'}
+									onchange={() => setTransparent(false)}
+								/> Color</label
+							>
+						</div>
+					</fieldset>
 					<label class="background-label" for={`${inputId}-background`}
 						>Background color (CSS)</label
 					>
@@ -176,6 +222,7 @@
 						<input
 							id={`${inputId}-background`}
 							type="text"
+							disabled={background === 'transparent'}
 							value={backgroundInput}
 							oninput={(event) => setBackground(event.currentTarget.value)}
 							spellcheck="false"
@@ -183,19 +230,30 @@
 							aria-invalid={backgroundError}
 							aria-describedby={`${inputId}-background-help`}
 						/>
-						<button onclick={() => setBackground(DEFAULT_BACKGROUND)}>Reset</button>
+						<button onclick={() => setTransparent(true)}>Reset</button>
 					</div>
 					<p id={`${inputId}-background-help`} class:color-error={backgroundError} role="status">
 						{backgroundError
-							? 'Enter a valid CSS color. The last valid color is still applied.'
-							: 'Use a CSS color, e.g. #00ff00, rgb(0 255 0), or transparent.'}
+							? 'Enter a CSS color or select Transparent. The last valid color still applies.'
+							: 'Use Transparent for OBS, or select Color for a chroma key background.'}
 					</p>
 					<p>{persistSettings ? 'Saved in this browser.' : 'Demo settings — not saved.'}</p>
 					{#if storageMessage}<p role="status">{storageMessage}</p>{/if}
 				</div>
 			</details>
 		</header>
-		<div class="connection" class:connected><span class="status-dot"></span>{connection}</div>
+		{#if !minimal || showMinimalConnection}
+			<div
+				class="connection"
+				class:connected
+				role="status"
+				aria-label={connection}
+				title={connection}
+			>
+				<span class="status-dot" aria-hidden="true"></span>
+				{#if !minimal}{connection}{/if}
+			</div>
+		{/if}
 		<section class="controllers" aria-label="Controller inputs">
 			{#each ALL_CONTROLLERS.filter((index) => visible.includes(index)) as index (index)}
 				{@const controller = controllers[index] ?? emptyState()}
@@ -227,6 +285,15 @@
 		display: block;
 		margin-top: 16px;
 		margin-bottom: 7px;
+	}
+	.background-options {
+		margin-top: 16px;
+	}
+	.background-options legend {
+		margin-bottom: 0;
+	}
+	.background-input input:disabled {
+		opacity: 0.5;
 	}
 	.background-input {
 		display: flex;
@@ -461,14 +528,20 @@
 		}
 	}
 	.minimal-option {
+		display: block;
+		margin-top: 16px;
+	}
+	.indicator-option {
 		display: flex;
 		align-items: center;
 		gap: 7px;
-		margin-top: 16px;
+		margin-top: 12px;
 		cursor: pointer;
 	}
+	.indicator-option input {
+		flex-shrink: 0;
+	}
 	.minimal header,
-	.minimal .connection,
 	.minimal .card-heading,
 	.minimal footer,
 	.minimal .empty {
@@ -482,6 +555,14 @@
 	}
 	.minimal {
 		padding: 8px;
+	}
+	.minimal .connection {
+		position: fixed;
+		top: 12px;
+		left: 12px;
+		z-index: 3;
+		margin: 0;
+		gap: 0;
 	}
 	.exit-minimal {
 		position: fixed;

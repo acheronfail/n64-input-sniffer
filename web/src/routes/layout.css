@@ -1,5 +1,5 @@
 :root {
-	color-scheme: dark;
+	color-scheme: normal;
 	font-family:
 		system-ui,
 		-apple-system,
@@ -14,6 +14,8 @@
 	box-sizing: border-box;
 }
 body {
+	background-color: #101720;
+	color-scheme: dark;
 	margin: 0;
 	min-width: 180px;
 }

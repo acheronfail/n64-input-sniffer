@@ -105,8 +105,11 @@ Storybook is for development only. The firmware HTML bundle does not include it.
 
 ## Minimal interface
 
-Enable **Minimal interface** in Settings for a view that shows only controllers.
-This view hides the page header, connection status, card headings, borders, and analog readout footers.
+Select **Enter minimal interface** in Settings for a view that shows only controllers.
+This view hides the page header, connection text, card headings, borders, and analog readout footers.
+A small dot at the top left shows the connection state: green when connected, tan when connecting or disconnected.
+Use **Show connection dot in minimal mode** in Settings to show or hide the dot.
+The checkbox defaults to checked, and the browser saves your choice.
 The browser saves this preference separately from controller visibility.
 
 A small button in the top-right corner restores the full interface.
@@ -114,13 +117,20 @@ A small button in the top-right corner restores the full interface.
 The button supports keyboard access and stays available even when you select no controllers.
 Storybook includes minimal, narrow OBS, empty, and toggle demos.
 
-## Background color
+## Background
 
-Settings includes a **Background color (CSS)** input with a live preview.
-The browser saves the color.
-Enter a hex value, named color, `rgb(...)`, `hsl(...)`, or `transparent`.
+The background defaults to **Transparent**, including when you select **Enter minimal interface**.
+Use this option for an OBS overlay.
+The page body has a dark background for regular browsers.
+The default OBS custom CSS overrides this background with transparency.
+Select **Color** to use a chroma key background instead.
+These options are mutually exclusive.
+
+The **Background color (CSS)** input is available only when you select **Color**.
+Enter a hex value, named color, `rgb(...)`, or `hsl(...)`.
 Invalid input leaves the last valid background in place.
-Reset restores the default dark background.
+**Reset** selects **Transparent**.
+The browser saves the selected background and restores existing saved colors.
 
-The color covers the full viewport.
-Use minimal mode to remove card backgrounds for a uniform OBS chroma-key background.
+The background covers the full viewport.
+Use minimal mode to remove card backgrounds and show only the controllers.

@@ -49,6 +49,9 @@ export const VisibilitySettings: Story = {
 };
 
 export const Minimal: Story = { args: { initialMinimal: true } };
+export const MinimalDisconnected: Story = {
+	args: { initialMinimal: true, connected: false, connection: 'disconnected (1006) — retrying…' }
+};
 export const MinimalOBS: Story = {
 	args: { initialMinimal: true },
 	globals: { viewport: { value: 'obs', isRotated: false } }
@@ -58,14 +61,17 @@ export const MinimalToggle: Story = {
 	play: async ({ canvasElement }) => {
 		const canvas = within(canvasElement);
 		await userEvent.click(canvas.getByText('Settings'));
-		await userEvent.click(canvas.getByRole('checkbox', { name: 'Minimal interface' }));
+		await userEvent.click(canvas.getByRole('button', { name: 'Enter minimal interface' }));
+		await expect(canvasElement.querySelector('.surface')).toHaveStyle({
+			backgroundColor: 'rgba(0, 0, 0, 0)'
+		});
 		await expect(canvas.queryByRole('heading', { name: 'N64 SPY' })).toBeNull();
 		await expect(canvas.getAllByRole('article')).toHaveLength(4);
 		const exit = canvas.getByRole('button', { name: 'Exit minimal mode' });
 		await expect(exit).toHaveFocus();
 		await userEvent.click(exit);
 		await expect(canvas.getByRole('heading', { name: 'N64 SPY' })).toBeVisible();
-		await userEvent.click(canvas.getByRole('checkbox', { name: 'Minimal interface' }));
+		await userEvent.click(canvas.getByRole('button', { name: 'Enter minimal interface' }));
 		await userEvent.keyboard('{Escape}');
 		await expect(canvas.getByRole('heading', { name: 'N64 SPY' })).toBeVisible();
 	}
@@ -83,6 +89,15 @@ export const BackgroundSettings: Story = {
 		const canvas = within(canvasElement);
 		await userEvent.click(canvas.getByText('Settings'));
 		const input = canvas.getByRole('textbox', { name: 'Background color (CSS)' });
+		const transparent = canvas.getByRole('radio', { name: 'Transparent' });
+		const color = canvas.getByRole('radio', { name: 'Color' });
+		await expect(transparent).toBeChecked();
+		await expect(color).not.toBeChecked();
+		await expect(input).toBeDisabled();
+		await userEvent.click(color);
+		await expect(transparent).not.toBeChecked();
+		await expect(color).toBeChecked();
+		await expect(input).toBeEnabled();
 		await userEvent.clear(input);
 		await userEvent.type(input, '#00ff00');
 		await expect(input).toHaveAttribute('aria-invalid', 'false');
@@ -97,10 +112,24 @@ export const BackgroundSettings: Story = {
 		});
 		await userEvent.clear(input);
 		await userEvent.type(input, 'transparent');
+		await expect(input).toHaveAttribute('aria-invalid', 'true');
+		await userEvent.click(transparent);
+		await expect(input).toBeDisabled();
+		await expect(input).toHaveAttribute('aria-invalid', 'false');
 		await expect(canvasElement.querySelector('.surface')).toHaveStyle({
 			backgroundColor: 'rgba(0, 0, 0, 0)'
 		});
+		await userEvent.click(color);
+		await expect(input).toHaveValue('#00ff00');
+		await expect(canvasElement.querySelector('.surface')).toHaveStyle({
+			backgroundColor: '#00ff00'
+		});
 		await userEvent.click(canvas.getByRole('button', { name: 'Reset' }));
-		await expect(input).toHaveValue('#101720');
+		await expect(transparent).toBeChecked();
+		await expect(color).not.toBeChecked();
+		await expect(input).toBeDisabled();
+		await expect(canvasElement.querySelector('.surface')).toHaveStyle({
+			backgroundColor: 'rgba(0, 0, 0, 0)'
+		});
 	}
 };
