@@ -20,3 +20,11 @@ export const StickTopRight: Story = {
 export const StickBottomLeft: Story = {
 	args: { controller: decodeFrame(new Uint8Array([0, 0, 0, 128, 128]))! }
 };
+export const Enlarged: Story = { args: { theme: 'enlarged' } };
+export const EnlargedPressed: Story = {
+	args: { theme: 'enlarged', controller: decodeFrame(new Uint8Array([0, 255, 63, 0, 0]))! }
+};
+export const ButtonsOnly: Story = { args: { theme: 'buttons-only' } };
+export const ButtonsOnlyPressed: Story = {
+	args: { theme: 'buttons-only', controller: decodeFrame(new Uint8Array([0, 255, 63, 0, 0]))! }
+};

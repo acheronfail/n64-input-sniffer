@@ -3,6 +3,10 @@
 	import { emptyState, type ControllerState } from '../controller';
 	import {
 		ALL_CONTROLLERS,
+		THEMES,
+		THEME_KEY,
+		parseTheme,
+		type ControllerTheme,
 		parseVisibility,
 		SETTINGS_KEY,
 		MINIMAL_KEY,
@@ -34,6 +38,7 @@
 		persistSettings?: boolean;
 	} = $props();
 	let visible = $state<number[]>(untrack(() => [...initialVisible]));
+	let theme = $state<ControllerTheme>('classic');
 	let storageMessage = $state('');
 	const inputId = $props.id();
 	let background = $state(untrack(() => initialBackground));
@@ -77,6 +82,7 @@
 		if (persistSettings) {
 			try {
 				visible = parseVisibility(localStorage.getItem(SETTINGS_KEY));
+				theme = parseTheme(localStorage.getItem(THEME_KEY));
 				minimal = localStorage.getItem(MINIMAL_KEY) === 'true';
 				showMinimalConnection = localStorage.getItem(MINIMAL_CONNECTION_KEY) !== 'false';
 				showMinimalLatency = localStorage.getItem(MINIMAL_LATENCY_KEY) === 'true';
@@ -161,6 +167,21 @@
 			<details class="settings">
 				<summary bind:this={settingsSummary}>Settings</summary>
 				<div class="settings-panel">
+					<fieldset class="theme-options">
+						<legend>Theme</legend>
+						{#each THEMES as option}
+							<label class:selected={theme === option.value}>
+								<input
+									type="radio"
+									name={`${inputId}-theme`}
+									value={option.value}
+									bind:group={theme}
+									onchange={() => save(THEME_KEY, option.value)}
+								/>
+								{option.label}
+							</label>
+						{/each}
+					</fieldset>
 					<fieldset>
 						<legend>Visible controllers</legend>
 						<div class="choices">
@@ -289,7 +310,7 @@
 					<div class="card-heading">
 						<h2 aria-label={`Player ${index + 1}`}><span class="port">{index + 1}</span></h2>
 					</div>
-					<N64Controller {controller} number={index + 1} />
+					<N64Controller {controller} {theme} number={index + 1} />
 					<footer>
 						<span>ANALOG STICK</span>
 						<div><span>X <b>{controller.x}</b></span><span>Y <b>{controller.y}</b></span></div>
@@ -304,6 +325,28 @@
 </div>
 
 <style>
+	.theme-options {
+		margin-bottom: 16px;
+	}
+	.theme-options label {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		padding: 8px;
+		margin-top: 4px;
+		border: 1px solid #526171;
+		border-radius: 6px;
+		cursor: pointer;
+	}
+	.theme-options label.selected {
+		background: #304b42;
+		border-color: #8dd9af;
+	}
+	.theme-options label:focus-within {
+		outline: 2px solid #8dd9af;
+		outline-offset: 2px;
+	}
+
 	.surface {
 		min-height: 100vh;
 		min-height: 100dvh;
@@ -402,6 +445,8 @@
 		top: 44px;
 		width: min(260px, calc(100vw - 20px));
 		padding: 16px;
+		max-height: calc(100dvh - 100px);
+		overflow-y: auto;
 		border: 1px solid #455361;
 		border-radius: 10px;
 		background: #202a35;
@@ -592,13 +637,16 @@
 		padding: 8px;
 	}
 	.minimal .connection {
-		position: fixed;
-		top: 12px;
-		left: 12px;
-		z-index: 3;
-		margin: 0;
+		min-height: 24px;
+		margin: 0 0 8px;
+		padding: 4px 38px 0 4px;
 		gap: 7px;
-		flex-wrap: nowrap;
+		flex-wrap: wrap;
+	}
+	.minimal .latency {
+		min-width: 0;
+		flex-shrink: 1;
+		white-space: normal;
 	}
 	.exit-minimal {
 		position: fixed;

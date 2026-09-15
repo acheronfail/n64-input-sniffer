@@ -43,8 +43,17 @@ Use Node.js 22.12+ and npm.
 The build embeds JavaScript and CSS in `build/index.html`.
 The ESP32 needs no Node server or filesystem upload.
 
-For development with hardware, proxy `/ws` to the ESP32 with `ESP32_PROXY=http://n64spy.local npm run dev`.
-An IP address also works.
+For development with hardware, run from the repository root:
+
+```sh
+just dev                 # Proxy /ws to http://n64spy.lan
+just dev 192.168.1.42    # Use a specific backend IP address
+just dev n64spy.local    # Or another hostname (host:port also works)
+```
+
+Open the local URL printed by Vite. Changes under `web/src/` reload in the browser
+without rebuilding or flashing the firmware. The backend must be reachable on your network.
+From this directory, the equivalent command is `ESP32_PROXY=http://n64spy.lan npm run dev`.
 
 From the repository root, `pio run` installs locked npm dependencies when needed and builds the UI.
 Then it embeds the HTML in a generated PROGMEM header under the PlatformIO environment's build directory.
@@ -59,6 +68,10 @@ Do not commit generated build files.
 The dashboard keeps a separate state for each of the four ports.
 Settings lets you show any subset, such as only controller 3 or controllers 1 and 4.
 The browser saves selections in localStorage for this browser and origin.
+Settings also offers three themes using an in-page radio group compatible with OBS:
+**Classic** keeps the original controller, **Enlarged** uses larger controls over a 75% transparent
+shell, and **Buttons only** hides the shell and lights up dim greyscale controls when pressed.
+The theme is saved per browser and applies to every visible controller.
 Hidden controllers still receive updates.
 The UI assigns legacy four-byte frames to controller 1.
 

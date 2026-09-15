@@ -22,3 +22,19 @@ export function parseVisibility(raw: string | null): number[] {
 		return [...ALL_CONTROLLERS];
 	}
 }
+
+export const THEME_KEY = 'n64-spy.theme.v1';
+export const THEMES = [
+	{ value: 'classic', label: 'Classic' },
+	{ value: 'enlarged', label: 'Enlarged' },
+	{ value: 'buttons-only', label: 'Buttons only' }
+] as const;
+export type ControllerTheme = (typeof THEMES)[number]['value'];
+export function parseTheme(raw: string | null): ControllerTheme {
+	try {
+		const value: unknown = JSON.parse(raw ?? 'null');
+		return THEMES.find((theme) => theme.value === value)?.value ?? 'classic';
+	} catch {
+		return 'classic';
+	}
+}
