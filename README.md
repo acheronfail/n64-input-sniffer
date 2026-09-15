@@ -1,32 +1,14 @@
 # NintendoSpy N64 reader — ESP32
 
-This PlatformIO/Arduino port reads Nintendo 64 (N64) controller input with NintendoSpy's single-wire protocol support.
-It supports only the N64 controller protocol.
-The ESP32 passively reads up to 4 controller DATA lines and sends the decoded input over serial.
-It never drives the line.
-
-The port uses the project's AVR firmware ([../firmware/firmware.ino](../firmware/firmware.ino), `loop_N64`)
-and the packet layout in [../Readers/Nintendo64.cs](../Readers/Nintendo64.cs).
-
 ## How it works
 
-The N64 controller uses one open-collector wire that stays high when idle. Each bit is a ~4µs pulse:
+The adapter reads input from up to four Nintendo 64 (N64) controllers and shows their buttons and stick positions in a browser.
+It connects between the console and controllers without changing their signals.
+The console must run and poll the controllers for input to appear.
 
-| Bit | Low  | High |
-| --- | ---- | ---- |
-| `0` | ~3µs | ~1µs |
-| `1` | ~1µs | ~3µs |
+## Setup
 
-The ESP32 RMT peripheral measures each low and high pulse in hardware, with 0.125 µs resolution.
-The decoder reads a `1` when the low pulse lasts at most 2 µs, and a `0` when it lasts longer.
-It checks pulse lengths and the poll prefix before it accepts a frame.
-Each polled frame starts with the console's 9-bit prefix: the `0x01` poll command (`0000_0001`) and a `1` stop bit.
-The controller's 32-bit response comes next.
-
-Fractional timing matters. At 1 µs resolution, a low pulse near 3 µs can measure as 2 µs and produce a false input.
-The finer resolution preserves that distinction. The decoder uses capture ticks directly, without first rounding them to whole microseconds.
-
-## Wiring
+### Wiring
 
 > [!WARNING]
 > **Do not connect USB-C while the adapter is connected to the N64 console.**
@@ -36,175 +18,90 @@ The finer resolution preserves that distinction. The decoder uses capture ticks 
 
 ![Four-controller passthrough wiring](docs/n64-esp32-wiring.png)
 
-[Download the wiring graphic (SVG)](docs/n64-esp32-wiring.svg).
-The diagram shows the component side of the board, with USB at the top. This matches the supplied Super Mini pinout.
-The right-edge pins are **5V, GND, 3V3, GPIO 13, 12, 11, 10, 9, 8**, from top to bottom.
-The reference image labels 3V3 as `3V3OUT`.
-The diagram simplifies board spacing and shows controller terminals as a schematic.
+[Download the wiring diagram (SVG)](docs/n64-esp32-wiring.svg).
+The diagram shows the component side of the Super Mini board, with USB at the top.
 
-1. Connect one console port's 3.3V rail to the ESP **3V3** pin. The diagram shows port 1.
-2. Connect **GND from that same port** to ESP GND.
-3. Keep each controller's power and ground passthrough connections.
-4. Connect a **470 µF electrolytic capacitor** across ESP 3V3 and GND, close to the board, with short leads.
+| Connection | ESP32 pin |
+| ---------- | --------- |
+| Port 1 DATA (middle pin) | GPIO 13 |
+| Port 2 DATA (middle pin) | GPIO 12 |
+| Port 3 DATA (middle pin) | GPIO 11 |
+| Port 4 DATA (middle pin) | GPIO 10 |
+| 3.3V from one console port | 3V3 |
+| GND from the same console port | GND |
+
+1. Connect the DATA lines as shown in the diagram and table.
+2. Connect one console port's 3.3V and GND to the ESP32.
+   Keep each controller's power and ground passthrough connections.
+3. Connect a **470 µF electrolytic capacitor**, rated at least **6.3V**, across ESP32 3V3 and GND.
+   Place it close to the board with short leads.
    Connect **positive (+) to 3V3**. Connect **negative (striped side) to GND**.
-   Use a voltage rating of at least 6.3V.
-5. Leave USB disconnected and the ESP 5V pin unconnected while the console supplies power.
+4. Leave the ESP32 **5V pin unconnected**.
 
-One ground tap is enough because all four port grounds connect inside the same N64 console.
-The ports need no extra ground bridges.
-The 470 µF value comes from the earlier power tests.
+### Install the firmware
 
-The Super Mini's onboard RGB LED defaults to solid red while powered.
-The controller command below can disable this power LED. The preference stays saved after a reboot.
-The `POWER_LED_PIN=48` flag in `platformio.ini` sets its GPIO for all S3 environments.
-The generic `esp32dev` environments leave the LED disabled unless this flag is set.
+Install PlatformIO, Node.js 22.12 or later, and npm on your computer.
 
-| N64 connector                | ESP32                                                                     |
-| ---------------------------- | ------------------------------------------------------------------------- |
-| GND (same port as power tap) | GND                                                                       |
-| DATA (middle)                | GPIO 13/12/11/10 (`N64_PIN_1..N64_PIN_4` in [src/main.cpp](src/main.cpp)) |
-| 3.3V (tap one console port)  | 3V3, with 470 µF capacitor to GND                                         |
+**Before connecting USB-C, disconnect the adapter from all four console ports—even if the console is off.**
 
-The N64 data line uses 3.3V logic with a pull-up on the console side.
-It connects directly to an ESP32 input without level shifting.
-**Share a common ground** with the console/controller.
-
-To read a live session, tap the DATA line between the console and controller, for example with a passthrough adapter.
-The console must poll the controller for frames to appear.
-
-If your data wires use different GPIOs, change `N64_PIN_1..N64_PIN_4` in [src/main.cpp](src/main.cpp).
-
-## Live web interface (wireless)
-
-The ESP32 serves a small web user interface (UI) that shows the controller state in real time.
-You can watch input without a wired serial connection.
-The firmware contains no fixed WiFi credentials. You enter them once through a captive portal.
-
-The LED shows WiFi status even when the normal power LED is disabled:
-
-| State                              | LED pattern                                                                             |
-| ---------------------------------- | --------------------------------------------------------------------------------------- |
-| Connecting or reconnecting         | Blue, 500 ms on / 500 ms off, repeating.                                                |
-| Connected (IP address obtained)    | Two green flashes, 250 ms on / 250 ms off, then the normal power LED setting.           |
-| Connection failed or lost          | Three red flashes, 125 ms on / 125 ms off, then the connection or setup portal pattern. |
-| Setup portal waits for credentials | Red, 500 ms on / 500 ms off, repeating.                                                 |
-
-When you submit credentials, the LED switches to the blue connection pattern.
-A successful connection takes priority over the failure flashes.
-If the portal times out, the LED shows the failure pattern before the ESP32 reboots.
-After the portal saves credentials, the LED shows success before the portal's cleanup reboot.
-
-Controller command feedback takes priority over WiFi status, including during the off phases.
-Commands become available after the initial WiFi setup completes.
-A background task controls the flashes, including during connection attempts.
-The flashes add no delays to controller capture or web updates.
-
-### Connect to WiFi
-
-1. On first boot, join the open **`N64Spy-Setup`** WiFi network from a phone or laptop.
-   The ESP32 starts this network automatically. A captive portal page opens automatically.
-2. Select your WiFi network on the portal page.
-3. Enter the network password.
-4. Save the credentials.
-   The ESP32 stores them in flash and automatically reconnects to your network on each later boot.
-5. Open `http://n64spy.local/` in a browser.
-   The serial monitor also prints the assigned IP address and the `http://n64spy.local/` address through multicast DNS (mDNS).
-   You can use either address.
-
-The page connects to a WebSocket at `/ws`.
-The firmware sends a 5-byte binary frame (`controllerIndex + 4-byte state`) each time the state changes.
-The page highlights buttons and moves the stick for the active controller.
-
-To change networks, hold **BOOT** (`WIFI_RESET_PIN`, GPIO 0 on most development boards) for ~3 seconds.
-You can do this at startup or during normal operation.
-The ESP32 deletes the saved network and reboots into the setup portal.
-
-### Controller commands
-
-1. Push **L + R + D-pad down** together on any controller to enter command mode.
-   The LED turns **green** for up to **5 seconds**.
-2. During this time, push one command button on the **same controller**.
-   You can release the entry combination first.
-
-| Button    | Action                                                                              |
-| --------- | ----------------------------------------------------------------------------------- |
-| **START** | Delete saved WiFi credentials and reboot into the **N64Spy-Setup** captive network. |
-| **Z**     | Switch the normal red power LED on or off and save the preference.                  |
-
-A recognized command ends command mode immediately.
-The LED flashes **magenta four times within one second**, each with **125 ms on and 125 ms off**.
-Then the ESP32 does the command's action.
-Command feedback still lights the LED when the red power LED is disabled.
-Capture and web updates continue during the confirmation flashes.
-
-If you held a command button when command mode started, release it. Then push it again.
-The ESP32 ignores other buttons and simultaneous START + Z presses until you push one command button or the time expires.
-A timeout restores the normal LED setting.
-To start another command window, release the entry combination. Then push it again.
-
-The console must run and poll the controller.
-Commands are available after startup WiFi setup completes.
-The ESP32 is a passive sniffer, so these button presses also reach the game.
-
-### Web server and state format
-
-The asynchronous server runs in its own task on the other core.
-The RMT peripheral captures pulse timing independently of the web server.
-The setup portal runs only during startup, before the server starts, so they do not compete for port 80.
-
-The state format uses the following bytes.
-See `packState()` in [include/n64_decoder.h](include/n64_decoder.h) and the bit masks in [web/src/lib/controller.ts](web/src/lib/controller.ts).
-Bits run from the most significant bit (MSB) to the least significant bit (LSB).
-
-| Byte | Bits (MSB→LSB)                            |
-| ---- | ----------------------------------------- |
-| 0    | controller index (0..3)                   |
-| 1    | A, B, Z, START, UP, DOWN, LEFT, RIGHT     |
-| 2    | –, –, L, R, C-UP, C-DOWN, C-LEFT, C-RIGHT |
-| 3    | stick X (int8)                            |
-| 4    | stick Y (int8)                            |
-
-## Build, upload, monitor
-
-Install Node.js 22.12+ and npm alongside PlatformIO.
-Each firmware build first builds the SvelteKit UI in `web/`.
-The build installs locked npm dependencies when needed and embeds the UI as a single HTML file in the firmware.
-It needs no separate filesystem upload.
-See [web/README.md](web/README.md) for UI development and checks.
-
-**Before plugging in USB-C, disconnect the adapter from all four console ports—even if the console is switched off.**
-
-1. Build the firmware:
-
-   ```sh
-   pio run
-   ```
-
-2. Upload the firmware:
+1. Connect the ESP32 to your computer through USB-C.
+2. From the project directory, build and upload the firmware:
 
    ```sh
    pio run -t upload
    ```
 
-3. Open the serial monitor at 115200 baud:
+3. Disconnect USB-C.
+4. Connect the adapter to the console and controllers.
+5. Turn on the console.
 
-   ```sh
-   pio device monitor
-   ```
+### Connect to WiFi
 
-## Tests
+1. On first boot, join the open **`N64Spy-Setup`** WiFi network from a phone or laptop.
+   The setup page opens automatically.
+2. Select your WiFi network on the setup page.
+3. Enter the network password.
+4. Save the credentials.
+   The adapter saves them and reconnects automatically on later boots.
+5. Open [n64spy.local](http://n64spy.local/) in a browser to view controller input.
 
-Run all firmware host tests with `sh scripts/test_host.sh`. These tests need no ESP32.
-Run web unit tests with `cd web && npm test`.
-See [test/README](test/README) for test coverage and hardware test limitations.
+To change networks, hold **BOOT** for about **3 seconds** at startup or during normal operation.
+The adapter deletes the saved network and restarts WiFi setup.
+You can also use the controller input code below.
 
-## Output
+## LED sequences
 
-The firmware logs state changes to keep the serial output readable:
+| State | LED sequence |
+| ----- | ------------ |
+| Normal power | Solid red, unless disabled with the input code below. |
+| WiFi setup waits for credentials | Red, 500 ms on / 500 ms off, repeating. |
+| WiFi connects or reconnects | Blue, 500 ms on / 500 ms off, repeating. |
+| WiFi connected | Two green flashes, 250 ms on / 250 ms off, then the normal power setting. |
+| WiFi connection failed or lost | Three red flashes, 125 ms on / 125 ms off, then the connection or setup sequence. |
+| Command mode | Solid green for up to 5 seconds. |
+| Command accepted | Four magenta flashes, 125 ms on / 125 ms off, then the command takes effect. |
 
-```
-[N64 1] A START stick=(0, 0)
-[N64 3] UP stick=(-42, 118)
-```
+WiFi and command feedback still show when the normal red power LED is disabled.
+Command feedback takes priority over WiFi status.
 
-The firmware ignores unrecognized frames, such as rumble/mempak commands, that are not controller-state polls.
+## Controller input codes
+
+Commands are available after the initial WiFi setup completes, while the console runs and polls the controller.
+These button presses also reach the game.
+
+1. Push **L + R + D-pad down** together on any controller.
+   The LED turns **green** for up to **5 seconds**.
+2. Within that time, push one command button on the **same controller**.
+   You can release the entry combination first.
+
+| Button | Action |
+| ------ | ------ |
+| **START** | Delete saved WiFi credentials and reboot into **N64Spy-Setup**. |
+| **Z** | Switch the normal red power LED on or off. The setting stays saved after a reboot. |
+
+An accepted command ends command mode and shows the magenta confirmation sequence before it takes effect.
+If you already held the command button when command mode started, release it before you push it again.
+Other buttons and simultaneous **START + Z** presses do not select a command.
+
+If five seconds pass without a command, the LED returns to its normal setting.
+To enter command mode again, release **L + R + D-pad down**, then push the combination again.
