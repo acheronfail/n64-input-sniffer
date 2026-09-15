@@ -610,7 +610,9 @@ static void startNetwork() {
   // Qualify the enum because WiFiManager includes the WebServer library.
   // That library also defines HTTP_GET, so the bare name is ambiguous here.
   server.on("/", WebRequestMethod::HTTP_GET, [](AsyncWebServerRequest *req) {
-    req->send(200, "text/html", INDEX_HTML);
+    // Stream the UI from flash. A full copy can exhaust the heap.
+    req->send(200, "text/html", reinterpret_cast<const uint8_t *>(INDEX_HTML),
+              sizeof(INDEX_HTML) - 1);
   });
   server.begin();
 
