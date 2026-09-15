@@ -474,6 +474,12 @@ static void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client,
     }
     Serial.printf("[ws] connect id=%lu from=%s\n", (unsigned long)client->id(),
                   client->remoteIP().toString().c_str());
+  } else if (type == WS_EVT_DATA) {
+    const auto *info = static_cast<AwsFrameInfo *>(arg);
+    if (info->final && info->index == 0 && info->len == 4 &&
+        info->opcode == WS_TEXT && len == 4 && memcmp(data, "ping", 4) == 0) {
+      client->text("pong");
+    }
   } else if (type == WS_EVT_DISCONNECT) {
     portENTER_CRITICAL(&wsDeliveryMux);
     wsDelivery.disconnect(client->id());

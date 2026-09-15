@@ -76,6 +76,12 @@ OBS stores settings separately from your regular browser.
 
 The connection indicator shows the browser's WebSocket connection to the ESP32.
 It does not show individual controller activity.
+The browser checks the connection each second. It sends `ping` only after at least one second without a valid controller frame or `pong`.
+The firmware replies with `pong`, so idle controllers do not cause a connection timeout.
+After three seconds without a valid controller frame or `pong`, the browser marks the connection lost at the next check.
+Detection normally takes three to four seconds. Background tabs can take longer if the browser delays timers.
+Connection attempts also time out after three seconds. The browser retries after one second.
+Flash the updated firmware and reload the page to use the heartbeat.
 After a connection loss, controllers keep the last input state they received.
 
 ## Storybook
