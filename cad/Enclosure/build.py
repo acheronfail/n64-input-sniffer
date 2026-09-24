@@ -4,7 +4,9 @@ from pathlib import Path
 import FreeCAD as A, Part, Mesh
 V=A.Vector
 ROOT=Path(__file__).resolve().parent
-P={'port_x':[-63.7,-36,36,63.7],'rear_y':-9.0,'front_y':-62.0,'half_width':84.0,'bottom_z':-16.0,'top_z':16.0,'wall':2.4,'connector_clearance':0.22,'nose_y':7.0,'curve_radius':1450.0,'pcb_width':18.0,'pcb_length':22.52,'pcb_thickness':1.6,'pcb_z':-8.6,'pcb_front_y':-59.0,'pcb_clearance':0.2,'keeper_gap':0.15,'keeper_thickness':1.8,'seam_gap':0.16,'usb_opening_width':10.0,'usb_opening_height':4.0,'usb_corner_radius':0.7,'usb_seam_tab_width':18.0,'usb_seam_inner_y':-58.9,'keeper_head_diameter':4.2,'closure_head_diameter':5.2,'countersink_angle_deg':90.0,'closure_nut_af':4.3,'closure_nut_pocket_z':2.0,'closure_nut_pocket_height':2.0,'pcb_rear_stop_thickness':1.6,'pcb_rear_stop_setback':.8,'male_tail_extra_depth':1.25}
+if str(ROOT) not in sys.path:sys.path.insert(0,str(ROOT))
+from male_reliefs import side_tab_reliefs, front_keeper_relief, cradle_depth_relief
+P={'port_x':[-63.7,-36,36,63.7],'rear_y':-9.0,'front_y':-62.0,'half_width':84.0,'bottom_z':-16.0,'top_z':16.0,'wall':2.4,'connector_clearance':0.22,'nose_y':7.0,'curve_radius':1450.0,'pcb_width':18.0,'pcb_length':22.52,'pcb_thickness':1.6,'pcb_z':-8.6,'pcb_front_y':-59.0,'pcb_clearance':0.2,'keeper_gap':0.15,'keeper_thickness':1.8,'seam_gap':0.16,'usb_opening_width':10.0,'usb_opening_height':4.0,'usb_corner_radius':0.7,'usb_seam_tab_width':18.0,'usb_seam_inner_y':-58.9,'keeper_head_diameter':4.2,'closure_head_diameter':5.2,'countersink_angle_deg':90.0,'closure_nut_af':4.3,'closure_nut_pocket_z':2.0,'closure_nut_pocket_height':2.0,'pcb_rear_stop_thickness':1.6,'pcb_rear_stop_setback':.8,'male_body_diameter':18.5,'male_body_height':14.3,'male_body_length':18.0,'male_total_length':29.9}
 if (ROOT/'parameters.json').exists(): P.update(json.loads((ROOT/'parameters.json').read_text()))
 (ROOT/'parameters.json').write_text(json.dumps(P,indent=2)+'\n')
 D=A.newDocument('Enclosure')
@@ -48,7 +50,14 @@ feature('OuterContourLoft',outer);feature('InteriorLoft',inner)
 shell=outer.cut(inner)
 
 # Solid local collars hold each housing. The enclosing halves retain their axial shoulders.
-male0=Part.Shape();male0.read(str(ROOT.parent/'n64-input-ControllerPortMale-housing.step'));male0.translate(V(120,0,0))
+# Stripped male body: measured D profile, flat up, plug shoulder at Y=0.
+body_radius=P['male_body_diameter']/2
+body_length=P['male_body_length']
+assert 0<P['male_body_height']<2*body_radius
+assert abs(body_length+P['male_mating_length']-P['male_total_length'])<1e-6
+male0=Part.makeCylinder(body_radius,body_length,V(0,-body_length,0),V(0,1,0))
+male0=male0.common(box(-body_radius-1,-body_length,-body_radius,2*body_radius+2,body_length,P['male_body_height']))
+assert male0.isValid() and len(male0.Solids)==1
 female0=Part.Shape();female0.read(str(ROOT.parent/'n64-input-ControllerPortFemale.step'));female0.translate(V(-110,0,0))
 hardware=[];mating_hardware=[];cutters=[];collars=[]
 # Male spacing is independent of the tested female seats. Keep the original Y depths.
@@ -71,14 +80,17 @@ for i,fx in enumerate(P['port_x']):
  f=female0.copy();f.translate(V(fx,P['front_y']+13,0));hardware.append(feature('FemalePort'+str(i+1),f,refs,(.29,.30,.32)))
  # 0.22 mm radial clearance on the supplied housing, including keyed profiles and flange.
  mc=clearance(m);cutters.extend([mc,clearance(f)])
- # Deepen only the inward tail saddle. Keep the console-facing mating seat fixed.
- tail_access=box(x-7,y-38,-5,14,5,10)
- tail_region=box(x-20,y-39,-30,40,9.5,30)
- tail_relief=mc.fuse(tail_access).translated(V(0,0,-P['male_tail_extra_depth'])).common(tail_region)
- cutters.append(tail_relief)
- collars.extend([box(x-13.6,-28+bow(fx),-13.6,27.2,P.get('male_collar_depth',21.5),27.2),box(fx-13.2,fr,bz+wall,26.4,19,13.6-(bz+wall))])
- # Cable/solder access from housing tails to common cavity.
- cutters.extend([box(x-7,y-38,-5,14,5,10),box(fx-9,fr+16,-5,18,10,10)])
+ # Empirical lower-cradle relief from the iteration-2 physical test.
+ cradle_relief=cradle_depth_relief(P,i)
+ cutters.append(cradle_relief)
+ feature('MaleCradleDepthRelief'+str(i+1),cradle_relief)
+ # Physical samples have two small aft tabs outside the smooth D profile.
+ tab_relief=side_tab_reliefs(P,i)
+ cutters.append(tab_relief)
+ feature('MaleTabRelief'+str(i+1),tab_relief)
+ # A rear stop captures the stripped body; a central opening gives wires access.
+ collars.extend([box(x-13.6,y-body_length-1.5,-13.6,27.2,P['male_collar_depth'],27.2),box(fx-13.2,fr,bz+wall,26.4,19,13.6-(bz+wall))])
+ cutters.extend([box(x-7,y-body_length-5,-5,14,5,10),box(fx-9,fr+16,-5,18,10,10)])
 collars=union(collars).common(outer)
 feature('ConnectorCollars',collars)
 
@@ -109,6 +121,8 @@ for h in holes:shell=shell.cut(h)
 side_boss_envelope=union(side_bosses)
 # Full-height clearance leaves the outer keepers free to lift past the bosses.
 side_keeper_relief=clearance(side_boss_envelope)
+# Boss additions must not refill the tab insertion pockets.
+for i in range(4):shell=shell.cut(side_tab_reliefs(P,i))
 
 
 # Console-light passage removed: the top window exposes the ESP32 LED.
@@ -157,9 +171,9 @@ print('Building independent port keepers',flush=True)
 # Only its two screws enter the printed lower posts.
 for i,x in enumerate(P.get('male_port_x',P['port_x'])):
  print('Male keeper',i+1,flush=True)
- y=P['nose_y']+bow(P['port_x'][i]);sy=y-37.5
+ y=P['nose_y']+bow(P['port_x'][i]);sy=y-body_length-4
  kt=P['male_keeper_top'];kz=kt-P['male_keeper_thickness']
- retainer=shell.common(box(x-13.3,y-31.5,P['connector_clearance'],26.6,34.5,kt-P['connector_clearance']))
+ retainer=shell.common(box(x-13.3,y-body_length-1.5,P['connector_clearance'],26.6,body_length+4.5,kt-P['connector_clearance']))
  # Wider posts leave the female terminal corridor clear in the shortened case.
  screw_offset=P['male_keeper_screw_offset']
  back=box(x-screw_offset-2.6,sy-2.6,kz,2*(screw_offset+2.6),9.6,kt-kz)
@@ -169,8 +183,26 @@ for i,x in enumerate(P.get('male_port_x',P['port_x'])):
  lip_region=box(x-15,y-12,-1,30,13,16)
  lip_relief=clearance(hardware[2*i].Shape,P['male_keeper_lip_clearance']).common(lip_region)
  retainer=retainer.cut(lip_relief)
- # Open the flat upper housing area while keeping front/rear capture bands.
- retainer=retainer.cut(box(x-8,y-27.2,6.8,16,15.2,10))
+ # Keep the top solid: the old material-saving recess is no longer needed.
+ # Extend the pressure pad down to match the deeper cradle.
+ # The nominal seated body still receives 0.15 mm of intended preload.
+ # The small extra travel is intentional interference with the undeformed reference.
+ pad_width=P['male_pressure_pad_width'];pad_length=P['male_pressure_pad_length']
+ flat_z=P['male_body_height']-body_radius
+ pad_bottom=flat_z-P['connector_clearance']-P['male_cradle_extra_depth']-P['male_pressure_preload']
+ assert abs(P['male_pressure_pad_extension']-P['male_cradle_extra_depth'])<1e-6
+ assert 0<pad_width<2*math.sqrt(body_radius**2-flat_z**2)
+ assert 0<pad_length<body_length-4 and 0<=P['male_pressure_preload']<=.3
+ pad=box(x-pad_width/2,y-body_length/2-P['male_pressure_pad_center_backshift']-pad_length/2,pad_bottom,pad_width,pad_length,6.8-pad_bottom)
+ # Embed the pad back into the solid roof for upside-down printing.
+ if P['male_pressure_pad_enabled']:retainer=retainer.fuse(pad)
+ pad_ref=feature('MalePressurePad'+str(i+1),pad)
+ if not P['male_pressure_pad_enabled']:pad_ref.Label='Disabled small pad tier reference '+str(i+1)
+ # Clear the raised feature extending back from the plug shoulder.
+ front_relief=front_keeper_relief(P,i)
+ retainer=retainer.cut(front_relief)
+ feature('MaleKeeperFrontRelief'+str(i+1),front_relief)
+
  posts=[]
  for sx in [x-screw_offset,x+screw_offset]:
   post=box(sx-2.6,sy-3.5,bz+wall,5.2,7.5,kz-(bz+wall))
@@ -180,8 +212,15 @@ for i,x in enumerate(P.get('male_port_x',P['port_x'])):
   retainer=retainer.cut(countersink(sx,sy,kt,4.2,2.2,-1))
   screw=Part.makeCylinder(1,7,V(sx,sy,kt-8)).fuse(Part.makeCone(1,2,1,V(sx,sy,kt-1)))
   feature('MaleKeeperScrew'+str(i+1)+('L' if sx<x else 'R'),screw,refs,(.7,.72,.75))
- retainer=retainer.cut(side_keeper_relief)
- supports=union(posts)
+ # Close the top above each side pocket; tabs enter the keeper from below.
+ tab_envelope=side_tab_reliefs(P,i)
+ tab_roof=tab_envelope.common(box(x-15,y-body_length-1,P['male_tab_keeper_roof_z'],30,body_length+2,kt-P['male_tab_keeper_roof_z']))
+ keeper_tab_relief=tab_envelope.cut(tab_roof)
+ feature('MaleKeeperTabRelief'+str(i+1),keeper_tab_relief)
+ retainer=retainer.cut(tab_envelope).fuse(tab_roof).cut(side_keeper_relief)
+ supports=union(posts).cut(side_tab_reliefs(P,i)).cut(cradle_depth_relief(P,i))
+ # The shortened rear capture band reaches the posts; seat it on their tops.
+ retainer=retainer.cut(supports)
  feature('MaleKeeperPosts'+str(i+1),supports)
  base=base.fuse(supports)
  lid=lid.cut(clearance(retainer)).cut(clearance(supports))
@@ -295,7 +334,7 @@ for obj in retainer_parts:
  # The notched keepers lift around the side bosses. Retain those nut walls.
  lid=lid.cut(pocket.cut(side_boss_envelope))
 base=base.removeSplitter();lid=lid.removeSplitter()
-bo=feature('LowerShell',base,parts);bo.Label='Lower shell · extended housing seats · independent keeper posts'
+bo=feature('LowerShell',base,parts);bo.Label='Lower shell · stripped male body seats · independent keeper posts'
 lo=feature('UpperShell',lid,parts);lo.Label='Upper shell · independent connector retention · no clamp hardware'
 # Separate translucent insert. Push it into the upper recess with a little adhesive if required.
 wi=feature('LightWindow',board_transform(box(-8.8,fr+5.2+window_shift,13.95,17.6,17.6,1.7)),parts,(.65,.9,.83));wi.Label='Optional translucent LED window'
@@ -304,10 +343,12 @@ pcb=feature('ESP32BoardEnvelope',board_transform(box(-W/2,usby,pcbz,W,L,P['pcb_t
 feature('ESP32ComponentKeepout',board_transform(box(-6.5,usby+7,pcbz+1.6,13,12,3)),refs,(.55,.56,.59))
 usb_ref=feature('USBCEnvelope',board_transform(box(-4.6,usby-1.7,pcbz+1.6,9.2,7.4,3.2)),refs,(.72,.73,.76))
 # Fit coupons check uncertain dimensions of purchased parts before a full case print.
-gauge=base.common(box(-90,-26,-17,180,24,20))
-gauge=gauge.fuse(box(-80,-22,-16,160,4,2.4)).removeSplitter()
+# Include the full shorter seats and complete keeper posts in the first-fit gauge.
+gauge_y=math.floor(min(P['nose_y']+bow(x) for x in P['port_x'])-body_length-8)
+gauge_end=math.ceil(max(P['nose_y']+bow(x) for x in P['port_x'])+4)
+gauge=base.common(box(-90,gauge_y,-17,180,gauge_end-gauge_y,34)).removeSplitter()
 go=feature('RearAlignmentGauge',gauge,hist);go.Label='PRINT FIRST · Four-plug lower alignment gauge'
-gauge_top=lid.common(box(-90,-26,0,180,24,20)).fuse(box(-80,-22,12.6,160,4,2.4)).removeSplitter()
+gauge_top=lid.common(box(-90,gauge_y,0,180,gauge_end-gauge_y,20)).removeSplitter()
 gt=feature('RearAlignmentGaugeUpper',gauge_top,hist)
 bc=feature('BoardFitCoupon',base.common(board_transform(box(-18,fr-12,-17,36,(usby+L+3)-(fr-12),34))),hist)
 fc=feature('FemaleFitCoupon',base.common(box(22,fr-4,-17,28,24,26)),hist)
@@ -317,13 +358,19 @@ for k,v in P.items():
  else:meta.addProperty('App::PropertyFloat',k,'Dimensions');setattr(meta,k,v)
 meta.addProperty('App::PropertyString','Status','Documentation');meta.Status='FIT PROTOTYPE. Regenerate using parameters.json + build.py; insertion depth and PCB details require physical checks.'
 # Geometry validity and unintended assembly intersections.
-report={'status':'fit prototype; physical fit not yet verified','parts':{},'collisions':[],'parameters':P}
+report={'status':'fit prototype; physical fit not yet verified','parts':{},'collisions':[],'intentional_pressure_contact_mm3':{},'parameters':P}
 for obj in [bo,lo,wi,ko,go,gt,bc,fc]+retainer_parts:
  s=obj.Shape;report['parts'][obj.Name]={'valid':s.isValid(),'solids':len(s.Solids),'volume_mm3':s.Volume,'bounds':str(s.BoundBox)}
  if not s.isValid() or len(s.Solids)!=1:raise RuntimeError('Invalid or disconnected '+obj.Name)
 for a in [bo,lo,ko]+retainer_parts:
  for b in hardware+mating_hardware+[pcb,usb_ref,D.getObject('ESP32ComponentKeepout')]:
-  vol=a.Shape.common(b.Shape).Volume
+  overlap=a.Shape.common(b.Shape)
+  # Only the pad-to-matching-body compression is permitted. All other contact fails.
+  if P['male_pressure_pad_enabled'] and b.Name in ['MalePort'+str(i) for i in range(1,5)] and a.Name=='MalePortKeeper'+b.Name[-1]:
+   pad=D.getObject('MalePressurePad'+b.Name[-1]).Shape
+   report['intentional_pressure_contact_mm3'][a.Name]=overlap.common(pad).Volume
+   overlap=overlap.cut(pad)
+  vol=overlap.Volume if not overlap.isNull() else 0
   if vol>.005:report['collisions'].append({'a':a.Name,'b':b.Name,'volume_mm3':vol})
 report['shell_overlap_mm3']=base.common(lid).Volume
 report['keeper_overlap_mm3']=keeper.common(base).Volume+keeper.common(lid).Volume
@@ -335,7 +382,7 @@ for o in [bo,lo,wi,ko,go,gt,bc,fc]:
 for prefix in ['FemalePortKeeper']:
  Mesh.Mesh(D.getObject(prefix+'1').Shape.tessellate(.08)).write(str(ROOT/(prefix+'.stl')))
 for obj in retainer_parts:Mesh.Mesh(obj.Shape.tessellate(.08)).write(str(ROOT/(obj.Name+'.stl')))
-Part.export([bo,lo,wi,ko]+retainer_parts,str(ROOT/'Enclosure-v1.2.step'))
+Part.export([bo,lo,wi,ko]+retainer_parts,str(ROOT/'Enclosure-v1.3.step'))
 Mesh.Mesh(union([hardware[2*i].Shape.fuse(mating_hardware[i].Shape) for i in range(4)]).tessellate(.05)).write(str(ROOT/'MaleConnectorAssembly.stl'))
 # Reuse the embedded display overlay from the tested release. This overlay is optional.
 # It does not certify clearance after changes to geometry or connector spacing.
@@ -352,13 +399,13 @@ D.recompute()
 if A.GuiUp:
  import FreeCADGui as G
  G.activeDocument().activeView().viewAxonometric();G.activeDocument().activeView().fitAll()
-# Update the source connector STEP with the measured mating projection.
-# Keep the original housing-only STEP separately so the model origin does not move.
+# Export the stripped body and inherited mating cross-section at the historical datum.
+# The parent housing reference remains the source for older releases and their jig.
 full=hardware[0].Shape.fuse(mating_hardware[0].Shape).removeSplitter()
 full.translate(V(-120-P.get('male_port_x',P['port_x'])[0],-(P['nose_y']+bow(P['port_x'][0])),0))
 assert full.isValid() and len(full.Solids)==1
 full.exportStep(str(ROOT/'ControllerPortMale.step'))
 
-D.recompute();D.saveAs(str(ROOT/'Enclosure-v1.2.FCStd'))
+D.recompute();D.saveAs(str(ROOT/'Enclosure-v1.3.FCStd'))
 
 print(json.dumps(report,indent=2))

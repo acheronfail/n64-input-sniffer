@@ -1,11 +1,23 @@
-"""Build a clean v1.2 multi-plate Orca project with the retained v1.0 release profiles."""
+"""Build a clean v1.3 multi-plate Orca project with the retained v1.0 release profiles."""
 from pathlib import Path
-import zipfile,json,uuid,xml.etree.ElementTree as E,numpy as np
-r=Path(__file__).resolve().parent;src=r/'print/full-enclosure-v1.2'
+import zipfile,json,uuid,xml.etree.ElementTree as E,numpy as np,argparse
+parser=argparse.ArgumentParser(description=__doc__)
+mode=parser.add_mutually_exclusive_group()
+mode.add_argument('--single-port',action='store_true',help='Print production keeper 2 with its compact matching seat and posts')
+mode.add_argument('--single-keeper',action='store_true',help='Print only production male keeper 2, with its central pressure pad')
+mode.add_argument('--fit-test',action='store_true',help='Only the four-port gauge and four pressure-pad keepers, on one plate')
+args=parser.parse_args()
+test_mode=args.fit_test or args.single_keeper or args.single_port
+project_stem='Enclosure-v1.3-single-port' if args.single_port else 'Enclosure-v1.3-single-keeper' if args.single_keeper else 'Enclosure-v1.3-fit-test' if args.fit_test else 'Enclosure-v1.3'
+layout_stem='orca-v1.3-single-port' if args.single_port else 'orca-v1.3-single-keeper' if args.single_keeper else 'orca-v1.3-fit-test' if args.fit_test else 'orca-v1.3'
+r=Path(__file__).resolve().parent;src=r/'print/full-enclosure-v1.3'
 with zipfile.ZipFile(r/'Enclosure-full-enclosure-v1.0-Orca-complete.3mf') as z:
  settings=json.loads(z.read('Metadata/project_settings.config'))
  content_types=z.read('[Content_Types].xml')
-settings['project_name']='Enclosure v1.2 - independent keepers - M2 nut pause'
+settings['project_name']='Enclosure v1.3 - single port base and keeper' if args.single_port else 'Enclosure v1.3 - single male keeper' if args.single_keeper else 'Enclosure v1.3 - male keeper fit test' if args.fit_test else 'Enclosure v1.3 - final keepers - M2 nut pause'
+fit_iteration=int(json.loads((r/'parameters.json').read_text()).get('fit_iteration',1))
+settings['project_name']+=f' - fit iteration {fit_iteration}'
+if test_mode:settings['enable_support']='0'
 assert settings['layer_height']=='0.16' and settings['initial_layer_print_height']=='0.2'
 assert settings['machine_pause_gcode'].strip()=='M400 U1' and settings['print_sequence']=='by layer'
 core='http://schemas.microsoft.com/3dmanufacturing/core/2015/02';prod='http://schemas.microsoft.com/3dmanufacturing/production/2015/06'
@@ -15,7 +27,8 @@ for k,v in [('Application','OrcaSlicer-2.4.2'),('OrcaSlicer','2.4.2'),('BambuStu
 resources=E.SubElement(model,'{'+core+'}resources');build=E.SubElement(model,'{'+core+'}build',{'{'+prod+'}UUID':str(uuid.uuid4())})
 config=E.Element('config');plates=[]
 def md(el,key,value):E.SubElement(el,'metadata',key=key,value=str(value))
-for i,name in enumerate(['Both shells - PLA - insert six M2 nuts at pause','Eight port keepers and PCB keeper - PLA','Optional LED window - PETG'],1):
+plate_names=['Single port base and keeper - PLA'] if args.single_port else ['Single male keeper - PLA'] if args.single_keeper else ['Male fit test - gauge and four keepers - PLA'] if args.fit_test else ['Both shells - PLA - insert six M2 nuts at pause','Eight port keepers and PCB keeper - PLA','Optional LED window - PETG']
+for i,name in enumerate(plate_names,1):
  plate=E.SubElement(config,'plate');plates.append(plate)
  for k,v in [('plater_id',i),('plater_name',name),('locked','false'),('bed_type',settings['curr_bed_type']),('filament_map_mode','Auto For Flush'),('gcode_file','')]:md(plate,k,v)
 # Plate origins follow Orca's existing 256 mm multi-plate layout.
@@ -23,6 +36,10 @@ specs=[('LowerShell',1,128,65,5),('UpperShell',1,128,165,5)]
 specs += [(f'MalePortKeeper{i+1}',2,70+40*i,70,5) for i in range(4)]
 specs += [('FemalePortKeeper',2,70+40*i,130,5) for i in range(4)]
 specs += [('BoardKeeper',2,128,180,5),('LightWindow',3,128,128,3)]
+if args.fit_test:
+ specs=[('RearAlignmentGauge',1,128,95,5)]+[(f'MalePortKeeper{i+1}',1,68+40*i,150,5) for i in range(4)]
+if args.single_keeper:specs=[('MalePortKeeper2',1,128,128,5)]
+if args.single_port:specs=[('SinglePortTestBase',1,105,128,5),('MalePortKeeper2',1,150,128,5)]
 origins=[(0,0),(307.2,0),(0,-307.2)];entries={};manifest=[]
 rels=E.Element('Relationships',xmlns='http://schemas.openxmlformats.org/package/2006/relationships')
 assembly=E.SubElement(config,'assemble')
@@ -55,10 +72,10 @@ for a in manifest:
 # Keep schema order conventional: object definitions, plates, assembly.
 config[:]=config.findall('object')+plates+[assembly]
 custom=E.Element('custom_gcodes_per_layer');pl=E.SubElement(custom,'plate');E.SubElement(pl,'plate_info',id='1')
-E.SubElement(pl,'layer',top_z='14.12',type='1',extruder='1',color='',extra='Insert SIX M2 nuts into the upper-shell closure pockets. Seat every nut below the printed rim, then resume.',gcode=settings['machine_pause_gcode'])
+if not test_mode:E.SubElement(pl,'layer',top_z='14.12',type='1',extruder='1',color='',extra='Insert SIX M2 nuts into the upper-shell closure pockets. Seat every nut below the printed rim, then resume.',gcode=settings['machine_pause_gcode'])
 E.SubElement(pl,'mode',value='SingleExtruder')
 entries.update({'[Content_Types].xml':content_types,'3D/3dmodel.model':E.tostring(model,encoding='utf-8',xml_declaration=True),'3D/_rels/3dmodel.model.rels':E.tostring(rels,encoding='utf-8',xml_declaration=True),'Metadata/model_settings.config':E.tostring(config,encoding='utf-8',xml_declaration=True),'Metadata/project_settings.config':json.dumps(settings,indent=2).encode(),'Metadata/custom_gcode_per_layer.xml':E.tostring(custom,encoding='utf-8',xml_declaration=True),'_rels/.rels':b'<?xml version="1.0"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Target="/3D/3dmodel.model" Id="rel-1" Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"/></Relationships>'})
-with zipfile.ZipFile(r/'Enclosure-v1.2-Orca-input.3mf','w',zipfile.ZIP_DEFLATED) as z:
+with zipfile.ZipFile(r/(project_stem+'-Orca-input.3mf'),'w',zipfile.ZIP_DEFLATED) as z:
  for n,data in entries.items():z.writestr(n,data)
-(r/'orca-v1.2-layout.json').write_text(json.dumps(manifest,indent=2)+'\n')
-print('Created 12 objects on plates [2,9,1]; plate 1 pause at Z=14.12.')
+(r/(layout_stem+'-layout.json')).write_text(json.dumps(manifest,indent=2)+'\n')
+print('Created one base and one matching pressure-pad keeper, no pauses or supports.' if args.single_port else 'Created one pressure-pad keeper, no pauses or supports.' if args.single_keeper else 'Created five test parts on one plate, no pauses or supports.' if args.fit_test else 'Created 12 objects on plates [2,9,1]; plate 1 pause at Z=14.12.')

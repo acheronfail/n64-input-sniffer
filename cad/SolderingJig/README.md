@@ -1,16 +1,21 @@
-# N64 soldering jig v1.1
+# N64 soldering jig v1.3
+
+**Status: physically verified on 2026-09-25.** The owner confirmed v1.3 as verified with the enclosure release. The exact saved model and print project are retained.
+
+The physically verified v1.1 model and print project remain unchanged.
 
 This compact fixture holds one male/female pair with their wiring ends toward a central work area.
-The 50 × 80.1 mm base supports both housings on keyed seats.
+The 50 × 64.6 mm base supports both housings on keyed seats.
 Two removable contour clamps prevent lift and rotation.
-The male clamp grips the middle flat portion, away from the curved front lip.
+The male clamp grips the stripped D-shaped body, with its flat up.
+The body dimensions come from the enclosure parameters; its outer moulded housing must be removed.
 Lower shoulders and flange grooves resist axial movement.
 
 Connector axes are 18 mm above the bench.
 A 26 × 18.1 mm opening sits under the wiring area.
 The female rear passage is 12.8 mm wide.
 
-[Print-ready 3MF](N64-Soldering-Jig-v1.1.3mf) · [FreeCAD model](N64-Soldering-Jig-v1.1.FCStd)
+[Print-ready 3MF](N64-Soldering-Jig-v1.3.3mf) · [FreeCAD model](N64-Soldering-Jig-v1.3.FCStd)
 
 ## Printing
 
@@ -55,21 +60,21 @@ The clamps need no nuts.
 
 ## Fit and model details
 
-The fixture uses the supplied connector housing shapes with 0.22 mm clearance.
+The fixture uses the measured stripped male body and the original female reference, with 0.22 mm clearance.
 CAD checks cover retention in all six translation directions, resistance to rolling, clamp installation clearance, and clear paths to the terminals.
 The model does not include individual metal terminals or wires.
-**Status: verified.** The owner printed v1.1 and confirmed that it works on 2026-09-15.
+Physical verification is still required for the stripped-body fit. The earlier v1.1 jig was verified on 2026-09-15.
 
 The FreeCAD document embeds the connector references and all three print solids.
 It opens without external models or scripts.
 
-The 18.1 mm connector gap matches enclosure v1.1, which leaves at least 2 mm between its opposing keeper towers.
+The 18.1 mm connector gap matches enclosure v1.3, which leaves at least 2 mm between its opposing keeper towers.
 The original [v1 model](N64-Soldering-Jig-v1.FCStd) and [v1 print project](N64-Soldering-Jig-v1.3mf) remain unchanged.
 
 ## Design changes
 
 1. Edit `build.py`.
-2. Run `build.FCMacro` in FreeCAD to produce `N64-Soldering-Jig-v1.1.FCStd` and print meshes.
+2. Run `build.FCMacro` in FreeCAD to produce `N64-Soldering-Jig-v1.3.FCStd` and print meshes.
 
 See the [development instructions](../DEVELOPMENT.md) for checks and 3MF generation.
 The versioned release files remain unchanged until an explicit replacement.

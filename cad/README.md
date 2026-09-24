@@ -1,38 +1,29 @@
-# CAD release
+# CAD release v1.3
 
-The v1.2 enclosure moves the ESP and its supports 2 mm toward the USB-C wall.
-**Status: verified.** The owner printed v1.2 and marked it verified on 2026-09-15.
-The v1.1 release stays available.
+**Status: enclosure and soldering jig physically verified.** The owner printed the complete v1.3 enclosure, confirmed that everything worked perfectly, and marked the v1.3 jig verified on 2026-09-25.
 
-- [v1.2 FreeCAD model](Enclosure/Enclosure-v1.2.FCStd)
-- [v1.2 print project](Enclosure/Enclosure-full-enclosure-v1.2-Orca-complete.3mf)
+- [v1.3 FreeCAD model](Enclosure/Enclosure-v1.3.FCStd)
+- [v1.3 print-ready 3MF](Enclosure/Enclosure-full-enclosure-v1.3-Orca-complete.3mf)
+- [Printing and assembly](Enclosure/README.md)
+- [Release validation](V1.3-VALIDATION.md)
+- [Development and regeneration](DEVELOPMENT.md)
 
-The tested **v1.1** enclosure leaves at least 2 mm between opposing keeper towers.
-It moves the ESP window 4 mm toward the N64 edge and moves four closure bolts toward that edge.
-The matching jig has an 18.1 mm connector gap.
-**Status: verified.** The owner confirmed that both printed v1.1 parts work on 2026-09-15.
-Physical verification applies to the retained v1.1 release files.
-Generated reports describe digital checks only. Future geometry changes need new physical tests.
+v1.3 captures the stripped male connector body and reduces enclosure depth by 15.5 mm, to approximately 58.1 mm. It retains the existing wiring gap and console port positions. The final keepers have side-tab clearances, an enclosed shoulder pocket and a wider internal contact step. The small central pad tier is removed. The cradle is 1.5 mm deeper than the initial fit design.
 
-The physically tested [v1.0 enclosure](Enclosure/Enclosure-v1.0.FCStd) and [v1.0 print project](Enclosure/Enclosure-full-enclosure-v1.0-Orca-complete.3mf) remain unchanged.
+The measured male body is 18.5 mm in diameter, 14.3 mm from flat to opposite arc, and 18 mm long. Overall length is 29.9 mm, including the 11.9 mm mating projection.
 
-- [Enclosure FreeCAD model](Enclosure/Enclosure-v1.1.FCStd)
-- [Enclosure print-ready OrcaSlicer 3MF](Enclosure/Enclosure-full-enclosure-v1.1-Orca-complete.3mf)
-- [Enclosure print and assembly instructions](Enclosure/README.md)
-- [Soldering jig model, print project, and instructions](SolderingJig/README.md)
-- Latest [female connector](n64-input-ControllerPortFemale.step) and [male connector](n64-input-ControllerPortMale.step) STEP models
-- [Male housing-only reference](n64-input-ControllerPortMale-housing.step), the seating datum for the enclosure and jig
+The release retains the exact model and sliced project used for the successful full test. Intermediate fit-test projects, previews, backups, meshes, bundles and slicing outputs have been removed. The source can regenerate working files when needed.
 
-Both FreeCAD documents embed their shapes and references.
-You need no external scans or build scripts to open them.
-These documents contain saved solid models, not a history of constrained sketches.
-Changes to the embedded parameter snapshot alone do not regenerate geometry.
+## Soldering jig
 
-The current Python build, geometry checks, and print export scripts remain beside each model.
-See the [development instructions](DEVELOPMENT.md) to regenerate and revise the models.
-Historical revisions and duplicate generated exports are omitted.
+The [v1.3 soldering jig](SolderingJig/README.md) holds a stripped male connector and female connector for wiring. The owner also confirmed this jig as verified on 2026-09-25. Its exact model and print project are retained alongside the earlier verified v1.1 jig.
 
-The enclosure contains reduced display meshes from [Wesk's N64 console scan](https://bitbuilt.net/forums/threads/n64-console-scan.5527/).
-Their alignment is approximate.
+## Retained releases and references
+
+The verified v1.0, v1.1 and v1.2 enclosure releases remain unchanged. The [v1.2 model](Enclosure/Enclosure-v1.2.FCStd) and [v1.2 print project](Enclosure/Enclosure-full-enclosure-v1.2-Orca-complete.3mf) were verified on 2026-09-15.
+
+The original [female](n64-input-ControllerPortFemale.step), [full male](n64-input-ControllerPortMale.step) and [male housing](n64-input-ControllerPortMale-housing.step) references remain for earlier releases. The [stripped male reference](n64-input-ControllerPortMale-stripped-v1.3.step) is retained separately for v1.3.
+
+FreeCAD documents embed their geometry and approximate console display meshes. They contain saved solids, not a constrained-sketch history. Changing their parameter snapshot alone does not regenerate the model. Build-time prototype labels inside saved documents predate the physical test; this release record identifies the verified files.
 
 See the [repository README](../README.md) for wiring and firmware.

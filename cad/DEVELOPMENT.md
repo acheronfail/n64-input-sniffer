@@ -1,10 +1,11 @@
 # CAD development
 
 The versioned FreeCAD models and print-ready 3MF files are the retained releases.
-Enclosure builds write v1.2 models, working meshes, and reports. They preserve the v1.0 and v1.1 releases.
-Soldering jig builds still write v1.1.
+Enclosure builds write v1.3 models, working meshes, and reports. They preserve the v1.0, v1.1, and v1.2 releases.
+Soldering jig builds write v1.3 and preserve v1.1.
 The enclosure's generated male connector STEP also stays in its own folder.
-If the connector design changes, explicitly promote that STEP file to the parent reference.
+The v1.3 copy is retained as `n64-input-ControllerPortMale-stripped-v1.3.step`.
+Keep versioned stripped references separate from the original full-housing references.
 
 ## Runtime
 
@@ -68,7 +69,7 @@ Other checks cover these features:
 The checks use the current geometry without loading discarded revisions.
 Each generated revision needs its own physical fit tests.
 
-`package_print.py` produces STL files in their print orientation, a manifest, and an assembly README in `Enclosure/print/full-enclosure-v1.2/`.
+`package_print.py` produces STL files in their print orientation, a manifest, and an assembly README in `Enclosure/print/full-enclosure-v1.3/`.
 It also produces a ZIP.
 `create_3mf.py` reads profiles from the retained v1.0 3MF and builds a new unsliced project from the new meshes.
 It does not reuse old toolpaths.
@@ -76,13 +77,13 @@ It does not reuse old toolpaths.
 Run the slicer and slice checks:
 
 ```sh
-mkdir -p cad/Enclosure/slice/v1.2
-orca-slicer --slice 0 --outputdir cad/Enclosure/slice/v1.2 --export-3mf Enclosure-full-enclosure-v1.2-Orca-complete.3mf cad/Enclosure/Enclosure-v1.2-Orca-input.3mf
+mkdir -p cad/Enclosure/slice/v1.3
+orca-slicer --slice 0 --outputdir cad/Enclosure/slice/v1.3 --export-3mf Enclosure-full-enclosure-v1.3-Orca-complete.3mf cad/Enclosure/Enclosure-v1.3-Orca-input.3mf
 python cad/Enclosure/check_nut_pause.py
 python cad/Enclosure/verify_print.py
 ```
 
-The two slice checks default to `Enclosure/slice/v1.2/`.
+The two slice checks default to `Enclosure/slice/v1.3/`.
 To check another Orca command-line output directory, pass `--slice-dir PATH`.
 That directory must contain the exported 3MF and plate G-code files, plus `result.json` when Orca writes it.
 The checks support Orca 2.4.0 through embedded slice metadata.
@@ -99,11 +100,58 @@ The checks fail if changed dimensions or settings invalidate the fixed layout, 1
 If this occurs, update the layout and pause checks together.
 Then inspect the new slice.
 
+## Optional male fit tests
+
+The verified v1.3 design has `male_pressure_pad_enabled=false`: the small central tier is omitted and the wider step remains. Its disabled parameters and construction reference are retained for reproducible geometry checks. The cradle has 1.5 mm extra depth, side-tab pockets remain open underneath, and the 22.8 mm internal shoulder pocket leaves nominal 1.9 mm side walls.
+
+Fit-test outputs are disposable working files and are not retained releases. Regenerate them only when needed.
+
+After building, checking, and packaging the current enclosure meshes, run:
+
+```sh
+python cad/Enclosure/create_3mf.py --fit-test
+mkdir -p cad/Enclosure/slice/v1.3-fit-test
+orca-slicer --slice 0 --outputdir cad/Enclosure/slice/v1.3-fit-test --export-3mf Enclosure-v1.3-fit-test-Orca-complete.3mf cad/Enclosure/Enclosure-v1.3-fit-test-Orca-input.3mf
+python cad/Enclosure/verify_print.py --fit-test
+```
+
+This creates one plate containing the lower alignment gauge and four production keepers, with no supports or pauses.
+The verification checks the exact meshes, their placement, all five expected part identities, and the exported G-code.
+Promote the checked 3MF from the slice directory to `Enclosure/`.
+Regenerate the full-enclosure 3MF too whenever a keeper changes, so both projects use the same parts.
+
+For a compact assembled clamping test, extract one complete production seat and pair it with keeper 2:
+
+```sh
+python cad/Enclosure/build_single_port.py
+python cad/Enclosure/check_mesh.py
+python cad/Enclosure/package_print.py
+python cad/Enclosure/create_3mf.py --single-port
+mkdir -p cad/Enclosure/slice/v1.3-single-port
+orca-slicer --slice 0 --outputdir cad/Enclosure/slice/v1.3-single-port --export-3mf Enclosure-v1.3-single-port-Orca-complete.3mf cad/Enclosure/Enclosure-v1.3-single-port-Orca-input.3mf
+python cad/Enclosure/verify_print.py --single-port
+```
+
+The extraction checks complete post and collar coverage, connector/keeper clearances, vertical installation, axial/lift retention, and absence of the disabled pad tier.
+It also saves `Enclosure-single-port-v1.3.FCStd`. Regenerate the test base after changes to the enclosure; print verification checks its source model hash.
+
+For a contour check only, generate and verify production keeper 2 without its seat:
+
+```sh
+python cad/Enclosure/create_3mf.py --single-keeper
+mkdir -p cad/Enclosure/slice/v1.3-single-keeper
+orca-slicer --slice 0 --outputdir cad/Enclosure/slice/v1.3-single-keeper --export-3mf Enclosure-v1.3-single-keeper-Orca-complete.3mf cad/Enclosure/Enclosure-v1.3-single-keeper-Orca-input.3mf
+python cad/Enclosure/verify_print.py --single-keeper
+```
+
+This uses the unchanged production mesh and checks that exactly one keeper is present, with no supports or pauses.
+It tests contour fit; an assembled clamping test also requires the lower seat.
+
 ## Soldering jig
 
-The jig's dimensions are in [SolderingJig/build.py](SolderingJig/build.py).
-The build uses the female and housing-only male STEP references directly.
-It builds its own mating projection.
+The jig's fixture dimensions are in [SolderingJig/build.py](SolderingJig/build.py).
+It reads the stripped male body and plug dimensions from `Enclosure/parameters.json` and uses the original female STEP.
+Both builds generate the male D profile with its flat up; no stripped-body scan is required.
 
 Run the build, checks, and slicer in this order:
 
@@ -111,8 +159,8 @@ Run the build, checks, and slicer in this order:
 python cad/SolderingJig/build.py
 python cad/SolderingJig/check_fit.py
 python cad/SolderingJig/create_3mf.py
-mkdir -p cad/SolderingJig/slice/v1.1
-orca-slicer --slice 0 --outputdir cad/SolderingJig/slice/v1.1 --export-3mf N64-Soldering-Jig-v1.1.3mf cad/SolderingJig/N64-Soldering-Jig-v1.1-input.3mf
+mkdir -p cad/SolderingJig/slice/v1.3
+orca-slicer --slice 0 --outputdir cad/SolderingJig/slice/v1.3 --export-3mf N64-Soldering-Jig-v1.3.3mf cad/SolderingJig/N64-Soldering-Jig-v1.3-input.3mf
 python cad/SolderingJig/verify_print.py
 ```
 
@@ -122,7 +170,7 @@ It accepts `--slice-dir PATH`, as the enclosure print check does.
 
 ## References and releases
 
-The parent connector STEP files are the only external construction geometry.
+The parent female connector STEP is the only external construction geometry for v1.3.
 The enclosure build copies the optional embedded console display meshes from the retained release, including their original placements.
 It needs no historical scans, measurement reports, or revision folders.
 This overlay is approximate.
@@ -134,9 +182,19 @@ The project retains named FreeCAD release models and sliced 3MFs.
 To make a release:
 
 1. Review the geometry and sliced project.
-2. Test the physical changes.
+2. Mark the release as a fit prototype until its physical changes have been tested.
 3. Explicitly save a new named FreeCAD release.
 4. Promote its checked sliced 3MF.
 5. Update versioned filenames in the scripts and documentation.
 
 New parameters saved in a FreeCAD document alone do not regenerate the solids.
+
+## v1.3 release record and cleanup
+
+The owner confirmed the full enclosure print on 2026-09-25. The exact retained model and 3MF hashes are in [V1.3-VALIDATION.md](V1.3-VALIDATION.md). The owner also marked soldering jig v1.3 verified on the same date.
+
+The fit history established the side-tab pockets, 7 mm axial shoulder relief, stronger keeper side walls and 1.5 mm deeper cradle. Removing the small central tier gave the successful clamping fit. Those final dimensions remain in the source; intermediate fit2/fit3/fit4 projects and previews are discarded.
+
+Keep release FreeCAD models, sliced 3MFs, source, parameters, reference STEP files and documentation. Remove generated STL/STEP exports, unsliced projects, test fixtures, logs, backups, reports, ZIPs and `print/` / `slice/` directories after recording release evidence. Preserve previously retained releases.
+
+Build and check scripts deliberately describe newly generated geometry as unverified; a code check cannot establish physical fit. The prototype status embedded in the retained v1.3 model predates its successful test. Do not rebuild or reslice a verified file merely to change its status label. Geometry changes need a new version and physical test.

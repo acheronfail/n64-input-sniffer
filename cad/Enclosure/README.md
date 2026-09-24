@@ -1,34 +1,43 @@
-# Enclosure v1.2
+# Enclosure v1.3
 
-**Status: verified.** The owner printed v1.2 and marked it verified on 2026-09-15.
-The owner tested the retained v1.1 print on 2026-09-15.
+**Status: physically verified on 2026-09-25.** The owner printed the complete enclosure and confirmed that everything worked perfectly. This release retains the exact tested model and sliced project.
 
-[FreeCAD model](Enclosure-v1.2.FCStd) · [Print-ready OrcaSlicer 3MF](Enclosure-full-enclosure-v1.2-Orca-complete.3mf)
+The final keepers omit the small central pad tier. The wider step, deeper cradle and reinforced front sides retain the successful fit.
 
-v1.2 moves the ESP board, supports, and keeper 2 mm toward the USB-C wall.
-The USB-C socket face moves from Y = 6.2 mm to Y = 8.2 mm.
-The USB slot and lid window stay in place.
-The existing board keeper fits the moved supports.
+[FreeCAD model](Enclosure-v1.3.FCStd) · [Full-enclosure 3MF](Enclosure-full-enclosure-v1.3-Orca-complete.3mf)
 
-v1.1 gives wires at least 2 mm of space between the opposing keeper screw towers.
-Connector tails are 18.094 mm apart at the center ports and 19.998 mm at the outer ports.
-The matching soldering jig uses an 18.1 mm gap.
-Female terminal passages remain 12.8 mm wide.
+v1.3 uses the male connector's inner body after its outer moulded housing is removed.
+The enclosure is 15.5 mm shallower than v1.2: approximately 58.1 mm instead of 73.6 mm over the curved shell (21% less depth).
+Its width and 32 mm height are unchanged. The female connector seats and their closure screws move 15.5 mm toward the console.
+The male port axes, board, USB socket, and LED window keep their v1.2 positions.
+The new male seats and individual keepers capture the smaller D-shaped body.
+Each male keeper now uses the existing wider internal step. The additional 10 × 6.5 mm central tier, projecting approximately 2.1–2.2 mm, is removed.
+The nominal smooth connector model does not predict the real cover contact accurately; the owner’s trimmed-part test establishes the successful single-port fit and clamping pressure.
 
-The ESP window, recess, and support ledge move 4 mm toward the N64-facing edge.
-They stay centered from left to right.
-v1.2 adds the board move described above.
+The measured male body is an 18.5 mm diameter circle clipped to 14.3 mm from its flat to the opposite arc.
+Its axial length is 18 mm from the plug shoulder to the back; the 29.9 mm total length leaves an 11.9 mm mating projection.
+The body flat faces up. The mating cross-section and concentric alignment use the inherited reference geometry; the full enclosure was tested with the owner’s stripped connectors.
+Two generous side-tab insertion pockets and a 7 mm-long keeper relief accommodate the features found during the first physical test.
+The 7 mm relief covers the measured 6.5 mm section behind the plug shoulder with 0.5 mm extra axial clearance.
+The tabs use clearance envelopes inferred from the photographs, not exact measured shapes.
+The keeper top is solid; its former square material-saving recess has been filled. The front relief is now an internal 22.8 mm-wide pocket, with 1.9 mm side walls joining the front face to the keeper. Its 7 mm axial clearance remains.
+The lower cradle alone has 1.5 mm extra depth; the plug opening, side-tab pockets, and screws stay at their tested positions. The small pad tier is omitted.
 
-Four of the six closure bolts now sit near the N64-facing edge: CAD (X, Y) = (±18, 3) and (±79.5, 2) mm.
-The remaining pair stays near the female side at (±18, −48.2) mm.
-This puts more fasteners along the edge that lifted.
+The closest male/female bodies remain approximately 18.1 mm apart.
+Opposing keeper towers retain at least 2 mm of wiring space.
+The [v1.3 soldering jig](../SolderingJig/README.md) models the stripped male body and was also marked verified by the owner on 2026-09-25.
+The old jig fits the full outer housing and is not a fit reference for this revision.
 
-Hardware quantities are unchanged.
-The closure bosses stay inside the original 168 mm case outline.
-Local reliefs let the two outer male keepers lift past the internal side bosses.
+The six closure screws are at CAD (X, Y) = (±18, −32.7), (±18, 3), and (±79.5, 2) mm.
+Hardware quantities are unchanged. The board keeper, female keepers, and light window retain their previous shapes.
+The four new male keepers are numbered by port.
 
-The original [v1.0 model](Enclosure-v1.0.FCStd) and [v1.0 print project](Enclosure-full-enclosure-v1.0-Orca-complete.3mf) remain unchanged.
-Physical tests of v1.0 took place on 2026-09-13.
+The physically verified [v1.2 model](Enclosure-v1.2.FCStd) and [v1.2 print project](Enclosure-full-enclosure-v1.2-Orca-complete.3mf) remain available unchanged, along with v1.0 and v1.1.
+v1.3 has its own successful physical test dated 2026-09-25.
+
+## Fit-test development files
+
+Intermediate fit-test models and print projects were removed after the successful full print. The source scripts can regenerate a compact fixture, a keeper-only plate or the four-port gauge; see [development instructions](../DEVELOPMENT.md).
 
 ## Printing
 
@@ -40,6 +49,8 @@ It uses a Bambu Lab P1S 0.4 mm profile, Supertack bed, 0.16 mm layers, and a 0.2
 | 1 | Lower and upper shells, PLA | One pause to insert nuts |
 | 2 | Four distinct male keepers, four identical female keepers, and one board keeper, PLA | None |
 | 3 | One optional light window, PETG | None |
+
+The saved profile estimates **5 h 40 min and 129.2 g PLA** for the shells and keepers together. The optional PETG window adds about 9 minutes and 0.8 g.
 
 Parts have their print orientation in millimeters at 100% scale.
 The four male keepers have one through four identification dimples and each fits a specific port.
@@ -63,7 +74,7 @@ The port-keeper screw heads must finish flush or below their keeper surfaces.
 Nominal countersunk screw length is measured including the head.
 An 8 mm keeper screw has approximately 6 mm of engagement below the 2 mm keeper bridge.
 Tighten until the keeper seats on its posts.
-Extra torque is not needed to squeeze the connector.
+Check that the wider keeper step holds the cover when the keeper seats; extra torque cannot correct a contact gap.
 
 ## Embedded closure nuts
 
@@ -80,16 +91,18 @@ The nut-pocket cap must not start until the nuts are installed.
 Check the real male mating portion against the extended CAD reference:
 
 - 16 mm circular diameter, flattened to 12 mm high
-- 12 mm projection from the housing
+- 11.9 mm projection from the stripped body
 - Concentric with the housing
-- Flat side down, opposite the housing's flat side (up)
+- Flat side down, opposite the stripped body's flat side (up)
 
 The 0.35 mm mating-opening clearance is per axis.
 The model does not include contacts.
 
 ## Install the connectors
 
-1. With the lower shell open, seat one male connector, flat housing side up.
+1. Remove the male connector’s outer moulded housing without damaging the inner body or wires.
+   Check that the exposed body matches the dimensions above, including any remaining tabs.
+   With the lower shell open, seat it with the body flat side up.
 2. Fit its matching keeper and two keeper screws before the next port.
    Keepers 1–4 correspond to increasing CAD X: −64.04, −36.00, +36.00, +64.04 mm.
    The identification dimples sit on the rear screw bridge, toward the wiring cavity.
@@ -110,11 +123,10 @@ The model does not include contacts.
 5. Make sure the console engagement is even and permits full insertion without force.
 
 The retaining lip surrounds the mating portion near its root.
-Thus, approximately 10 mm of the measured 12 mm projection remains beyond the local case face.
-Check full insertion on the real console before final wiring and assembly.
-The v1.1 geometry and toolpaths passed digital checks.
-The owner confirmed that the printed v1.1 enclosure works on 2026-09-15.
-The owner also printed v1.2 and marked it verified on 2026-09-15.
+Thus, approximately 9.9 mm of the 11.9 mm projection remains beyond the local case face.
+The optional `RearAlignmentGauge.stl` can be regenerated and paired with the four keepers; it is not on the three full-enclosure plates.
+Check seating, clearance around any tabs, retention in both axial directions, and full insertion on the real console before final wiring and assembly.
+These checks passed on the owner’s complete v1.3 print. Repeat them after changes or when using different connector samples.
 
 ## Close the case
 
@@ -133,7 +145,7 @@ Fully disconnect the adapter from all four console ports before connecting USB-C
 
 1. Edit `parameters.json` for exposed dimensions.
 2. Edit `build.py` for geometry changes.
-3. Run `build.FCMacro` in FreeCAD to produce `Enclosure-v1.2.FCStd` and print meshes.
+3. Run `build.FCMacro` in FreeCAD to produce `Enclosure-v1.3.FCStd` and print meshes.
 
 See the [development instructions](../DEVELOPMENT.md) for checks, packaging, and slicing.
 The saved model parameter snapshot does not recompute the design on its own.

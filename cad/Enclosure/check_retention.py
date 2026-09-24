@@ -1,9 +1,9 @@
-"""Check the geometry of independent connector retention in v1.2 for regressions."""
+"""Check the geometry of independent connector retention in v1.3 for regressions."""
 from pathlib import Path
 import sys,json,itertools
 import FreeCAD as A,Part
 r=Path(__file__).resolve().parent
-new=A.openDocument(str(r/'Enclosure-v1.2.FCStd'))
+new=A.openDocument(str(r/'Enclosure-v1.3.FCStd'))
 p=json.loads((r/'parameters.json').read_text());v=A.Vector
 checks={};retention={}
 def vol(s):return 0. if s.isNull() or not s.Solids else s.Volume
@@ -21,7 +21,8 @@ for i in range(1,5):
  keeper=new.getObject('MalePortKeeper'+str(i)).Shape
  male=new.getObject('MalePort'+str(i)).Shape.fuse(new.getObject('MaleMatingProjection'+str(i)).Shape)
  for name,delta in [('lift',v(0,0,.8)),('forward',v(0,.8,0)),('backward',v(0,-.8,0))]:
-  overlap=vol(male.translated(delta).common(new.LowerShell.Shape.fuse(keeper)))
+  # Prove the capture geometry works independently of intentional pad preload.
+  overlap=vol(male.translated(delta).common(new.LowerShell.Shape.fuse(keeper)).cut(new.getObject('MalePressurePad'+str(i)).Shape))
   retention[f'male_{i}_{name}_blocked_mm3']=overlap
   assert overlap>.01,(i,name,overlap)
  # All eight keeper screws must be clear of the connector housing.
@@ -30,7 +31,7 @@ for i in range(1,5):
   checks[f'male_{i}_screw_{side}_housing_overlap_mm3']=vol(screw.common(male))
  # Check the measured projection separately. The original housing datum stays fixed.
  tip=new.getObject('MaleMatingProjection'+str(i)).Shape.optimalBoundingBox()
- assert abs(tip.XLength-16)<.001 and abs(tip.ZLength-12)<.001 and abs(tip.YLength-12)<.001
+ assert abs(tip.XLength-16)<.001 and abs(tip.ZLength-12)<.001 and abs(tip.YLength-p['male_mating_length'])<.001
 for prefix in ['Male','Female']:
  for i in range(1,5):
   for side in ['L','R']:
@@ -47,6 +48,6 @@ face=new.USBCEnvelope.Shape.BoundBox.YMax
 path=Part.makeBox(8.4,25,2.4,v(-4.2,face,9))
 checks['USB_access_mm3']=sum(vol(path.common(o.Shape)) for o in new.PrintParts.Group)
 assert all(x<.005 for x in checks.values()),checks
-result={'revision':'v1.2','checks':checks,'retention_checks':retention,'physical_fit_verified':False,'console_scan_axial_clearance':'Not checked by this script; embedded scans are display references only.'}
+result={'revision':'v1.3','checks':checks,'retention_checks':retention,'physical_fit_verified':False,'console_scan_axial_clearance':'Not checked by this script; embedded scans are display references only.'}
 (r/'independent-retention-validation.json').write_text(json.dumps(result,indent=2)+'\n')
 print(json.dumps(result,indent=2))

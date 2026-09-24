@@ -2,10 +2,10 @@
 from pathlib import Path
 import argparse
 parser=argparse.ArgumentParser(description=__doc__)
-parser.add_argument("--slice-dir", type=Path, default=Path(__file__).resolve().parent/"slice"/"v1.1")
+parser.add_argument("--slice-dir", type=Path, default=Path(__file__).resolve().parent/"slice"/"v1.3")
 args=parser.parse_args()
 import json,zipfile,hashlib,xml.etree.ElementTree as E,numpy as np,shutil
-r=Path(__file__).resolve().parent;folder=args.slice_dir.resolve();p=folder/'N64-Soldering-Jig-v1.1.3mf'
+r=Path(__file__).resolve().parent;folder=args.slice_dir.resolve();p=folder/'N64-Soldering-Jig-v1.3.3mf'
 ns={'m':'http://schemas.microsoft.com/3dmanufacturing/core/2015/02'};pn='{http://schemas.microsoft.com/3dmanufacturing/production/2015/06}path'
 dt=np.dtype([('n','<f4',3),('v','<f4',(3,3)),('a','<u2')])
 result_path=folder/'result.json'
@@ -75,7 +75,7 @@ with zipfile.ZipFile(p) as z:
  assert len(layers)==0
  assert not any(line.strip()=='M400 U1' for line in z.read('Metadata/plate_1.gcode').decode().splitlines())
  assert settings['enable_support']=='0'
-report={'revision':'v1.1','printer':settings['printer_settings_id'],'bed':settings['curr_bed_type'],'plate_counts':[3],'slices':result,'inherited_profile_warnings':warnings,'geometry':checks,'embedded_gcode_matches_verified_files':True,'pauses':0,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()}
+report={'revision':'v1.3','printer':settings['printer_settings_id'],'bed':settings['curr_bed_type'],'plate_counts':[3],'slices':result,'inherited_profile_warnings':warnings,'geometry':checks,'embedded_gcode_matches_verified_files':True,'pauses':0,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()}
 (r/'print-validation.json').write_text(json.dumps(report,indent=2)+'\n')
 # The checked slice stays in slice-dir. Promote it explicitly after review.
 print('Verified',p)

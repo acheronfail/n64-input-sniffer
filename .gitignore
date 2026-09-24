@@ -34,3 +34,12 @@
 /cad/SolderingJig/*-layout.json
 /cad/SolderingJig/*validation.json
 /cad/SolderingJig/slice/
+
+# Regenerable combined CAD delivery bundles
+/cad/N64-CAD-v*.zip
+
+# Regenerable enclosure fit-test artifacts, not retained releases
+/cad/Enclosure/Enclosure-single-port-v*.FCStd
+/cad/Enclosure/Enclosure-v*-fit-test-Orca-complete.3mf
+/cad/Enclosure/Enclosure-v*-single-keeper-Orca-complete.3mf
+/cad/Enclosure/Enclosure-v*-single-port*-Orca-complete.3mf
