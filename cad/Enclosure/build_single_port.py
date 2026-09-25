@@ -5,7 +5,7 @@ import FreeCAD as A, Part, Mesh
 
 r=Path(__file__).resolve().parent
 p=json.loads((r/'parameters.json').read_text())
-source=A.openDocument(str(r/'Enclosure-v1.3.FCStd'))
+source=A.openDocument(str(r/'Enclosure-v1.4.FCStd'))
 V=A.Vector
 x=p['male_port_x'][1]
 y=p['nose_y']+p['port_x'][1]**2/p['curve_radius']
@@ -68,8 +68,8 @@ for name,shape,group in [('SinglePortTestBase',base,parts),('MalePortKeeper2',ke
 meta=d.addObject('App::FeaturePython','FitTestNotes')
 meta.addProperty('App::PropertyString','Instructions')
 meta.Instructions='Production port 2 with two-dimple keeper. Two 2 mm x 8 mm countersunk plastic screws. Fit 4: deeper cradle retained; small central pad tier removed. Check contact at the remaining wider step and plug fit; no nominal pad preload. Physical fit not verified.'
-d.recompute();d.saveAs(str(r/'Enclosure-single-port-v1.3.FCStd'))
+d.recompute();d.saveAs(str(r/'Enclosure-single-port-v1.4.FCStd'))
 Mesh.Mesh(base.tessellate(.08)).write(str(r/'SinglePortTestBase.stl'))
-report={'revision':'v1.3','parts':2,'source_model':'Enclosure-v1.3.FCStd','source_model_sha256':hashlib.sha256((r/'Enclosure-v1.3.FCStd').read_bytes()).hexdigest(),'production_port':2,'base_dimensions_mm':[base.BoundBox.XLength,base.BoundBox.YLength,base.BoundBox.ZLength],'checks':checks,'retention':retention,'contact_at_deeper_body_seat_mm3':vol(contact),'cradle_extra_depth_mm':p['male_cradle_extra_depth'],'small_tier_enabled':p['male_pressure_pad_enabled'],'pad_extension_mm':p['male_pressure_pad_extension'] if p['male_pressure_pad_enabled'] else 0,'actual_clamp_contact_requires_physical_test':True,'physical_fit_verified':False}
+report={'revision':'v1.4','parts':2,'source_model':'Enclosure-v1.4.FCStd','source_model_sha256':hashlib.sha256((r/'Enclosure-v1.4.FCStd').read_bytes()).hexdigest(),'production_port':2,'base_dimensions_mm':[base.BoundBox.XLength,base.BoundBox.YLength,base.BoundBox.ZLength],'checks':checks,'retention':retention,'contact_at_deeper_body_seat_mm3':vol(contact),'cradle_extra_depth_mm':p['male_cradle_extra_depth'],'small_tier_enabled':p['male_pressure_pad_enabled'],'pad_extension_mm':p['male_pressure_pad_extension'] if p['male_pressure_pad_enabled'] else 0,'actual_clamp_contact_requires_physical_test':True,'physical_fit_verified':False}
 (r/'single-port-validation.json').write_text(json.dumps(report,indent=2)+'\n')
 print(json.dumps(report,indent=2))

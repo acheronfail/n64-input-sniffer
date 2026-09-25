@@ -1,7 +1,7 @@
 # CAD development
 
 The versioned FreeCAD models and print-ready 3MF files are the retained releases.
-Enclosure builds write v1.3 models, working meshes, and reports. They preserve the v1.0, v1.1, and v1.2 releases.
+Enclosure builds write v1.4 models, working meshes and reports. They preserve the verified v1.0–v1.3 releases.
 Soldering jig builds write v1.3 and preserve v1.1.
 The enclosure's generated male connector STEP also stays in its own folder.
 The v1.3 copy is retained as `n64-input-ControllerPortMale-stripped-v1.3.step`.
@@ -52,6 +52,8 @@ python cad/Enclosure/build.py
 python cad/Enclosure/check_fit.py
 python cad/Enclosure/check_nut_seats.py
 python cad/Enclosure/check_retention.py
+python cad/Enclosure/check_side_closure.py
+python cad/Enclosure/check_gap_fills.py
 python cad/Enclosure/check_mesh.py
 python cad/Enclosure/package_print.py
 python cad/Enclosure/create_3mf.py
@@ -69,7 +71,7 @@ Other checks cover these features:
 The checks use the current geometry without loading discarded revisions.
 Each generated revision needs its own physical fit tests.
 
-`package_print.py` produces STL files in their print orientation, a manifest, and an assembly README in `Enclosure/print/full-enclosure-v1.3/`.
+`package_print.py` produces STL files in their print orientation, a manifest, and an assembly README in `Enclosure/print/full-enclosure-v1.4/`.
 It also produces a ZIP.
 `create_3mf.py` reads profiles from the retained v1.0 3MF and builds a new unsliced project from the new meshes.
 It does not reuse old toolpaths.
@@ -77,13 +79,13 @@ It does not reuse old toolpaths.
 Run the slicer and slice checks:
 
 ```sh
-mkdir -p cad/Enclosure/slice/v1.3
-orca-slicer --slice 0 --outputdir cad/Enclosure/slice/v1.3 --export-3mf Enclosure-full-enclosure-v1.3-Orca-complete.3mf cad/Enclosure/Enclosure-v1.3-Orca-input.3mf
+mkdir -p cad/Enclosure/slice/v1.4
+orca-slicer --slice 0 --outputdir cad/Enclosure/slice/v1.4 --export-3mf Enclosure-full-enclosure-v1.4-Orca-complete.3mf cad/Enclosure/Enclosure-v1.4-Orca-input.3mf
 python cad/Enclosure/check_nut_pause.py
 python cad/Enclosure/verify_print.py
 ```
 
-The two slice checks default to `Enclosure/slice/v1.3/`.
+The two slice checks default to `Enclosure/slice/v1.4/`.
 To check another Orca command-line output directory, pass `--slice-dir PATH`.
 That directory must contain the exported 3MF and plate G-code files, plus `result.json` when Orca writes it.
 The checks support Orca 2.4.0 through embedded slice metadata.
@@ -110,8 +112,8 @@ After building, checking, and packaging the current enclosure meshes, run:
 
 ```sh
 python cad/Enclosure/create_3mf.py --fit-test
-mkdir -p cad/Enclosure/slice/v1.3-fit-test
-orca-slicer --slice 0 --outputdir cad/Enclosure/slice/v1.3-fit-test --export-3mf Enclosure-v1.3-fit-test-Orca-complete.3mf cad/Enclosure/Enclosure-v1.3-fit-test-Orca-input.3mf
+mkdir -p cad/Enclosure/slice/v1.4-fit-test
+orca-slicer --slice 0 --outputdir cad/Enclosure/slice/v1.4-fit-test --export-3mf Enclosure-v1.4-fit-test-Orca-complete.3mf cad/Enclosure/Enclosure-v1.4-fit-test-Orca-input.3mf
 python cad/Enclosure/verify_print.py --fit-test
 ```
 
@@ -127,20 +129,20 @@ python cad/Enclosure/build_single_port.py
 python cad/Enclosure/check_mesh.py
 python cad/Enclosure/package_print.py
 python cad/Enclosure/create_3mf.py --single-port
-mkdir -p cad/Enclosure/slice/v1.3-single-port
-orca-slicer --slice 0 --outputdir cad/Enclosure/slice/v1.3-single-port --export-3mf Enclosure-v1.3-single-port-Orca-complete.3mf cad/Enclosure/Enclosure-v1.3-single-port-Orca-input.3mf
+mkdir -p cad/Enclosure/slice/v1.4-single-port
+orca-slicer --slice 0 --outputdir cad/Enclosure/slice/v1.4-single-port --export-3mf Enclosure-v1.4-single-port-Orca-complete.3mf cad/Enclosure/Enclosure-v1.4-single-port-Orca-input.3mf
 python cad/Enclosure/verify_print.py --single-port
 ```
 
 The extraction checks complete post and collar coverage, connector/keeper clearances, vertical installation, axial/lift retention, and absence of the disabled pad tier.
-It also saves `Enclosure-single-port-v1.3.FCStd`. Regenerate the test base after changes to the enclosure; print verification checks its source model hash.
+It also saves `Enclosure-single-port-v1.4.FCStd`. Regenerate the test base after changes to the enclosure; print verification checks its source model hash.
 
 For a contour check only, generate and verify production keeper 2 without its seat:
 
 ```sh
 python cad/Enclosure/create_3mf.py --single-keeper
-mkdir -p cad/Enclosure/slice/v1.3-single-keeper
-orca-slicer --slice 0 --outputdir cad/Enclosure/slice/v1.3-single-keeper --export-3mf Enclosure-v1.3-single-keeper-Orca-complete.3mf cad/Enclosure/Enclosure-v1.3-single-keeper-Orca-input.3mf
+mkdir -p cad/Enclosure/slice/v1.4-single-keeper
+orca-slicer --slice 0 --outputdir cad/Enclosure/slice/v1.4-single-keeper --export-3mf Enclosure-v1.4-single-keeper-Orca-complete.3mf cad/Enclosure/Enclosure-v1.4-single-keeper-Orca-input.3mf
 python cad/Enclosure/verify_print.py --single-keeper
 ```
 
@@ -170,7 +172,7 @@ It accepts `--slice-dir PATH`, as the enclosure print check does.
 
 ## References and releases
 
-The parent female connector STEP is the only external construction geometry for v1.3.
+The parent female connector STEP is the only external construction geometry for the current enclosure.
 The enclosure build copies the optional embedded console display meshes from the retained release, including their original placements.
 It needs no historical scans, measurement reports, or revision folders.
 This overlay is approximate.
@@ -198,3 +200,19 @@ The fit history established the side-tab pockets, 7 mm axial shoulder relief, st
 Keep release FreeCAD models, sliced 3MFs, source, parameters, reference STEP files and documentation. Remove generated STL/STEP exports, unsliced projects, test fixtures, logs, backups, reports, ZIPs and `print/` / `slice/` directories after recording release evidence. Preserve previously retained releases.
 
 Build and check scripts deliberately describe newly generated geometry as unverified; a code check cannot establish physical fit. The prototype status embedded in the retained v1.3 model predates its successful test. Do not rebuild or reslice a verified file merely to change its status label. Geometry changes need a new version and physical test.
+
+## v1.4 side closure placement
+
+The outer closure fasteners move from Y = 2 to Y = −13.8 mm at X = ±79.5 mm. The side outline at each bolt's X position spans Y ≈ −40.90 to +13.36 mm, giving a midpoint of −13.77 mm. The rounded placement is within 0.05 mm of that midpoint. `check_side_closure.py` verifies the centring, open bores, filled old underside holes, unchanged hardware references and changes restricted to the old/new fastener regions and upper-shell gap additions.
+
+The new boss position changes local clearance around the outer male keepers. Verify the complete assembly and nut pause after generating the new slice; do not overwrite the verified v1.3 files. The soldering jig remains at verified v1.3.
+
+### Upper-shell collar gap fill
+
+`inter_port_gap_fill=true` joins the paired collar wall skins across unused 0.84 mm male-row and 1.30 mm female-row slots. `gap_fills.py` supplies four upper-shell bridges, two in each row. They overlap the existing wall skins by 0.05 mm and are clipped to the outer shell. The final nominal ribs are 1.0 mm and 1.66 mm wide; the keeper service openings retain their original dimensions. `check_gap_fills.py` verifies solid ribs, unchanged exterior and clear keeper removal paths. The base and separate printed parts do not change in this tweak.
+
+## v1.4 release record
+
+The owner confirmed v1.4 as verified on 2026-09-25, including the relocated side fasteners and filled upper-shell ribs. The exact retained model and sliced project hashes are recorded in [V1.4-VALIDATION.md](V1.4-VALIDATION.md). Working exports, previews, reports, backups and slice folders were removed using the same release layout as v1.3.
+
+The saved model’s prototype label predates physical confirmation. Keep the tested files unchanged; build/check status describes newly generated geometry rather than certifying future edits. The verified soldering jig remains v1.3.

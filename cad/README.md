@@ -1,4 +1,15 @@
-# CAD release v1.3
+# CAD release v1.4
+
+**Status: physically verified on 2026-09-25.** The owner confirmed that the complete v1.4 enclosure, including the filled ribs, is working well.
+
+v1.4 moves the two outer closure bolts and captive nuts to the centres of the side edges, 15.8 mm along the sides from their v1.3 positions. It also fills the four narrow slots between paired connector collars in the upper shell, joining their thin walls into solid ribs. It retains the existing enclosure outline and connector layout. The exact tested model and sliced project are retained.
+
+- [v1.4 FreeCAD model](Enclosure/Enclosure-v1.4.FCStd)
+- [v1.4 print project](Enclosure/Enclosure-full-enclosure-v1.4-Orca-complete.3mf)
+- [Current printing and assembly instructions](Enclosure/README.md)
+- [v1.4 validation](V1.4-VALIDATION.md)
+
+## Verified CAD release v1.3
 
 **Status: enclosure and soldering jig physically verified.** The owner printed the complete v1.3 enclosure, confirmed that everything worked perfectly, and marked the v1.3 jig verified on 2026-09-25.
 

@@ -1,12 +1,16 @@
-# Enclosure v1.3
+# Enclosure v1.4
 
-**Status: physically verified on 2026-09-25.** The owner printed the complete enclosure and confirmed that everything worked perfectly. This release retains the exact tested model and sliced project.
+**Status: physically verified on 2026-09-25.** The owner confirmed that all changes are working well. The exact tested model and print project are retained.
+
+ v1.4 moves the two outer closure bolts and captive nuts from (X, Y) = (±79.5, 2) to (±79.5, −13.8) mm. They are now centred along the left and right side edges. The four inner closure fasteners retain their positions. Four narrow upper-shell slots between paired connector collars are filled, joining the brittle wall pairs into continuous ribs (approximately 1.0 mm at the male row and 1.66 mm at the female row).
+
+The verified [v1.3 model](Enclosure-v1.3.FCStd) and [v1.3 print project](Enclosure-full-enclosure-v1.3-Orca-complete.3mf) remain unchanged.
 
 The final keepers omit the small central pad tier. The wider step, deeper cradle and reinforced front sides retain the successful fit.
 
-[FreeCAD model](Enclosure-v1.3.FCStd) · [Full-enclosure 3MF](Enclosure-full-enclosure-v1.3-Orca-complete.3mf)
+[FreeCAD model](Enclosure-v1.4.FCStd) · [Full-enclosure 3MF](Enclosure-full-enclosure-v1.4-Orca-complete.3mf)
 
-v1.3 uses the male connector's inner body after its outer moulded housing is removed.
+Like v1.3, this enclosure uses the male connector's inner body after its outer moulded housing is removed.
 The enclosure is 15.5 mm shallower than v1.2: approximately 58.1 mm instead of 73.6 mm over the curved shell (21% less depth).
 Its width and 32 mm height are unchanged. The female connector seats and their closure screws move 15.5 mm toward the console.
 The male port axes, board, USB socket, and LED window keep their v1.2 positions.
@@ -16,7 +20,7 @@ The nominal smooth connector model does not predict the real cover contact accur
 
 The measured male body is an 18.5 mm diameter circle clipped to 14.3 mm from its flat to the opposite arc.
 Its axial length is 18 mm from the plug shoulder to the back; the 29.9 mm total length leaves an 11.9 mm mating projection.
-The body flat faces up. The mating cross-section and concentric alignment use the inherited reference geometry; the full enclosure was tested with the owner’s stripped connectors.
+The body flat faces up. The mating cross-section and concentric alignment use the inherited reference geometry; the v1.3 enclosure was tested with the owner’s stripped connectors.
 Two generous side-tab insertion pockets and a 7 mm-long keeper relief accommodate the features found during the first physical test.
 The 7 mm relief covers the measured 6.5 mm section behind the plug shoulder with 0.5 mm extra axial clearance.
 The tabs use clearance envelopes inferred from the photographs, not exact measured shapes.
@@ -28,7 +32,7 @@ Opposing keeper towers retain at least 2 mm of wiring space.
 The [v1.3 soldering jig](../SolderingJig/README.md) models the stripped male body and was also marked verified by the owner on 2026-09-25.
 The old jig fits the full outer housing and is not a fit reference for this revision.
 
-The six closure screws are at CAD (X, Y) = (±18, −32.7), (±18, 3), and (±79.5, 2) mm.
+The six closure screws are at CAD (X, Y) = (±18, −32.7), (±18, 3), and (±79.5, −13.8) mm.
 Hardware quantities are unchanged. The board keeper, female keepers, and light window retain their previous shapes.
 The four new male keepers are numbered by port.
 
@@ -41,6 +45,10 @@ Intermediate fit-test models and print projects were removed after the successfu
 
 ## Printing
 
+The final gap-fill change affects only the upper shell compared with the first v1.4 prototype. The reinforced version is the retained, verified release.
+
+To update a printed v1.3 enclosure, reprint **LowerShell, UpperShell, MalePortKeeper1 and MalePortKeeper4**. The two outer keepers need their new local clearance notches. Reuse male keepers 2–3, all female keepers, the board keeper and light window. The complete 3MF still contains all parts; select only the required objects when reusing parts.
+
 The 3MF includes all 12 parts and sliced toolpaths across three plates.
 It uses a Bambu Lab P1S 0.4 mm profile, Supertack bed, 0.16 mm layers, and a 0.20 mm first layer.
 
@@ -50,7 +58,7 @@ It uses a Bambu Lab P1S 0.4 mm profile, Supertack bed, 0.16 mm layers, and a 0.2
 | 2 | Four distinct male keepers, four identical female keepers, and one board keeper, PLA | None |
 | 3 | One optional light window, PETG | None |
 
-The saved profile estimates **5 h 40 min and 129.2 g PLA** for the shells and keepers together. The optional PETG window adds about 9 minutes and 0.8 g.
+The saved profile estimates **5 h 37 min and 130.1 g PLA** for the shells and keepers together. The optional PETG window adds about 9 minutes and 0.8 g.
 
 Parts have their print orientation in millimeters at 100% scale.
 The four male keepers have one through four identification dimples and each fits a specific port.
@@ -126,7 +134,7 @@ The retaining lip surrounds the mating portion near its root.
 Thus, approximately 9.9 mm of the 11.9 mm projection remains beyond the local case face.
 The optional `RearAlignmentGauge.stl` can be regenerated and paired with the four keepers; it is not on the three full-enclosure plates.
 Check seating, clearance around any tabs, retention in both axial directions, and full insertion on the real console before final wiring and assembly.
-These checks passed on the owner’s complete v1.3 print. Repeat them after changes or when using different connector samples.
+These checks passed on the owner’s complete v1.4 print. Repeat them after changes or when using different connector samples.
 
 ## Close the case
 
@@ -145,7 +153,7 @@ Fully disconnect the adapter from all four console ports before connecting USB-C
 
 1. Edit `parameters.json` for exposed dimensions.
 2. Edit `build.py` for geometry changes.
-3. Run `build.FCMacro` in FreeCAD to produce `Enclosure-v1.3.FCStd` and print meshes.
+3. Run `build.FCMacro` in FreeCAD to produce `Enclosure-v1.4.FCStd` and print meshes.
 
 See the [development instructions](../DEVELOPMENT.md) for checks, packaging, and slicing.
 The saved model parameter snapshot does not recompute the design on its own.

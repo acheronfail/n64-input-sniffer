@@ -1,4 +1,4 @@
-"""Build a clean v1.3 multi-plate Orca project with the retained v1.0 release profiles."""
+"""Build a clean v1.4 multi-plate Orca project with the retained v1.0 release profiles."""
 from pathlib import Path
 import zipfile,json,uuid,xml.etree.ElementTree as E,numpy as np,argparse
 parser=argparse.ArgumentParser(description=__doc__)
@@ -8,13 +8,13 @@ mode.add_argument('--single-keeper',action='store_true',help='Print only product
 mode.add_argument('--fit-test',action='store_true',help='Only the four-port gauge and four pressure-pad keepers, on one plate')
 args=parser.parse_args()
 test_mode=args.fit_test or args.single_keeper or args.single_port
-project_stem='Enclosure-v1.3-single-port' if args.single_port else 'Enclosure-v1.3-single-keeper' if args.single_keeper else 'Enclosure-v1.3-fit-test' if args.fit_test else 'Enclosure-v1.3'
-layout_stem='orca-v1.3-single-port' if args.single_port else 'orca-v1.3-single-keeper' if args.single_keeper else 'orca-v1.3-fit-test' if args.fit_test else 'orca-v1.3'
-r=Path(__file__).resolve().parent;src=r/'print/full-enclosure-v1.3'
+project_stem='Enclosure-v1.4-single-port' if args.single_port else 'Enclosure-v1.4-single-keeper' if args.single_keeper else 'Enclosure-v1.4-fit-test' if args.fit_test else 'Enclosure-v1.4'
+layout_stem='orca-v1.4-single-port' if args.single_port else 'orca-v1.4-single-keeper' if args.single_keeper else 'orca-v1.4-fit-test' if args.fit_test else 'orca-v1.4'
+r=Path(__file__).resolve().parent;src=r/'print/full-enclosure-v1.4'
 with zipfile.ZipFile(r/'Enclosure-full-enclosure-v1.0-Orca-complete.3mf') as z:
  settings=json.loads(z.read('Metadata/project_settings.config'))
  content_types=z.read('[Content_Types].xml')
-settings['project_name']='Enclosure v1.3 - single port base and keeper' if args.single_port else 'Enclosure v1.3 - single male keeper' if args.single_keeper else 'Enclosure v1.3 - male keeper fit test' if args.fit_test else 'Enclosure v1.3 - final keepers - M2 nut pause'
+settings['project_name']='Enclosure v1.4 - single port base and keeper' if args.single_port else 'Enclosure v1.4 - single male keeper' if args.single_keeper else 'Enclosure v1.4 - male keeper fit test' if args.fit_test else 'Enclosure v1.4 - centred side closure - M2 nut pause'
 fit_iteration=int(json.loads((r/'parameters.json').read_text()).get('fit_iteration',1))
 settings['project_name']+=f' - fit iteration {fit_iteration}'
 if test_mode:settings['enable_support']='0'

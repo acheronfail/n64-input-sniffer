@@ -6,6 +6,7 @@ V=A.Vector
 ROOT=Path(__file__).resolve().parent
 if str(ROOT) not in sys.path:sys.path.insert(0,str(ROOT))
 from male_reliefs import side_tab_reliefs, front_keeper_relief, cradle_depth_relief
+from gap_fills import inter_port_gap_fills
 P={'port_x':[-63.7,-36,36,63.7],'rear_y':-9.0,'front_y':-62.0,'half_width':84.0,'bottom_z':-16.0,'top_z':16.0,'wall':2.4,'connector_clearance':0.22,'nose_y':7.0,'curve_radius':1450.0,'pcb_width':18.0,'pcb_length':22.52,'pcb_thickness':1.6,'pcb_z':-8.6,'pcb_front_y':-59.0,'pcb_clearance':0.2,'keeper_gap':0.15,'keeper_thickness':1.8,'seam_gap':0.16,'usb_opening_width':10.0,'usb_opening_height':4.0,'usb_corner_radius':0.7,'usb_seam_tab_width':18.0,'usb_seam_inner_y':-58.9,'keeper_head_diameter':4.2,'closure_head_diameter':5.2,'countersink_angle_deg':90.0,'closure_nut_af':4.3,'closure_nut_pocket_z':2.0,'closure_nut_pocket_height':2.0,'pcb_rear_stop_thickness':1.6,'pcb_rear_stop_setback':.8,'male_body_diameter':18.5,'male_body_height':14.3,'male_body_length':18.0,'male_total_length':29.9}
 if (ROOT/'parameters.json').exists(): P.update(json.loads((ROOT/'parameters.json').read_text()))
 (ROOT/'parameters.json').write_text(json.dumps(P,indent=2)+'\n')
@@ -218,7 +219,7 @@ for i,x in enumerate(P.get('male_port_x',P['port_x'])):
  keeper_tab_relief=tab_envelope.cut(tab_roof)
  feature('MaleKeeperTabRelief'+str(i+1),keeper_tab_relief)
  retainer=retainer.cut(tab_envelope).fuse(tab_roof).cut(side_keeper_relief)
- supports=union(posts).cut(side_tab_reliefs(P,i)).cut(cradle_depth_relief(P,i))
+ supports=union(posts).cut(side_tab_reliefs(P,i)).cut(cradle_depth_relief(P,i)).cut(side_keeper_relief)
  # The shortened rear capture band reaches the posts; seat it on their tops.
  retainer=retainer.cut(supports)
  feature('MaleKeeperPosts'+str(i+1),supports)
@@ -333,6 +334,12 @@ for obj in retainer_parts:
  pocket=box(b.XMin-c,b.YMin-c,P['seam_gap'],b.XLength+2*c,b.YLength+2*c,b.ZMax+c-P['seam_gap'])
  # The notched keepers lift around the side bosses. Retain those nut walls.
  lid=lid.cut(pocket.cut(side_boss_envelope))
+# Join the paired thin collar walls across unused slots in the upper shell.
+# These bridges remain outside the keeper service openings.
+if P['inter_port_gap_fill']:
+ gap_bridges=inter_port_gap_fills(P).common(outer)
+ feature('InterPortGapFills',gap_bridges)
+ lid=lid.fuse(gap_bridges)
 base=base.removeSplitter();lid=lid.removeSplitter()
 bo=feature('LowerShell',base,parts);bo.Label='Lower shell · stripped male body seats · independent keeper posts'
 lo=feature('UpperShell',lid,parts);lo.Label='Upper shell · independent connector retention · no clamp hardware'
@@ -382,7 +389,7 @@ for o in [bo,lo,wi,ko,go,gt,bc,fc]:
 for prefix in ['FemalePortKeeper']:
  Mesh.Mesh(D.getObject(prefix+'1').Shape.tessellate(.08)).write(str(ROOT/(prefix+'.stl')))
 for obj in retainer_parts:Mesh.Mesh(obj.Shape.tessellate(.08)).write(str(ROOT/(obj.Name+'.stl')))
-Part.export([bo,lo,wi,ko]+retainer_parts,str(ROOT/'Enclosure-v1.3.step'))
+Part.export([bo,lo,wi,ko]+retainer_parts,str(ROOT/'Enclosure-v1.4.step'))
 Mesh.Mesh(union([hardware[2*i].Shape.fuse(mating_hardware[i].Shape) for i in range(4)]).tessellate(.05)).write(str(ROOT/'MaleConnectorAssembly.stl'))
 # Reuse the embedded display overlay from the tested release. This overlay is optional.
 # It does not certify clearance after changes to geometry or connector spacing.
@@ -406,6 +413,6 @@ full.translate(V(-120-P.get('male_port_x',P['port_x'])[0],-(P['nose_y']+bow(P['p
 assert full.isValid() and len(full.Solids)==1
 full.exportStep(str(ROOT/'ControllerPortMale.step'))
 
-D.recompute();D.saveAs(str(ROOT/'Enclosure-v1.3.FCStd'))
+D.recompute();D.saveAs(str(ROOT/'Enclosure-v1.4.FCStd'))
 
 print(json.dumps(report,indent=2))

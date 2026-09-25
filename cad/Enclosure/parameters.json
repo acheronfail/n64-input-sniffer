@@ -78,11 +78,11 @@
     ],
     [
       -79.5,
-      2
+      -13.8
     ],
     [
       79.5,
-      2
+      -13.8
     ]
   ],
   "closure_boss_radius": 4.3,
@@ -104,10 +104,11 @@
   "male_keeper_front_relief_length": 7.0,
   "male_keeper_front_relief_top_z": 11.5,
   "male_pressure_pad_center_backshift": 1.75,
-  "fit_iteration": 4,
+  "fit_iteration": 2,
   "male_tab_keeper_roof_z": 7.0,
   "male_cradle_extra_depth": 1.5,
   "male_keeper_front_relief_width": 22.8,
   "male_pressure_pad_extension": 1.5,
-  "male_pressure_pad_enabled": false
+  "male_pressure_pad_enabled": false,
+  "inter_port_gap_fill": true
 }
