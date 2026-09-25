@@ -6,6 +6,21 @@ The adapter reads input from up to four Nintendo 64 (N64) controllers and shows 
 It connects between the console and controllers without changing their signals.
 The console must run and poll the controllers for input to appear.
 
+## Parts list
+
+For one complete four-controller adapter with the [verified v1.4 enclosure](cad/Enclosure/README.md):
+
+| Quantity     | Part                                                            | Notes / source                                                                                                                                                                                          |
+| ------------ | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1            | ESP32-S3 Super Mini                                             | Brains!                                                                                                                                                                                                 |
+| 4            | Standalone female N64 controller connectors                     | [Female connectors used for this build](https://www.aliexpress.com/item/1005008958336033.html).                                                                                                         |
+| 4 male plugs | Male N64 connectors cut from donor cables                       | [Donor cables used for this build](https://www.aliexpress.com/item/1005008510879323.html). Cut off the male ends and remove their outer moulded housings; the enclosure holds the smaller inner bodies. |
+| 1            | 470 µF electrolytic capacitor, rated at least 6.3 V             | Connected across the ESP32's 3V3 and GND, as shown below.                                                                                                                                               |
+| 6            | M2 × 20 mm countersunk machine screws / bolts                   | Close the enclosure.                                                                                                                                                                                    |
+| 6            | M2 nuts                                                         | Embedded in the upper shell during the print pause.                                                                                                                                                     |
+| 18           | 2 mm nominal × 8 mm countersunk screws suitable for plastic     | Two for each of the eight connector keepers. And holding the ESP down                                                                                                                                   |
+| 1 set        | Printed enclosure parts                                         | [Print-ready v1.4 3MF](cad/Enclosure/Enclosure-full-enclosure-v1.4-Orca-complete.3mf); the light window is optional.                                                                                    |
+
 ## Setup
 
 ### Wiring
