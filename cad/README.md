@@ -9,6 +9,10 @@ v1.4 moves the two outer closure bolts and captive nuts to the centres of the si
 - [Current printing and assembly instructions](Enclosure/README.md)
 - [v1.4 validation](V1.4-VALIDATION.md)
 
+## Verified two-port alternative
+
+The two-port enclosure uses the v1.4 connector geometry for ports 1 and 2 and mounts the ESP32 upright on the inner side. The owner verified the print, fit, and operation. The release removes the unused capacitor cup from the verified design. [Two-port model, print project, and assembly instructions](Enclosure/TwoPort/README.md)
+
 ## Verified CAD release v1.3
 
 **Status: enclosure and soldering jig physically verified.** The owner printed the complete v1.3 enclosure, confirmed that everything worked perfectly, and marked the v1.3 jig verified on 2026-09-25.
