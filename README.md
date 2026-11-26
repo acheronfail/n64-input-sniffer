@@ -6,6 +6,24 @@ The adapter reads input from up to four Nintendo 64 (N64) controllers and shows 
 It connects between the console and controllers without changing their signals.
 The console must run and poll the controllers for input to appear.
 
+## Enclosure options
+
+### Four-port enclosure
+
+The verified v1.4 enclosure fits all four controller ports. The shell is 168.6 × 58.1 × 32.0 mm.
+
+![Four-port enclosure closed, installed on the N64, and with the lid removed](docs/enclosure-four-port.png)
+
+[Printing and assembly](cad/Enclosure/README.md) · [OrcaSlicer project](cad/Enclosure/Enclosure-full-enclosure-v1.4-Orca-complete.3mf)
+
+### Two-port enclosure
+
+The verified two-port enclosure fits the two left-hand ports and leaves ports 3 and 4 accessible. The shell is 75.5 × 58.1 × 28.2 mm. It uses two male plugs, two female sockets, three M2 closure screws and nuts, and eight keeper screws.
+
+![Two-port enclosure closed, installed on the N64, and with the lid removed](docs/enclosure-two-port.png)
+
+[Printing and assembly](cad/Enclosure/TwoPort/README.md) · [OrcaSlicer project](cad/Enclosure/TwoPort/Enclosure-two-port-Orca-complete.3mf)
+
 ## Parts list
 
 For one complete four-controller adapter with the [verified v1.4 enclosure](cad/Enclosure/README.md):
@@ -27,7 +45,7 @@ For one complete four-controller adapter with the [verified v1.4 enclosure](cad/
 
 > [!WARNING]
 > **Do not connect USB-C while the adapter is connected to the N64 console.**
-> Fully disconnect the adapter from **all four console ports** before connecting USB-C to a computer or USB power source. Disconnect USB-C before reconnecting the adapter to the console.
+> Fully disconnect the adapter from **every console port it plugs into** before connecting USB-C to a computer or USB power source. Disconnect USB-C before reconnecting the adapter to the console.
 >
 > **Turning the console off is not enough.** USB power can backfeed the console’s 3.3V rail and potentially damage hardware. The 100 µF capacitor does not prevent backfeeding.
 
@@ -35,6 +53,7 @@ For one complete four-controller adapter with the [verified v1.4 enclosure](cad/
 
 [Download the wiring diagram (SVG)](docs/n64-esp32-wiring.svg).
 The diagram shows the component side of the Super Mini board, with USB at the top.
+For the two-port adapter, wire ports 1 and 2 using the same pin assignments.
 
 | Connection | ESP32 pin |
 | ---------- | --------- |
@@ -57,7 +76,7 @@ The diagram shows the component side of the Super Mini board, with USB at the to
 
 Install PlatformIO, Node.js 22.12 or later, and npm on your computer.
 
-**Before connecting USB-C, disconnect the adapter from all four console ports—even if the console is off.**
+**Before connecting USB-C, unplug the adapter completely from the console, even if the console is off.**
 
 1. Connect the ESP32 to your computer through USB-C.
 2. From the project directory, build and upload the firmware:
