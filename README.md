@@ -2,6 +2,8 @@
 
 This passthrough adapter shows button presses and stick positions from up to four Nintendo 64 controllers in a browser. Input appears when the console polls the controllers.
 
+[![N64 Spy in minimal mode with simulated controller input and link latency, shown in Classic, Enlarged, and Buttons only](docs/input-viewer-themes.png)](docs/input-viewer-themes.png)
+
 ## Enclosures
 
 ### Four-port
