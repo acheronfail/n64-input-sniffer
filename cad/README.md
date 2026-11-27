@@ -6,7 +6,7 @@ v1.4 moves the two outer closure bolts and captive nuts to the centres of the si
 
 - [v1.4 FreeCAD model](Enclosure/Enclosure-v1.4.FCStd)
 - [v1.4 print project](Enclosure/Enclosure-full-enclosure-v1.4-Orca-complete.3mf)
-- [Current printing and assembly instructions](Enclosure/README.md)
+- [Current printing and assembly instructions](../README.md#four-port)
 - [v1.4 validation](V1.4-VALIDATION.md)
 
 ## Verified two-port alternative
@@ -21,7 +21,6 @@ The two-port enclosure uses the v1.4 connector geometry for ports 1 and 2 and mo
 
 - [v1.3 FreeCAD model](Enclosure/Enclosure-v1.3.FCStd)
 - [v1.3 print-ready 3MF](Enclosure/Enclosure-full-enclosure-v1.3-Orca-complete.3mf)
-- [Printing and assembly](Enclosure/README.md)
 - [Release validation](V1.3-VALIDATION.md)
 - [Development and regeneration](DEVELOPMENT.md)
 

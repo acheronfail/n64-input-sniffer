@@ -6,11 +6,18 @@ This passthrough adapter shows button presses and stick positions from up to fou
 
 ## Enclosures
 
+If you reslice either project, check that the nut-insertion pause comes before the pockets are covered.
+
 ### Four-port
 
 ![Four-port enclosure](docs/enclosure-four-port.png)
 
-[Printing and assembly](cad/Enclosure/README.md) · [OrcaSlicer project](cad/Enclosure/Enclosure-full-enclosure-v1.4-Orca-complete.3mf)
+[OrcaSlicer project](cad/Enclosure/Enclosure-full-enclosure-v1.4-Orca-complete.3mf)
+
+1. Print the shells and keepers in PLA and the optional LED window in translucent PETG. Insert six M2 nuts into the upper shell at the pause on plate 1 (14.12 mm).
+2. Seat the stripped male plugs flat side up. Fit male keepers 1–4 from left to right as viewed from the controller side, then install the female sockets and their keepers. Keep the keeper screw heads flush or recessed.
+3. Check that the adapter seats evenly on the console without force. Follow the [wiring guide](#wiring) for all four ports.
+4. Fit the ESP32 under its keeper with USB-C toward the console. Keep wires clear of the lid and screws. Fit the LED window if using it, then screw the lid closed.
 
 ### Two-port
 
@@ -18,7 +25,7 @@ This passthrough adapter shows button presses and stick positions from up to fou
 
 [OrcaSlicer project](cad/Enclosure/TwoPort/Enclosure-two-port-Orca-complete.3mf)
 
-1. Print the shells and keepers in PLA and the LED window in translucent PETG. Insert the three M2 nuts into the upper shell at the pause on plate 1 (13.16 mm). If you reslice, check that the pause comes before the pockets are covered.
+1. Print the shells and keepers in PLA and the LED window in translucent PETG. Insert the three M2 nuts into the upper shell at the pause on plate 1 (13.16 mm).
 2. Fit the connectors under their keepers and follow the [wiring guide](#wiring) for ports 1 and 2.
 3. Slide the ESP32 into its guides with USB-C toward the console and the components facing the LED window. Slide the window into its slot and screw the lid closed. Remove the lid to access BOOT.
 
