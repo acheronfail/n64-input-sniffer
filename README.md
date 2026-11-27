@@ -16,22 +16,25 @@ This passthrough adapter shows button presses and stick positions from up to fou
 
 ![Two-port enclosure](docs/enclosure-two-port.png)
 
-[Printing and assembly](cad/Enclosure/TwoPort/README.md) · [OrcaSlicer project](cad/Enclosure/TwoPort/Enclosure-two-port-Orca-complete.3mf)
+[OrcaSlicer project](cad/Enclosure/TwoPort/Enclosure-two-port-Orca-complete.3mf)
+
+1. Print the shells and keepers in PLA and the LED window in translucent PETG. Insert the three M2 nuts into the upper shell at the pause on plate 1 (13.16 mm). If you reslice, check that the pause comes before the pockets are covered.
+2. Fit the connectors under their keepers and follow the [wiring guide](#wiring) for ports 1 and 2.
+3. Slide the ESP32 into its guides with USB-C toward the console and the components facing the LED window. Slide the window into its slot and screw the lid closed. Remove the lid to access BOOT.
 
 ## Parts list
 
-These quantities are for the four-port enclosure. See the [two-port assembly guide](cad/Enclosure/TwoPort/README.md#assembly) for its hardware.
-
-| Qty | Part |
-| --- | ---- |
-| 1 | ESP32-S3 Super Mini |
-| 4 | [Female N64 controller sockets](https://www.aliexpress.com/item/1005008958336033.html) |
-| 4 | Male N64 plugs from [donor cables](https://www.aliexpress.com/item/1005008510879323.html), with the outer moulding removed |
-| 1 | 100 µF electrolytic capacitor rated 6.3 V or higher |
-| 6 | M2 × 20 mm countersunk machine screws |
-| 6 | M2 nuts |
-| 18 | 2 × 8 mm countersunk screws for plastic |
-| 1 set | Printed enclosure parts |
+| Four-port | Two-port | Part |
+| :-------: | :------: | ---- |
+| 1 | 1 | ESP32-S3 Super Mini |
+| 4 | 2 | [Female N64 controller sockets](https://www.aliexpress.com/item/1005008958336033.html) |
+| 4 | 2 | Male N64 plugs from [donor cables](https://www.aliexpress.com/item/1005008510879323.html), with the outer moulding removed |
+| 1 | 1 | 100 µF electrolytic capacitor rated 6.3 V or higher |
+| 6 | 3 | M2 × 20 mm countersunk machine screws |
+| 6 | 3 | M2 nuts |
+| 16 | 8 | 2 × 8 mm countersunk screws for plastic (port keepers) |
+| 2 | — | M2 × 8 mm screws for plastic (board keeper) |
+| 1 set | 1 set | Printed enclosure parts |
 
 ## Setup
 

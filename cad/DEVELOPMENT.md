@@ -102,6 +102,15 @@ The checks fail if changed dimensions or settings invalidate the fixed layout, 1
 If this occurs, update the layout and pause checks together.
 Then inspect the new slice.
 
+## Two-port enclosure
+
+Build from the v1.4 model with FreeCAD's Python interpreter. Package the seven exported parts with Python and NumPy to create an unsliced OrcaSlicer project with the three-nut pause.
+
+```sh
+python cad/Enclosure/TwoPort/build.py --output cad/Enclosure/print/two-port/Enclosure-two-port.FCStd --print-directory cad/Enclosure/print/two-port
+python cad/Enclosure/TwoPort/make_project.py cad/Enclosure/print/two-port cad/Enclosure/print/two-port/TwoPort-Orca-input.3mf
+```
+
 ## Optional male fit tests
 
 The verified v1.3 design has `male_pressure_pad_enabled=false`: the small central tier is omitted and the wider step remains. Its disabled parameters and construction reference are retained for reproducible geometry checks. The cradle has 1.5 mm extra depth, side-tab pockets remain open underneath, and the 22.8 mm internal shoulder pocket leaves nominal 1.9 mm side walls.

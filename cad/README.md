@@ -11,7 +11,9 @@ v1.4 moves the two outer closure bolts and captive nuts to the centres of the si
 
 ## Verified two-port alternative
 
-The two-port enclosure uses the v1.4 connector geometry for ports 1 and 2 and mounts the ESP32 upright on the inner side. The owner verified the print, fit, and operation. The release removes the unused capacitor cup from the verified design. [Two-port model, print project, and assembly instructions](Enclosure/TwoPort/README.md)
+The two-port enclosure uses the v1.4 connector geometry for ports 1 and 2 and mounts the ESP32 upright on the inner side. The owner verified the print, fit, and operation. The release removes the unused capacitor cup from the verified design.
+
+[FreeCAD model](Enclosure/TwoPort/Enclosure-two-port.FCStd) · [OrcaSlicer project](Enclosure/TwoPort/Enclosure-two-port-Orca-complete.3mf) · [Assembly](../README.md#two-port) · [Regeneration](DEVELOPMENT.md#two-port-enclosure)
 
 ## Verified CAD release v1.3
 
